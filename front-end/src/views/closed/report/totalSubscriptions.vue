@@ -1,0 +1,5 @@
+<template>
+
+Total Subscriptions
+
+</template>
