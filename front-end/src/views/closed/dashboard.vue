@@ -142,7 +142,7 @@
 
     <div class="flex flex-1 overflow-hidden relative">
       <!-- Desktop Sidebar -->
-      <aside class="hidden lg:flex flex-col w-52 shrink-0 bg-white border-r border-slate-100 h-full overflow-y-auto sidebar-scroll">
+      <aside class="hidden lg:flex flex-col w-86 shrink-0 bg-white border-r border-slate-100 h-full overflow-y-auto sidebar-scroll">
         <Sidebar />
       </aside>
 

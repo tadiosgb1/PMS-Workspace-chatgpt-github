@@ -14,108 +14,150 @@
               Setting up your Alpha PMS subscription
               <span v-if="selectedPlanName" class="ml-1">— <span class="text-primary font-semibold">{{ selectedPlanName }}</span></span>
             </p>
+            <!-- Step indicator -->
+            <div class="flex items-center gap-2 mt-4">
+              <div
+                class="flex items-center gap-1.5"
+                :class="currentStep === 1 ? 'text-primary' : 'text-slate-400'"
+              >
+                <span
+                  class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border"
+                  :class="currentStep === 1 ? 'bg-primary text-white border-primary' : 'bg-slate-100 border-slate-300'"
+                >1</span>
+                <span class="text-xs font-semibold uppercase tracking-wider">Company</span>
+              </div>
+              <div class="flex-1 h-px bg-slate-200"></div>
+              <div
+                class="flex items-center gap-1.5"
+                :class="currentStep === 2 ? 'text-primary' : 'text-slate-400'"
+              >
+                <span
+                  class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border"
+                  :class="currentStep === 2 ? 'bg-primary text-white border-primary' : 'bg-slate-100 border-slate-300'"
+                >2</span>
+                <span class="text-xs font-semibold uppercase tracking-wider">Contact Person</span>
+              </div>
+            </div>
           </div>
 
-          <form @submit.prevent="submitForm" class="space-y-5">
+          <form @submit.prevent="handleFormAction" class="space-y-5">
 
-            <!-- Name row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- ═══════════ STEP 1: Company Info ═══════════ -->
+            <template v-if="currentStep === 1">
               <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">First Name</label>
-                <input v-model="form.first_name" required placeholder="First name" class="field" />
+                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Company Name</label>
+                <input v-model="form.company_name" required placeholder="Company name" class="field" />
               </div>
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Middle Name</label>
-                <input v-model="form.middle_name" placeholder="Middle name" class="field" />
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">TIN Number</label>
+                  <input v-model="form.tin_number" required placeholder="TIN number" class="field" />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Business License</label>
+                  <input v-model="form.business_license" required placeholder="Business license number" class="field" />
+                </div>
               </div>
-            </div>
+            </template>
 
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Last Name</label>
-              <input v-model="form.last_name" required placeholder="Family name" class="field" />
-            </div>
+            <!-- ═══════════ STEP 2: Contact Person ═══════════ -->
+            <template v-else-if="currentStep === 2">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">First Name</label>
+                  <input v-model="form.contact_person.first_name" required placeholder="First name" class="field" />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Middle Name</label>
+                  <input v-model="form.contact_person.middle_name" placeholder="Middle name" class="field" />
+                </div>
+              </div>
 
-            <!-- Contact row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Email Address</label>
-                <div class="relative group">
-                  <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-primary transition-colors"></i>
+              
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Email Address</label>
                   <input
-                    v-model="form.email"
+                    v-model="form.contact_person.email"
                     type="email"
                     required
                     placeholder="you@example.com"
-                    class="field pl-9"
+                    class="field"
                     :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-300': emailExistsError }"
                   />
+                  <p v-if="emailExistsError" class="text-xs font-medium text-red-600">{{ emailExistsError }}</p>
                 </div>
-                <p v-if="emailExistsError" class="text-xs font-medium text-red-600">{{ emailExistsError }}</p>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Phone Number</label>
-                <div class="relative group">
-                  <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-primary transition-colors"></i>
-                  <input v-model="form.phone_number" type="tel" required placeholder="+251..." class="field pl-9" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Password row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Password</label>
-                <div class="relative group">
-                  <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-primary transition-colors"></i>
-                  <input v-model="form.password" type="password" required placeholder="Create a password" class="field pl-9" />
-                </div>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Confirm Password</label>
-                <div class="relative group">
-                  <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-primary transition-colors"></i>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Phone Number</label>
                   <input
-                    v-model="form.confirmPassword"
+                    v-model="form.contact_person.phone_number"
+                    type="tel"
+                    required
+                    placeholder="+251..."
+                    class="field"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Password</label>
+                  <input
+                    v-model="form.contact_person.password"
+                    type="password"
+                    required
+                    placeholder="Create a password"
+                    class="field"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Confirm Password</label>
+                  <input
+                    v-model="form.contact_person.confirmPassword"
                     type="password"
                     required
                     placeholder="Repeat password"
-                    class="field pl-9"
+                    class="field"
                     :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-300': passwordMismatch }"
                   />
-                </div>
-                <p v-if="passwordMismatch" class="text-xs font-medium text-red-600">Passwords do not match</p>
-              </div>
-            </div>
-
-            <!-- Membership dates -->
-            <div class="border border-slate-100 rounded p-5 bg-slate-50">
-              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Membership Period</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="space-y-1.5">
-                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Start Date</label>
-                  <input v-model="form.start_date" type="date" class="field" />
-                </div>
-                <div class="space-y-1.5">
-                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">End Date</label>
-                  <input v-model="form.end_date" type="date" class="field" />
+                  <p v-if="passwordMismatch" class="text-xs font-medium text-red-600">Passwords do not match</p>
                 </div>
               </div>
-            </div>
+            </template>
 
+            <!-- Navigation buttons -->
             <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
               <p class="text-xs text-slate-500">
                 Already have an account?
                 <router-link to="/login" class="text-primary font-medium hover:underline ml-1">Sign in</router-link>
               </p>
-              <button
-                type="submit"
-                :disabled="loading"
-                class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded font-semibold text-sm transition-all duration-150 active:bg-slate-950 disabled:opacity-60 flex items-center justify-center gap-2"
-              >
-                <div v-if="loading" class="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                {{ loading ? 'Creating Account...' : 'Complete Registration' }}
-                <i v-if="!loading" class="fas fa-arrow-right text-xs"></i>
-              </button>
+
+              <div class="flex items-center gap-3 w-full sm:w-auto">
+                <button
+                  v-if="currentStep > 1"
+                  type="button"
+                  @click="goBack"
+                  class="w-full sm:w-auto border border-slate-300 hover:bg-slate-50 text-slate-700 px-6 py-3 rounded font-semibold text-sm transition-all duration-150"
+                >
+                  Back
+                </button>
+
+                <button
+                  type="submit"
+                  :disabled="loading"
+                  class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded font-semibold text-sm transition-all duration-150 active:bg-slate-950 disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  <div v-if="loading" class="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <template v-if="currentStep === 1">
+                    Next
+                  </template>
+                  <template v-else>
+                    {{ loading ? 'Creating Account...' : 'Complete Registration' }}
+                  </template>
+                </button>
+              </div>
             </div>
 
           </form>
@@ -172,7 +214,7 @@
               <h3 class="text-lg font-bold text-slate-900">Verify Your Phone</h3>
               <p class="text-xs text-slate-500 leading-relaxed">
                 We sent a one-time code to<br />
-                <span class="font-semibold text-slate-700">{{ form.phone_number }}</span>
+                <span class="font-semibold text-slate-700">{{ form.contact_person.phone_number }}</span>
               </p>
             </div>
 
@@ -234,17 +276,20 @@ export default {
   components: { NavBar, LandingFooter },
   data() {
     return {
+      currentStep: 1,
       form: {
         plan: null,
-        first_name: "",
-        middle_name: "",
-        last_name: "",
-        email: "",
-        phone_number: "",
-        start_date: "",
-        end_date: "",
-        password: "",
-        confirmPassword: "",
+        company_name: "",
+        tin_number: "",
+        business_license: "",
+        contact_person: {
+          first_name: "",
+          middle_name: "",
+          email: "",
+          phone_number: "",
+          password: "",
+          confirmPassword: "",
+        },
       },
       selectedPlanName: "",
       passwordMismatch: false,
@@ -273,20 +318,51 @@ export default {
     if (this.resendTimer) clearInterval(this.resendTimer);
   },
   methods: {
+    goBack() {
+      if (this.currentStep > 1) {
+        this.currentStep -= 1;
+        this.passwordMismatch = false;
+        this.emailExistsError = "";
+      }
+    },
+
+    handleFormAction() {
+      if (this.currentStep === 1) {
+        // Validate company fields (HTML required handles most; just advance)
+        this.currentStep = 2;
+        return;
+      }
+      // Step 2 → submit
+      this.submitForm();
+    },
+
     // ── Step 1: Register ──────────────────────────────────────────────
     async submitForm() {
       this.passwordMismatch = false;
       this.emailExistsError = "";
 
-      if (this.form.password !== this.form.confirmPassword) {
+      if (this.form.contact_person.password !== this.form.contact_person.confirmPassword) {
         this.passwordMismatch = true;
         return;
       }
 
       this.loading = true;
       try {
-        const payload = { ...this.form };
-        delete payload.confirmPassword;
+        const payload = {
+          plan: this.form.plan,
+          company_name: this.form.company_name,
+          tin_number: this.form.tin_number,
+          business_license: this.form.business_license,
+          contact_person: {
+            first_name: this.form.contact_person.first_name,
+            middle_name: this.form.contact_person.middle_name,
+            last_name: this.form.contact_person.last_name,
+            email: this.form.contact_person.email,
+            phone_number: this.form.contact_person.phone_number,
+            password: this.form.contact_person.password,
+          },
+        };
+
         const response = this.$apiPost("sign_up", payload);
 
         if (response) {
@@ -309,7 +385,7 @@ export default {
 
     // ── Step 2a: Send / Resend OTP ────────────────────────────────────
     async sendOtp() {
-      const payload = { phone_number: this.form.phone_number };
+      const payload = { phone_number: this.form.contact_person.phone_number };
       await this.$apiPost("resend_otp", payload);
     },
 
@@ -338,7 +414,7 @@ export default {
       this.otpError = "";
       try {
         const payload = {
-          phone_number: this.form.phone_number,
+          phone_number: this.form.contact_person.phone_number,
           otp_code: this.otpCode.trim(),
         };
         await this.$apiPost("verify_otp", payload);

@@ -1,21 +1,21 @@
 <template>
   <div>
     <transition name="slide">
-      <aside class="w-52 flex flex-col fixed md:relative z-15 h-full bg-white border-r border-slate-100">
+      <aside class="w-72 flex flex-col fixed md:relative z-15 h-full bg-white border-r border-slate-200 shadow-sm">
 
         <!-- Sidebar Header -->
         <div
           v-if="showTitle"
-          class="flex items-center gap-3 px-4 py-3.5 bg-white border-b border-slate-100 sticky top-0 z-10"
+          class="flex items-center gap-3 px-5 py-4 bg-white border-b border-slate-200 sticky top-0 z-10"
         >
-          <div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-sm">
-            <div class="h-full w-full bg-primary/10 flex items-center justify-center text-primary font-black text-sm">
+          <div class="w-9 h-9 rounded-lg overflow-hidden shrink-0 shadow-sm ring-1 ring-slate-100">
+            <div class="h-full w-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-base">
               α
             </div>
           </div>
-          <div>
-            <p class="text-sm font-black text-slate-800 leading-none">Alpha PMS</p>
-            <p class="text-[9px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">
+          <div class="min-w-0">
+            <p class="text-sm font-bold text-slate-900 leading-none tracking-tight">Alpha PMS</p>
+            <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mt-1 truncate">
               {{ displayRole }}
             </p>
           </div>
@@ -23,51 +23,55 @@
 
         <!-- Navigation Menu -->
         <div class="flex-1 overflow-y-auto py-3 sidebar-inner">
-          <ul class="px-2 space-y-0.5">
+          <ul class="px-3 space-y-0.5">
             <li v-for="(item, index) in filteredMenuItems" :key="item.id || item.name">
 
               <!-- Menu Item with Dropdown Children -->
               <div v-if="item.children && item.children.length > 0">
                 <button
                   @click="toggleMenu(index)"
-                  class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all group"
+                  class="w-full flex items-center justify-between px-3.5 py-2 rounded-lg transition-all duration-150 group"
                   :class="openMenuIndex === index
-                    ? 'bg-primary/30 text-primary'
-                    : 'text-slate-800 hover:bg-slate-100 hover:text-primary'"
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'"
                 >
-                  <div class="flex items-center gap-2.5">
+                  <div class="flex items-center gap-3 min-w-0">
                     <div
-                      class="w-5 h-5 flex items-center justify-center rounded shrink-0"
-                      :class="openMenuIndex === index ? 'text-primary' : 'text-slate-500 group-hover:text-slate-700'"
+                      class="w-7 h-7 flex items-center justify-center rounded-lg shrink-0 transition-colors"
+                      :class="openMenuIndex === index
+                        ? 'bg-blue-100 text-blue-600'
+                        : 'bg-slate-50 text-blue-600 group-hover:bg-blue-50'"
                     >
-                      <i :class="[item.icon, 'text-xs']"></i>
+                      <i :class="[item.icon, 'text-sm']"></i>
                     </div>
-                    <span class="text-xs font-bold tracking-tight">{{ item.name }}</span>
+                    <span class="text-sm font-semibold tracking-tight truncate">{{ item.name }}</span>
                   </div>
                   <i
-                    class="fas text-[10px] transition-transform duration-200 text-slate-400"
-                    :class="openMenuIndex === index ? 'fa-chevron-down' : 'fa-chevron-right'"
+                    class="fas text-[10px] transition-transform duration-200 shrink-0 ml-2"
+                    :class="[
+                      openMenuIndex === index ? 'fa-chevron-down text-blue-500' : 'fa-chevron-right text-slate-400',
+                    ]"
                   ></i>
                 </button>
 
                 <transition name="fade">
                   <ul
                     v-if="openMenuIndex === index"
-                    class="mt-0.5 mb-1 ml-3 pl-3 space-y-0.5 border-l-2 border-slate-200"
+                    class="mt-0.5 mb-1 ml-4 pl-3.5 space-y-0.5 border-l-2 border-blue-100"
                   >
                     <li v-for="child in item.children" :key="child.id || (child.name + child.route)">
                       <router-link
                         :to="{ name: child.route }"
-                        class="flex items-center gap-2 px-2.5 py-2 rounded-md text-xs font-semibold transition-all"
+                        class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150"
                         :class="$route.name === child.route
-                          ? 'bg-primary text-white shadow-sm'
-                          : 'text-slate-700 hover:bg-primary hover:text-white'"
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700'"
                       >
                         <span
                           class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-                          :class="$route.name === child.route ? 'bg-white' : 'bg-slate-300'"
+                          :class="$route.name === child.route ? 'bg-white' : 'bg-blue-300'"
                         ></span>
-                        {{ child.name }}
+                        <span class="truncate">{{ child.name }}</span>
                       </router-link>
                     </li>
                   </ul>
@@ -78,18 +82,20 @@
               <router-link
                 v-else
                 :to="{ name: item.route }"
-                class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-bold transition-all group"
+                class="flex items-center gap-3 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all duration-150 group"
                 :class="$route.name === item.route
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-slate-800 hover:bg-slate-100 hover:text-slate-900'"
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'"
               >
-                <div class="w-5 h-5 flex items-center justify-center shrink-0">
-                  <i
-                    :class="[item.icon, 'text-xs',
-                      $route.name === item.route ? 'text-white' : 'text-slate-500 group-hover:text-slate-700']"
-                  ></i>
+                <div
+                  class="w-7 h-7 flex items-center justify-center rounded-lg shrink-0 transition-colors"
+                  :class="$route.name === item.route
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-slate-50 text-blue-600 group-hover:bg-blue-50'"
+                >
+                  <i :class="[item.icon, 'text-sm']"></i>
                 </div>
-                {{ item.name }}
+                <span class="truncate">{{ item.name }}</span>
               </router-link>
 
             </li>
@@ -118,7 +124,7 @@ export default {
   data() {
     return {
       showTitle: false,
-      userRole: "tenant", 
+      userRole: "tenant",
       userPermissions: [],
       openMenuIndex: null,
 
@@ -130,38 +136,22 @@ export default {
           route: "first-dash",
           icon: "fas fa-gauge"
         },
-        {
-          id: "configurations",
-          name: "Configurations",
-          route: "configurations",
-          icon: "fas fa-gear",
-          explicitRoles: ["superuser"],
-        },
-        // ── User Management ─────────────────────────────────────────────
+      
         {
           id: "user_management",
           name: "User Management",
           icon: "fas fa-users-gear",
           explicitRoles: ["superuser", "owner", "manager", "staff"],
           children: [
-            { name: "Role Management",        route: "groups",           permission: "auth.view_group",       explicitRoles: ["superuser"] },
-            { name: "Permissions Management", route: "permissions_view", permission: "auth.view_permission",  explicitRoles: ["superuser"] },
             { name: "Super Staffs",           route: "user_view",        permission: "pms.view_user",         explicitRoles: ["superuser"] },
             { name: "Owners",                 route: "owners",           explicitRoles: ["superuser"] },
             { name: "Brokers",                route: "brokers",          explicitRoles: ["superuser"] },
             { name: "Property Managers",      route: "managers",         explicitRoles: ["owner"] },
             { name: "Operational Staffs",     route: "staffs",           explicitRoles: ["owner", "manager", "staff"] },
-            { name: "Property Tenants",       route: "tenants",          explicitRoles: ["owner", "manager", "staff", "superuser"] },
+            { name: "Tenants",       route: "tenants",          explicitRoles: ["owner", "manager", "staff", "superuser"] },
           ],
         },
-        // ── Plans & Subscriptions ───────────────────────────────────────
-        {
-          id: "subscriptions",
-          name: "Subscriptions",
-          route: "subscriptions_view",
-          icon: "fas fa-clipboard-list",
-          explicitRoles: ["superuser", "super_staff", "owner"],
-        },
+      
         // ── Properties ──────────────────────────────────────────────────
         {
           id: "properties",
@@ -233,31 +223,64 @@ export default {
           explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
         },
         // ── Finance ─────────────────────────────────────────────────────
+          // ── Plans & Subscriptions ───────────────────────────────────────
+        {
+          id: "subscriptions",
+          name: "Subscriptions",
+          route: "subscriptions_view",
+          icon: "fas fa-clipboard-list",
+          explicitRoles: ["superuser", "super_staff", "owner"],
+        },
         {
           id: "finance",
           name: "Finance",
           icon: "fas fa-coins",
-          route:"payments",
+          route: "payments",
           minRole: "staff",
-          id:"fin_pay"
+          id: "fin_pay"
         },
-        // ── Notifications ───────────────────────────────────────────────
+     
+       
+        // ── User Management ─────────────────────────────────────────────
+     
+
+          {
+          id: "Settings",
+          name: "Settings",
+          icon: "fas fa-users-gear",
+          explicitRoles: ["superuser"],
+          children: [
+            { name: "Roles",        route: "groups",           permission: "auth.view_group",       explicitRoles: ["superuser"] },
+            { name: "Permissions ", route: "permissions_view", permission: "auth.view_permission",  explicitRoles: ["superuser"] },
+
+             {
+                id: "configurations",
+                name: "Configurations",
+                route: "configurations",
+                icon: "fas fa-gear",
+                explicitRoles: ["superuser"],
+              },
+          ],
+        },
+
+
+           // ── Notifications ───────────────────────────────────────────────
         {
           id: "notifications",
           name: "Notifications",
-          route:"notifications",
+          route: "notifications",
           icon: "fas fa-bell",
           minRole: "manager",
-         
         },
+
       ],
     };
   },
 
   computed: {
     displayRole() {
-      if (!this.userRole) return 'Portal';
-      return this.userRole.replace('_', ' ');
+      if (!this.userRole) return "Portal";
+      return this.userRole.replace("_", " ");
     },
 
     isPMSContext() {
@@ -273,22 +296,19 @@ export default {
         .map(item => {
           let parentName = item.name;
 
-          // Rename parent labels for PMS context (owner/manager/staff)
           if (this.isPMSContext) {
-            if (item.id === 'properties')    parentName = 'My Properties';
-            if (item.id === 'cowork_spaces') parentName = 'My Co-work Spaces';
-            if (item.id === 'rentals')       parentName = 'My Rentals';
-            if (item.id === 'finance')       parentName = 'My Finance';
+            if (item.id === "properties")    parentName = "My Properties";
+            if (item.id === "cowork_spaces") parentName = "My Co-work Spaces";
+            if (item.id === "rentals")       parentName = "My Rentals";
+            if (item.id === "finance")       parentName = "My Finance";
           }
 
-          // No children — just filter by role/permission
           if (!item.children) {
             if (!this.isRoleAllowed(item.minRole, item.explicitRoles)) return null;
             if (item.permission && !this.checkPermission(item.permission)) return null;
             return { ...item, name: parentName };
           }
 
-          // Filter and (optionally) rename children
           const filteredChildren = item.children
             .filter(child => {
               if (!this.isRoleAllowed(child.minRole || item.minRole, child.explicitRoles)) return false;
@@ -298,16 +318,15 @@ export default {
             .map(child => {
               let childName = child.name;
 
-              // PMS context label overrides
               if (this.isPMSContext) {
-                if (child.id === 'prop_zones')   childName = 'My Zones';
-                if (child.id === 'prop_list')    childName = 'My Properties';
-                if (child.id === 'co_spaces')    childName = 'Co-work Spaces';
-                if (child.id === 'co_rentals')   childName = 'Workspace Rentals';
-                if (child.id === 'co_payments')  childName = 'Rental Payments';
-                if (child.id === 'rent_house')   childName = 'House Rentals';
-                if (child.id === 'rent_pay')     childName = 'Rent Payments';
-                if (child.id === 'fin_pay')      childName = 'All Payments';
+                if (child.id === "prop_zones")   childName = "My Zones";
+                if (child.id === "prop_list")    childName = "My Properties";
+                if (child.id === "co_spaces")    childName = "Co-work Spaces";
+                if (child.id === "co_rentals")   childName = "Workspace Rentals";
+                if (child.id === "co_payments")  childName = "Rental Payments";
+                if (child.id === "rent_house")   childName = "House Rentals";
+                if (child.id === "rent_pay")     childName = "Rent Payments";
+                if (child.id === "fin_pay")      childName = "All Payments";
               }
 
               return { ...child, name: childName };
@@ -353,12 +372,11 @@ export default {
       const isSuperuser = localStorage.getItem("is_superuser") === "true";
       const storedRole = localStorage.getItem("role");
       let groups = [];
-      
+
       try {
         const rawGroups = localStorage.getItem("groups");
         if (rawGroups) {
-          // Cleans up any potential syntax formatting mistakes like groups["owner"] or literal arrays safely
-          const cleanRaw = rawGroups.replace(/groups\s*\[/, '[');
+          const cleanRaw = rawGroups.replace(/groups\s*\[/, "[");
           groups = JSON.parse(cleanRaw);
         }
       } catch (e) {
@@ -417,10 +435,10 @@ export default {
 
 .sidebar-inner {
   scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
-.sidebar-inner::-webkit-scrollbar        { width: 3px; }
+.sidebar-inner::-webkit-scrollbar        { width: 4px; }
 .sidebar-inner::-webkit-scrollbar-track  { background: transparent; }
 .sidebar-inner::-webkit-scrollbar-thumb  { background-color: #e2e8f0; border-radius: 99px; }
-.sidebar-inner:hover::-webkit-scrollbar-thumb { background-color: #cbd5e1; }
+.sidebar-inner:hover::-webkit-scrollbar-thumb { background-color: #94a3b8; }
 </style>

@@ -49,7 +49,7 @@
     </div>
   </div>
       <!-- ── KPI Cards ──────────────────────────────────────────────── -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-10 gap-2">
+    <!-- <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-10 gap-2">
   <div 
     v-for="kpi in kpis" 
     :key="kpi.label"
@@ -67,10 +67,10 @@
       {{ kpi.sub }}
     </p>
   </div>
-</div>
+</div> -->
 
       <!-- ── Tabs ──────────────────────────────────────────────────── -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="bg-white  border border-slate-200 shadow-sm overflow-hidden">
         <div class="border-b border-slate-100 flex gap-0.5 px-3 pt-3 overflow-x-auto">
           <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key"
             class="flex items-center gap-1.5 px-3 py-2.5 text-[11px] font-bold rounded-t-lg border-b-2 whitespace-nowrap transition-all"
@@ -568,9 +568,7 @@ export default {
         { key: "rents",         label: "Rents",            icon: "fas fa-file-contract",  count: this.rents.length },
         { key: "rent_payments", label: "Rent Payments",    icon: "fas fa-coins",          count: this.rentPayments.length },
         { key: "sales",         label: "Property Sales",   icon: "fas fa-tags",           count: this.sales.length },
-        { key: "subscriptions", label: "Subscriptions",    icon: "fas fa-layer-group",    count: this.subscriptions.length },
-        { key: "sub_payments",  label: "Sub Payments",     icon: "fas fa-receipt",        count: this.subPayments.length },
-        { key: "maintenance",   label: "Maintenance",      icon: "fas fa-screwdriver-wrench", count: this.maintenance.length },
+       { key: "maintenance",   label: "Maintenance",      icon: "fas fa-screwdriver-wrench", count: this.maintenance.length },
       ];
     },
     kpis() {
