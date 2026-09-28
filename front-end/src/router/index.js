@@ -1,34 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-// Utility function to detect tenant context
-// Function updated to precisely match your target domains: alphapms.com
-function getTenantContext() {
-  const { hostname, pathname, port } = window.location;
-  const baseSaaSAppDomain = 'alphapms.com'; 
-
-  // 1. Port Fallbacks (For local port-based dev testing)
-  if (port === '7001') return 'saas-owner';
-  if (['7002', '7003', '7004', '7005'].includes(port)) return 'real-estate-owner';
-
-  // 2. Exact Production/Local Domain Checks
-  const lowerHost = hostname.toLowerCase();
-
-  // If visiting admin.alphapms.com
-  if (lowerHost === 'admin.alphapms.com') {
-    return 'saas-owner';
-  }
-
-  // If visiting client.alphapms.com or a wildcard tenant subdomain (e.g., company.alphapms.com)
-  if (lowerHost.endsWith('alphapms.com') && lowerHost !== baseSaaSAppDomain) {
-    return 'real-estate-owner';
-  }
-
-  // If visiting the bare root platform domain (alphapms.com)
-  if (lowerHost === baseSaaSAppDomain) {
-    return 'real-estate-owner'; // Lands them on the main marketing page
-  }
-  return 'saas-estate-owner'; // Default safety fallback
-}
+import { getTenantContext, isAdminTenant } from '../composables/useTenant.js';
 // --- Views Imports ---
 import Login from '../views/opened/auth/login.vue'
 import Pricing from '../views/opened/landing/PricingPage.vue'
@@ -361,17 +333,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem("access");
   const userRole = localStorage.getItem("role");
-  const tenantType = getTenantContext();
+  const tenantType = getTenantContext().tenantType;
 
   // 1. DYNAMIC INITIAL LOAD INTERCEPTION (The core request)
   if (to.path === "/") {
-    if (tenantType === 'saas-owner') {
-      // Direct SaaS owner right to the login clean view
-      return next("/login");
-    } else {
-      // Direct Client Domain visitors to the public marketing/landing Home page
-      return next();
+    if (tenantType === 'admin') {
+      return next('/login');
     }
+    return next();
   }
 
   // 2. STANDARD AUTHENTICATION GUARDS
