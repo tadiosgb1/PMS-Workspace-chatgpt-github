@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import { getTenantContext, isAdminTenant } from '../composables/useTenant.js';
+import { getTenantContext } from '../composables/useTenant.js';
 // --- Views Imports ---
 import Login from '../views/opened/auth/login.vue'
 import Pricing from '../views/opened/landing/PricingPage.vue'
