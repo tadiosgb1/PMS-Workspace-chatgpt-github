@@ -6,13 +6,13 @@
   "scripts": {
     "dev": "vite",
     "dev:admin": "vite --mode admin --host 0.0.0.0 --port 3000 --strictPort",
-    "dev:portal": "vite --mode portal --host 0.0.0.0 --port 3001 --strictPort",
+    "dev:client": "vite --mode client --host 0.0.0.0 --port 3001 --strictPort",
     "build": "vite build",
     "build:admin": "vite build --mode admin",
-    "build:portal": "vite build --mode portal",
+    "build:client": "vite build --mode client",
     "preview": "vite preview",
     "preview:admin": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
-    "preview:portal": "vite preview --host 0.0.0.0 --port 3001 --strictPort"
+    "preview:client": "vite preview --host 0.0.0.0 --port 3001 --strictPort"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",
