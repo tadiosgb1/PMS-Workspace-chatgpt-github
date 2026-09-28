@@ -1,49 +1,42 @@
 // src/composables/useTenant.js
 
+const ADMIN_HOST = 'adminproperty.alpha.com.et';
+const PORTAL_HOST = 'property.alpha.com.et';
+
+export function getTenantContext() {
+  const { hostname, port } = window.location;
+  const lowerHost = hostname.toLowerCase();
+
+  // Development: port identifies the application.
+  if (port === '3000') {
+    return { tenantType: 'admin', tenantId: 'admin' };
+  }
+
+  if (port === '3001') {
+    return { tenantType: 'portal', tenantId: 'property' };
+  }
+
+  // Production: hostname identifies the application.
+  if (lowerHost === ADMIN_HOST) {
+    return { tenantType: 'admin', tenantId: 'admin' };
+  }
+
+  if (lowerHost === PORTAL_HOST) {
+    return { tenantType: 'portal', tenantId: 'property' };
+  }
+
+  // Safe default: unknown hosts use the public portal.
+  return { tenantType: 'portal', tenantId: 'property' };
+}
+
+export function isAdminTenant() {
+  return getTenantContext().tenantType === 'admin';
+}
+
+export function isPortalTenant() {
+  return getTenantContext().tenantType === 'portal';
+}
+
 export function useTenant() {
-  const { hostname, pathname, port } = window.location;
-
-  // Define your base SaaS domain (update this for production)
-  const baseSaaSAppDomain = 'propertymsaas.com'; 
-
-  let tenantType = 'client'; // default fallback
-  let tenantId = null;
-
-  // 1. PORT-BASED DETECTION (Local Dev)
-  if (port === '7001') {
-    return { tenantType: 'saas-owner', tenantId: 'admin' };
-  }
-  if (['7002', '7003', '7004', '7005'].includes(port)) {
-    return { tenantType: 'client', tenantId: 'localhost-client' };
-  }
-
-  // 2. PATH-BASED FALLBACK (Useful for testing)
-  if (pathname.startsWith('/saas-admin')) {
-    return { tenantType: 'saas-owner', tenantId: 'admin' };
-  }
-
-  // 3. DOMAIN / SUBDOMAIN DETECTION (Production/Staging)
-  // Split hostname into parts: ['subdomain', 'propertymsaas', 'com']
-  const parts = hostname.toLowerCase().split('.');
-  
-  if (parts.length > 1) {
-    const firstSubdomain = parts[0];
-
-    // Check if it's explicitly the platform owner portal
-    if (firstSubdomain === 'admin' || firstSubdomain === 'saas') {
-      return { tenantType: 'saas-owner', tenantId: 'admin' };
-    }
-
-    // If it's a custom domain (e.g., 'myrealestate.com' instead of '*.propertymsaas.com')
-    // or a dedicated tenant subdomain (e.g., 'acme.propertymsaas.com')
-    if (hostname !== baseSaaSAppDomain && hostname !== 'localhost') {
-      return { 
-        tenantType: 'client', 
-        tenantId: firstSubdomain // This acts as your client identifier slug
-      };
-    }
-  }
-
-  // Default Fallback
-  return { tenantType: 'saas-owner', tenantId: 'admin' };
+  return getTenantContext();
 }
