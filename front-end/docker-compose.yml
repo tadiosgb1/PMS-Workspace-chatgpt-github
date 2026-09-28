@@ -1,11 +1,65 @@
+name: alpha-pms
+
 services:
   pms:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    image: alpha-pms:latest
     container_name: alpha-pms
     restart: unless-stopped
+    init: true
+
     ports:
-      - "80:80"
+      - "${PMS_HTTP_PORT:-80}:80"
+
     environment:
-      TZ: Africa/Addis_Ababa
+      TZ: ${TZ:-Africa/Addis_Ababa}
+
+    networks:
+      - alpha-pms-network
+
+    volumes:
+      - pms-nginx-cache:/var/cache/nginx
+      - pms-nginx-run:/var/run
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    read_only: true
+
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+
+    stop_grace_period: 10s
+
+networks:
+  alpha-pms-network:
+    name: alpha-pms-network
+    driver: bridge
+
+volumes:
+  pms-nginx-cache:
+    name: alpha-pms-nginx-cache
+  pms-nginx-run:
+    name: alpha-pms-nginx-run
