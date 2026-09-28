@@ -18,11 +18,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
-    // Explicitly allow your multi-tenant domains to clear the security block
     allowedHosts: [
-      'alphapms.com',
-      'admin.alphapms.com',
-      'client.alphapms.com'
+      'property.alpha.com.et',
+      'adminproperty.alpha.com.et'
     ]
   },
 
