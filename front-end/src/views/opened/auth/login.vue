@@ -1,10 +1,6 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-slate-100">
-    <NavBar />
-
-    <div class="h-24"></div>
-
-    <div class="flex-1 flex items-center justify-center px-4 py-16">
+  <div class="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+    <div class="w-full max-w-md py-16">
       <Toast ref="toast" />
 
       <div class="bg-white border border-slate-200 rounded-md w-full max-w-md">
@@ -84,18 +80,15 @@
       </div>
     </div>
 
-    <LandingFooter />
   </div>
 </template>
 
 <script>
 import Toast from "../../../components/Toast.vue";
-import NavBar from "../landing/NavBar.vue";
-import LandingFooter from "../landing/footer.vue";
 
 export default {
   name: "LoginPage",
-  components: { Toast, NavBar, LandingFooter },
+  components: { Toast },
   data() {
     return {
       form: { phone_number: "", password: "" },
