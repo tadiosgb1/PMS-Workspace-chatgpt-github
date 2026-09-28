@@ -5,8 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:admin": "vite --mode admin --host 0.0.0.0 --port 3000 --strictPort",
+    "dev:portal": "vite --mode portal --host 0.0.0.0 --port 3001 --strictPort",
     "build": "vite build",
-    "preview": "vite preview"
+    "build:admin": "vite build --mode admin",
+    "build:portal": "vite build --mode portal",
+    "preview": "vite preview",
+    "preview:admin": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
+    "preview:portal": "vite preview --host 0.0.0.0 --port 3001 --strictPort"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",
@@ -54,7 +60,7 @@
     "vite": "^4.5.3",
     "vite-plugin-commonjs": "^0.10.4"
   },
-  "description": "This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.",
+  "description": "This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 <script setup> SFCs.",
   "main": "postcss.config.js",
   "keywords": [],
   "author": "",
