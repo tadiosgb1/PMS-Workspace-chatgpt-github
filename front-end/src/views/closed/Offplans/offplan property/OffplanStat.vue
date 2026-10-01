@@ -1,0 +1,2 @@
+<template><div class="bg-white p-5"><p class="text-[11px] font-bold uppercase tracking-wide text-slate-400">{{ label }}</p><p class="mt-2 break-words text-lg font-black text-slate-900">{{ value }}</p></div></template>
+<script>export default { name:"OffplanStat", props:{label:{type:String,required:true},value:{type:[String,Number],default:"—"}} };</script>
