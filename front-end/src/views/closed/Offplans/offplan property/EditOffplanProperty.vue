@@ -116,6 +116,12 @@ export default {
       loadingData: false,
       saving: false,
       error: "",
+      zones: [],
+      owners: [],
+      managers: [],
+      zoneSearch: "",
+      ownerSearch: "",
+      managerSearch: "",
       amenityOptions: [
         { key: "is_furnished", label: "Furnished" }, { key: "has_maids_room", label: "Maid’s room" },
         { key: "has_study", label: "Study" }, { key: "has_central_or_ac_and_heating", label: "Central A/C & heating" },
