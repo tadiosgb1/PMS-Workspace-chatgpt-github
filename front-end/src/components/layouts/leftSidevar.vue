@@ -281,26 +281,6 @@ export default {
         },
      
        
-          {
-          id: "Settings",
-          name: "Settings",
-          icon: "fas fa-users-gear",
-          explicitRoles: ["superuser"],
-          children: [
-            { name: "Roles",        route: "groups",           permission: "auth.view_group",       explicitRoles: ["superuser"] },
-            { name: "Permissions ", route: "permissions_view", permission: "auth.view_permission",  explicitRoles: ["superuser"] },
-
-             {
-                id: "configurations",
-                name: "Configurations",
-                route: "configurations",
-                icon: "fas fa-gear",
-                explicitRoles: ["superuser"],
-              },
-          ],
-        },
-
-
            // ── Notifications ───────────────────────────────────────────────
         {
           id: "notifications",
