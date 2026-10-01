@@ -213,6 +213,39 @@ const routes = [
         props: true,
       },
       {
+        path: "offplan-bank-financing",
+        name: "OffplanBankFinancing-view",
+        component: () => import('../views/closed/Offplans/offplan bank financing/ViewOffplanBankFinancing.vue'),
+      },
+      {
+        path: "offplan-bank-financing/detail/:id",
+        name: "OffplanBankFinancing-detail",
+        component: () => import('../views/closed/Offplans/offplan bank financing/OffplanBankFinancingDetail.vue'),
+        props: true,
+      },
+      {
+        path: "offplan-payments",
+        name: "OffplanPayment-view",
+        component: () => import('../views/closed/Offplans/offplan payment/ViewOffplanPayment.vue'),
+      },
+      {
+        path: "offplan-payments/detail/:id",
+        name: "OffplanPayment-detail",
+        component: () => import('../views/closed/Offplans/offplan payment/OffplanPaymentDetail.vue'),
+        props: true,
+      },
+      {
+        path: "offplan-payment-plans",
+        name: "OffplanPaymentPlan-view",
+        component: () => import('../views/closed/Offplans/offplan payment plan/ViewOffplanPaymentPlan.vue'),
+      },
+      {
+        path: "offplan-payment-plans/detail/:id",
+        name: "OffplanPaymentPlan-detail",
+        component: () => import('../views/closed/Offplans/offplan payment plan/OffplanPaymentPlanDetail.vue'),
+        props: true,
+      },
+      {
         path: "tenantspropertsalerequests",
         name: "TenantPropertySaleRequest-view",
         component: () => import('../views/closed/TenantsPropertSaleRequests/TenantPropertySaleRequestView.vue'),
