@@ -130,14 +130,12 @@ export default {
       openMenuIndex: null,
 
       menuItems: [
-        // ── Dashboard ───────────────────────────────────────────────────
         {
           id: "dashboard",
           name: "Dashboard",
           route: "first-dash",
           icon: "fas fa-gauge"
         },
-      
         {
           id: "user_management",
           name: "User Management",
@@ -152,8 +150,6 @@ export default {
             { name: "Tenants",       route: "tenants",          explicitRoles: ["owner", "manager", "staff", "superuser"] },
           ],
         },
-      
-        // ── Properties ──────────────────────────────────────────────────
         {
           id: "properties",
           name: "Properties",
@@ -179,10 +175,6 @@ export default {
             { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin"] },
           ],
         },
-
-// ── Settings ─────────────────────────────────────────────────────
-,
-        // ── Rentals ─────────────────────────────────────────────────────
         {
           id: "rentals",
           name: "Rentals",
@@ -194,8 +186,6 @@ export default {
             { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
           ],
         },
-
-        // ── Sales (superuser sees ALL: broker + tenant + house + payments) ──
         {
           id: "sales_superuser",
           name: "Sales",
@@ -207,8 +197,6 @@ export default {
             { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
           ],
         },
-
-        // ── My Sales (non-superuser: house sales + their payments) ──────
         {
           id: "sales_pms",
           name: "My Sales",
@@ -219,8 +207,6 @@ export default {
             { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
           ],
         },
-
-        // ── Maintenance ─────────────────────────────────────────────────
         {
           id: "maintenance",
           name: "Maintenance Requests",
@@ -228,8 +214,6 @@ export default {
           route: "maintenance-requests",
           explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
         },
-        // ── Finance ─────────────────────────────────────────────────────
-          // ── Plans & Subscriptions ───────────────────────────────────────
         {
           id: "subscriptions",
           name: "Subscriptions",
@@ -245,10 +229,6 @@ export default {
           minRole: "staff",
           id: "fin_pay"
         },
-
-           // ── Notifications ───────────────────────────────────────────────
-,
-        // ── Co-work Spaces ──────────────────────────────────────────────
         {
           id: "cowork_spaces",
           name: "Co-work Spaces",
@@ -260,203 +240,15 @@ export default {
             { id: "co_payments", name: "Payments", route: "coworking-payments" },
           ],
         },
-        // ── Rentals ─────────────────────────────────────────────────────
-        {
-          id: "rentals",
-          name: "Rentals",
-          icon: "fas fa-file-contract",
-          minRole: "manager",
-          children: [
-            { id: "rent_house",   name: "Property Rentals",  route: "rents" },
-            { id: "rent_cowork",  name: "Workspace Rentals", route: "coworking-space-rentals" },
-            { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
-          ],
-        },
 
-        // ── Sales (superuser sees ALL: broker + tenant + house + payments) ──
-        {
-          id: "sales_superuser",
-          name: "Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["superuser", "super_staff"],
-          children: [
-            { id: "sale_broker",   name: "Broker/Tenant For Sale",   route: "BrokerListSales-view" },
-            { id: "sale_house",    name: "House Sales",       route: "propertiesListForSale" },
-            { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
-          ],
-        },
-
-        // ── My Sales (non-superuser: house sales + their payments) ──────
-        {
-          id: "sales_pms",
-          name: "My Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["owner", "manager", "staff"],
-          children: [
-            { id: "my_sale_house", name: "House Sales",    route: "propertiesListForSale" },
-            { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
-          ],
-        },
-
-        // ── Maintenance ─────────────────────────────────────────────────
-        {
-          id: "maintenance",
-          name: "Maintenance Requests",
-          icon: "fas fa-screwdriver-wrench",
-          route: "maintenance-requests",
-          explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
-        },
-        // ── Finance ─────────────────────────────────────────────────────
-          // ── Plans & Subscriptions ───────────────────────────────────────
-        {
-          id: "subscriptions",
-          name: "Subscriptions",
-          route: "subscriptions_view",
-          icon: "fas fa-clipboard-list",
-          explicitRoles: ["superuser", "super_staff", "owner"],
-        },
-        {
-          id: "finance",
-          name: "Finance",
-          icon: "fas fa-coins",
-          route: "payments",
-          minRole: "staff",
-          id: "fin_pay"
-        },
-
-        // ── Settings ─────────────────────────────────────────────────────
-        {
-          id: "Settings",
-          name: "Settings",
-          icon: "fas fa-gear",
-          explicitRoles: ["superuser", "admin"],
-          children: [
-            { name: "Roles", route: "groups", permission: "auth.view_group", explicitRoles: ["superuser"] },
-            { name: "Permissions", route: "permissions_view", permission: "auth.view_permission", explicitRoles: ["superuser"] },
-            {
-              id: "configurations",
-              name: "Configurations",
-              route: "configurations",
-              icon: "fas fa-gear",
-              explicitRoles: ["superuser"],
-            },
-            {
-              id: "brands",
-              name: "Brands",
-              route: "Brands-view",
-              icon: "fas fa-palette",
-              explicitRoles: ["superuser", "admin"],
-            },
-          ],
-        },
-        // ── Co-work Spaces ──────────────────────────────────────────────
-        {
-          id: "cowork_spaces",
-          name: "Co-work Spaces",
-          icon: "fas fa-people-roof",
-          minRole: "manager",
-          children: [
-            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
-            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
-            { id: "co_payments", name: "Payments", route: "coworking-payments" },
-          ],
-        },
-        // ── Rentals ─────────────────────────────────────────────────────
-        {
-          id: "rentals",
-          name: "Rentals",
-          icon: "fas fa-file-contract",
-          minRole: "manager",
-          children: [
-            { id: "rent_house",   name: "Property Rentals",  route: "rents" },
-            { id: "rent_cowork",  name: "Workspace Rentals", route: "coworking-space-rentals" },
-            { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
-          ],
-        },
-
-        // ── Sales (superuser sees ALL: broker + tenant + house + payments) ──
-        {
-          id: "sales_superuser",
-          name: "Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["superuser", "super_staff"],
-          children: [
-            { id: "sale_broker",   name: "Broker/Tenant For Sale",   route: "BrokerListSales-view" },
-            { id: "sale_house",    name: "House Sales",       route: "propertiesListForSale" },
-            { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
-          ],
-        },
-
-        // ── My Sales (non-superuser: house sales + their payments) ──────
-        {
-          id: "sales_pms",
-          name: "My Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["owner", "manager", "staff"],
-          children: [
-            { id: "my_sale_house", name: "House Sales",    route: "propertiesListForSale" },
-            { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
-          ],
-        },
-
-        // ── Maintenance ─────────────────────────────────────────────────
-        {
-          id: "maintenance",
-          name: "Maintenance Requests",
-          icon: "fas fa-screwdriver-wrench",
-          route: "maintenance-requests",
-          explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
-        },
-        // ── Finance ─────────────────────────────────────────────────────
-          // ── Plans & Subscriptions ───────────────────────────────────────
-        {
-          id: "subscriptions",
-          name: "Subscriptions",
-          route: "subscriptions_view",
-          icon: "fas fa-clipboard-list",
-          explicitRoles: ["superuser", "super_staff", "owner"],
-        },
-        {
-          id: "finance",
-          name: "Finance",
-          icon: "fas fa-coins",
-          route: "payments",
-          minRole: "staff",
-          id: "fin_pay"
-        },
-
-        {
+{
           id: "notifications",
           name: "Notifications",
           route: "notifications",
           icon: "fas fa-bell",
           minRole: "manager",
         },
-        // ── Settings ─────────────────────────────────────────────────────
-        {
-          id: "Settings",
-          name: "Settings",
-          icon: "fas fa-gear",
-          explicitRoles: ["superuser", "admin"],
-          children: [
-            { name: "Roles", route: "groups", permission: "auth.view_group", explicitRoles: ["superuser"] },
-            { name: "Permissions", route: "permissions_view", permission: "auth.view_permission", explicitRoles: ["superuser"] },
-            {
-              id: "configurations",
-              name: "Configurations",
-              route: "configurations",
-              icon: "fas fa-gear",
-              explicitRoles: ["superuser"],
-            },
-            {
-              id: "brands",
-              name: "Brands",
-              route: "Brands-view",
-              icon: "fas fa-palette",
-              explicitRoles: ["superuser", "admin"],
-            },
-          ],
-        }        {
+{
           id: "Settings",
           name: "Settings",
           icon: "fas fa-gear",
@@ -480,18 +272,7 @@ export default {
             },
           ],
         },
-        // ── Co-work Spaces ──────────────────────────────────────────────
-        {
-          id: "cowork_spaces",
-          name: "Co-work Spaces",
-          icon: "fas fa-people-roof",
-          minRole: "manager",
-          children: [
-            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
-            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
-            { id: "co_payments", name: "Payments", route: "coworking-payments" },
-          ],
-        }
+
       ],
     };
   },
