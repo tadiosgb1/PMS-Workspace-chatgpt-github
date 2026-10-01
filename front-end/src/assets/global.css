@@ -9,7 +9,7 @@
 /* 3. Base styles */
 @layer base {
   body {
-    @apply font-sans bg-white text-gray-900;
+    @apply font-sans bg-background text-gray-900;
   }
 }
 
