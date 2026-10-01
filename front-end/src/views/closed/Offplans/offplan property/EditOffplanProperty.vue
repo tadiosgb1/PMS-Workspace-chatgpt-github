@@ -242,7 +242,7 @@ export default {
       this.saving = true;
       this.error = "";
       try {
-        await this.$apiPatch("/update_offplane_property", this.id, { ...this.form });
+        await this.$apiPatch("/update_offplan_property", this.id, { ...this.form });
         this.$emit("saved");
         this.$emit("close");
       } catch (e) {
