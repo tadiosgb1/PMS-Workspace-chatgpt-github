@@ -130,14 +130,12 @@ export default {
       openMenuIndex: null,
 
       menuItems: [
-        // ── Dashboard ───────────────────────────────────────────────────
         {
           id: "dashboard",
           name: "Dashboard",
           route: "first-dash",
           icon: "fas fa-gauge"
         },
-      
         {
           id: "user_management",
           name: "User Management",
@@ -152,8 +150,6 @@ export default {
             { name: "Tenants",       route: "tenants",          explicitRoles: ["owner", "manager", "staff", "superuser"] },
           ],
         },
-      
-        // ── Properties ──────────────────────────────────────────────────
         {
           id: "properties",
           name: "Properties",
@@ -179,45 +175,6 @@ export default {
             { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin"] },
           ],
         },
-
-// ── Settings ─────────────────────────────────────────────────────
-        {
-          id: "Settings",
-          name: "Settings",
-          icon: "fas fa-gear",
-          explicitRoles: ["superuser", "admin"],
-          children: [
-            { name: "Roles", route: "groups", permission: "auth.view_group", explicitRoles: ["superuser"] },
-            { name: "Permissions", route: "permissions_view", permission: "auth.view_permission", explicitRoles: ["superuser"] },
-            {
-              id: "configurations",
-              name: "Configurations",
-              route: "configurations",
-              icon: "fas fa-gear",
-              explicitRoles: ["superuser"],
-            },
-            {
-              id: "brands",
-              name: "Brands",
-              route: "Brands-view",
-              icon: "fas fa-palette",
-              explicitRoles: ["superuser", "admin"],
-            },
-          ],
-        },
-        // ── Co-work Spaces ──────────────────────────────────────────────
-        {
-          id: "cowork_spaces",
-          name: "Co-work Spaces",
-          icon: "fas fa-people-roof",
-          minRole: "manager",
-          children: [
-            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
-            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
-            { id: "co_payments", name: "Payments", route: "coworking-payments" },
-          ],
-        },
-        // ── Rentals ─────────────────────────────────────────────────────
         {
           id: "rentals",
           name: "Rentals",
@@ -229,8 +186,6 @@ export default {
             { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
           ],
         },
-
-        // ── Sales (superuser sees ALL: broker + tenant + house + payments) ──
         {
           id: "sales_superuser",
           name: "Sales",
@@ -242,8 +197,6 @@ export default {
             { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
           ],
         },
-
-        // ── My Sales (non-superuser: house sales + their payments) ──────
         {
           id: "sales_pms",
           name: "My Sales",
@@ -254,8 +207,6 @@ export default {
             { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
           ],
         },
-
-        // ── Maintenance ─────────────────────────────────────────────────
         {
           id: "maintenance",
           name: "Maintenance Requests",
@@ -263,8 +214,6 @@ export default {
           route: "maintenance-requests",
           explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
         },
-        // ── Finance ─────────────────────────────────────────────────────
-          // ── Plans & Subscriptions ───────────────────────────────────────
         {
           id: "subscriptions",
           name: "Subscriptions",
@@ -280,17 +229,26 @@ export default {
           minRole: "staff",
           id: "fin_pay"
         },
-
-           // ── Notifications ───────────────────────────────────────────────
         {
+          id: "cowork_spaces",
+          name: "Co-work Spaces",
+          icon: "fas fa-people-roof",
+          minRole: "manager",
+          children: [
+            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
+            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
+            { id: "co_payments", name: "Payments", route: "coworking-payments" },
+          ],
+        },
+
+{
           id: "notifications",
           name: "Notifications",
           route: "notifications",
           icon: "fas fa-bell",
           minRole: "manager",
         },
-        // ── Settings ─────────────────────────────────────────────────────
-        {
+{
           id: "Settings",
           name: "Settings",
           icon: "fas fa-gear",
@@ -313,182 +271,6 @@ export default {
               explicitRoles: ["superuser", "admin"],
             },
           ],
-        },
-        // ── Co-work Spaces ──────────────────────────────────────────────
-        {
-          id: "cowork_spaces",
-          name: "Co-work Spaces",
-          icon: "fas fa-people-roof",
-          minRole: "manager",
-          children: [
-            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
-            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
-            { id: "co_payments", name: "Payments", route: "coworking-payments" },
-          ],
-        },
-        // ── Rentals ─────────────────────────────────────────────────────
-        {
-          id: "rentals",
-          name: "Rentals",
-          icon: "fas fa-file-contract",
-          minRole: "manager",
-          children: [
-            { id: "rent_house",   name: "Property Rentals",  route: "rents" },
-            { id: "rent_cowork",  name: "Workspace Rentals", route: "coworking-space-rentals" },
-            { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
-          ],
-        },
-
-        // ── Sales (superuser sees ALL: broker + tenant + house + payments) ──
-        {
-          id: "sales_superuser",
-          name: "Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["superuser", "super_staff"],
-          children: [
-            { id: "sale_broker",   name: "Broker/Tenant For Sale",   route: "BrokerListSales-view" },
-            { id: "sale_house",    name: "House Sales",       route: "propertiesListForSale" },
-            { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
-          ],
-        },
-
-        // ── My Sales (non-superuser: house sales + their payments) ──────
-        {
-          id: "sales_pms",
-          name: "My Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["owner", "manager", "staff"],
-          children: [
-            { id: "my_sale_house", name: "House Sales",    route: "propertiesListForSale" },
-            { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
-          ],
-        },
-
-        // ── Maintenance ─────────────────────────────────────────────────
-        {
-          id: "maintenance",
-          name: "Maintenance Requests",
-          icon: "fas fa-screwdriver-wrench",
-          route: "maintenance-requests",
-          explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
-        },
-        // ── Finance ─────────────────────────────────────────────────────
-          // ── Plans & Subscriptions ───────────────────────────────────────
-        {
-          id: "subscriptions",
-          name: "Subscriptions",
-          route: "subscriptions_view",
-          icon: "fas fa-clipboard-list",
-          explicitRoles: ["superuser", "super_staff", "owner"],
-        },
-        {
-          id: "finance",
-          name: "Finance",
-          icon: "fas fa-coins",
-          route: "payments",
-          minRole: "staff",
-          id: "fin_pay"
-        },
-
-        // ── Settings ─────────────────────────────────────────────────────
-        {
-          id: "Settings",
-          name: "Settings",
-          icon: "fas fa-gear",
-          explicitRoles: ["superuser", "admin"],
-          children: [
-            { name: "Roles", route: "groups", permission: "auth.view_group", explicitRoles: ["superuser"] },
-            { name: "Permissions", route: "permissions_view", permission: "auth.view_permission", explicitRoles: ["superuser"] },
-            {
-              id: "configurations",
-              name: "Configurations",
-              route: "configurations",
-              icon: "fas fa-gear",
-              explicitRoles: ["superuser"],
-            },
-            {
-              id: "brands",
-              name: "Brands",
-              route: "Brands-view",
-              icon: "fas fa-palette",
-              explicitRoles: ["superuser", "admin"],
-            },
-          ],
-        },
-        // ── Co-work Spaces ──────────────────────────────────────────────
-        {
-          id: "cowork_spaces",
-          name: "Co-work Spaces",
-          icon: "fas fa-people-roof",
-          minRole: "manager",
-          children: [
-            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
-            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
-            { id: "co_payments", name: "Payments", route: "coworking-payments" },
-          ],
-        },
-        // ── Rentals ─────────────────────────────────────────────────────
-        {
-          id: "rentals",
-          name: "Rentals",
-          icon: "fas fa-file-contract",
-          minRole: "manager",
-          children: [
-            { id: "rent_house",   name: "Property Rentals",  route: "rents" },
-            { id: "rent_cowork",  name: "Workspace Rentals", route: "coworking-space-rentals" },
-            { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
-          ],
-        },
-
-        // ── Sales (superuser sees ALL: broker + tenant + house + payments) ──
-        {
-          id: "sales_superuser",
-          name: "Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["superuser", "super_staff"],
-          children: [
-            { id: "sale_broker",   name: "Broker/Tenant For Sale",   route: "BrokerListSales-view" },
-            { id: "sale_house",    name: "House Sales",       route: "propertiesListForSale" },
-            { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
-          ],
-        },
-
-        // ── My Sales (non-superuser: house sales + their payments) ──────
-        {
-          id: "sales_pms",
-          name: "My Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["owner", "manager", "staff"],
-          children: [
-            { id: "my_sale_house", name: "House Sales",    route: "propertiesListForSale" },
-            { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
-          ],
-        },
-
-        // ── Maintenance ─────────────────────────────────────────────────
-        {
-          id: "maintenance",
-          name: "Maintenance Requests",
-          icon: "fas fa-screwdriver-wrench",
-          route: "maintenance-requests",
-          explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
-        },
-        // ── Finance ─────────────────────────────────────────────────────
-          // ── Plans & Subscriptions ───────────────────────────────────────
-        {
-          id: "subscriptions",
-          name: "Subscriptions",
-          route: "subscriptions_view",
-          icon: "fas fa-clipboard-list",
-          explicitRoles: ["superuser", "super_staff", "owner"],
-        },
-        {
-          id: "finance",
-          name: "Finance",
-          icon: "fas fa-coins",
-          route: "payments",
-          minRole: "staff",
-          id: "fin_pay"
         },
 
       ],
@@ -608,123 +390,8 @@ export default {
     });
   },
 };
-      ],
-    };
-  },
+</script>
 
-  computed: {
-    displayRole() {
-      if (!this.userRole) return "Portal";
-      return this.userRole.replace("_", " ");
-    },
-
-    isPMSContext() {
-      return ["owner", "manager", "staff"].includes(this.userRole);
-    },
-
-    isSaaSContext() {
-      return ["superuser", "super_staff"].includes(this.userRole);
-    },
-
-    filteredMenuItems() {
-      return this.menuItems
-        .map(item => {
-          let parentName = item.name;
-
-          if (this.isPMSContext) {
-            if (item.id === "properties")    parentName = "My Properties";
-            if (item.id === "cowork_spaces") parentName = "My Co-work Spaces";
-            if (item.id === "rentals")       parentName = "My Rentals";
-            if (item.id === "finance")       parentName = "My Finance";
-          }
-
-          if (!item.children) {
-            if (!this.isRoleAllowed(item.minRole, item.explicitRoles)) return null;
-            if (item.permission && !this.checkPermission(item.permission)) return null;
-            return { ...item, name: parentName };
-          }
-
-          const filteredChildren = item.children
-            .filter(child => {
-              if (!this.isRoleAllowed(child.minRole || item.minRole, child.explicitRoles)) return false;
-              if (child.permission && !this.checkPermission(child.permission)) return false;
-              return true;
-            })
-            .map(child => {
-              let childName = child.name;
-
-              if (this.isPMSContext) {
-                if (child.id === "prop_zones")   childName = "My Zones";
-                if (child.id === "prop_list")    childName = "My Properties";
-                if (child.id === "co_spaces")    childName = "Co-work Spaces";
-                if (child.id === "co_rentals")   childName = "Workspace Rentals";
-                if (child.id === "co_payments")  childName = "Rental Payments";
-                if (child.id === "rent_house")   childName = "House Rentals";
-                if (child.id === "rent_pay")     childName = "Rent Payments";
-                if (child.id === "fin_pay")      childName = "All Payments";
-              }
-
-              return { ...child, name: childName };
-            });
-
-          if (filteredChildren.length === 0) return null;
-          return { ...item, name: parentName, children: filteredChildren };
-        })
-        .filter(item => {
-          if (!item) return false;
-          if (!this.isRoleAllowed(item.minRole, item.explicitRoles)) return false;
-          if (item.permission && !this.checkPermission(item.permission)) return false;
-          return true;
-        });
-    },
-  },
-
-  methods: {
-    isRoleAllowed(minRole, explicitRoles) {
-      if (explicitRoles && explicitRoles.length > 0) {
-        return explicitRoles.includes(this.userRole);
-      }
-      if (!minRole) return true;
-      const userWeight = ROLE_LEVELS[this.userRole] ?? 0;
-      const requiredWeight = ROLE_LEVELS[minRole] ?? 0;
-      return userWeight >= requiredWeight;
-    },
-
-    checkPermission(perm) {
-      if (typeof this.$hasPermission === "function") {
-        return this.$hasPermission(perm);
-      }
-      return this.userPermissions.includes(perm);
-    },
-
-    toggleMenu(index) {
-      this.openMenuIndex = this.openMenuIndex === index ? null : index;
-    },
-  },
-
-  mounted() {
-    try {
-      // Use the same centralized role resolution used throughout the application.
-      this.userRole = typeof this.$getRole === "function" ? this.$getRole() : "tenant";
-    } catch {
-      this.userRole = "tenant";
-    }
-
-    try {
-      this.userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-    } catch {
-      this.userPermissions = [];
-    }
-
-    this.showTitle = window.innerWidth < 1024;
-
-    this.filteredMenuItems.forEach((item, index) => {
-      if (item.children?.some(child => child.route === this.$route.name)) {
-        this.openMenuIndex = index;
-      }
-    });
-  },
-};
 <style scoped>
 .slide-enter-active,
 .slide-leave-active {
