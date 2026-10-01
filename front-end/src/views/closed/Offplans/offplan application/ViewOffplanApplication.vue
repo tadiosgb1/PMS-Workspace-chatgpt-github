@@ -36,13 +36,13 @@
         <div v-else-if="filteredApplications.length === 0" class="p-12 text-center">
           <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center border border-primary/20 bg-primary/10 text-primary"><i class="fas fa-file-signature"></i></div>
           <p class="font-semibold text-slate-900">No applications found</p>
-          <p class="mt-1 text-sm text-slate-500">Create the first offplan application to start tracking customer interest.</p>
+          <p class="mt-1 text-sm text-slate-500">Customer applications will appear here when submitted.</p>
         </div>
         <div v-else class="overflow-x-auto">
           <table class="min-w-full text-left">
             <thead class="border-b border-slate-200 bg-slate-50">
               <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                <th class="px-5 py-3">Application</th>
+                <th class="px-2 py-2">Application</th>
                 <th class="px-5 py-3">Customer</th>
                 <th class="px-5 py-3">Property</th>
                 <th class="px-5 py-3">Agreed price</th>
@@ -53,15 +53,15 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="item in filteredApplications" :key="item.id" class="hover:bg-slate-50">
-                <td class="px-5 py-4"><span class="font-bold text-slate-900">#{{ item.id }}</span><p class="mt-0.5 text-xs text-slate-500">{{ formatDate(item.created_at) }}</p></td>
-                <td class="px-5 py-4 text-sm font-medium text-slate-700">{{ relationLabel(item.customer) }}</td>
-                <td class="px-5 py-4 text-sm text-slate-700">{{ relationLabel(item.offplan_property) }}</td>
-                <td class="px-5 py-4 text-sm font-bold text-slate-900">{{ item.agreed_price || "—" }}</td>
-                <td class="px-5 py-4 text-sm text-slate-600">{{ item.preferred_payment_method || "—" }}</td>
-                <td class="px-5 py-4"><span class="border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">{{ display(item.application_status) }}</span></td>
+                <td class="px-2 py-1.5"><span class="font-bold text-slate-900">#{{ item.id }}</span><p class="mt-0.5 text-xs text-slate-500">{{ formatDate(item.created_at) }}</p></td>
+                <td class="px-5 py-4 text-xs font-medium text-slate-700">{{ relationLabel(item.customer) }}</td>
+                <td class="px-5 py-4 text-xs text-slate-700">{{ relationLabel(item.offplan_property) }}</td>
+                <td class="px-5 py-4 text-xs font-bold text-slate-900">{{ item.agreed_price || "—" }}</td>
+                <td class="px-5 py-4 text-xs text-slate-600">{{ item.preferred_payment_method || "—" }}</td>
+                <td class="px-5 py-4"><span class="border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">{{ display(item.application_status) }}</span></td>
                 <td class="px-5 py-4">
                   <div class="flex justify-end gap-2">
-                    <router-link :to="{ name: 'OffplanApplication-detail', params: { id: item.id } }" class="border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:border-primary hover:text-primary">View</router-link>
+                    <router-link :to="{ name: 'OffplanApplication-detail', params: { id: item.id } }" class="border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</router-link>
                     <select :value="normalizedStatus(item.application_status)" @change="changeStatus(item, $event.target.value)" class="border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 outline-none focus:border-primary" :disabled="statusSavingId === item.id">
                       <option value="pending">Pending</option>
                       <option value="approved">Approve</option>
@@ -77,16 +77,12 @@
       </div>
     </div>
 
-    <EditOffplanApplication :open="editOpen" :id="selectedId" @close="editOpen = false" @saved="load" />
   </div>
 </template>
 
 <script>
-import EditOffplanApplication from "./EditOffplanApplication.vue";
-
 export default {
   name: "ViewOffplanApplication",
-  components: { EditOffplanApplication },
   data() {
     return {
       applications: [],
@@ -114,10 +110,10 @@ export default {
       });
     },
     pendingCount() {
-      return this.applications.filter(item => String(item.application_status).toLowerCase() === "pending").length;
+      return this.filteredApplications.filter(item => this.normalizedStatus(item.application_status) === "pending").length;
     },
     agreedValue() {
-      const total = this.applications.reduce((sum, item) => {
+      const total = this.filteredApplications.reduce((sum, item) => {
         const value = Number(String(item.agreed_price || "").replace(/,/g, ""));
         return Number.isFinite(value) ? sum + value : sum;
       }, 0);
