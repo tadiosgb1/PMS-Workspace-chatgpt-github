@@ -75,7 +75,6 @@
       </div>
     </div>
 
-    <AddOffplanApplication :open="addOpen" @close="addOpen = false" @saved="load" />
     <EditOffplanApplication :open="editOpen" :id="selectedId" @close="editOpen = false" @saved="load" />
   </div>
 </template>
