@@ -1,38 +1,28 @@
 <template>
   <div class="min-h-full bg-background p-4 md:p-6 lg:p-8">
     <div class="mx-auto max-w-7xl">
-      <div class="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <div>
-          <p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">Offplan sales</p>
-          <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-900">Offplan Applications</h1>
-          <p class="mt-1 text-sm text-slate-500">Manage customer applications, agreed prices and payment preferences.</p>
-        </div>
-        <button type="button" @click="addOpen = true" class="border border-primary bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90">
-          <i class="fas fa-plus mr-2"></i>New application
-        </button>
-      </div>
+      <header class="mb-4 flex items-center justify-between border-b border-slate-200 pb-3">
+        <h1 class="text-lg font-semibold text-slate-900">Offplan applications</h1>
+      </header>
 
-      <div class="mb-5 grid gap-3 sm:grid-cols-3">
-        <div class="border border-slate-200 bg-white px-5 py-4">
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total applications</p>
-          <p class="mt-1 text-2xl font-black text-slate-900">{{ filteredApplications.length }}</p>
+      <div class="mb-3 grid border border-slate-200 bg-white sm:grid-cols-3">
+        <div class="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-3 sm:border-b-0 sm:border-r">
+          <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Total</p><p class="text-lg font-semibold leading-none text-slate-900">{{ filteredApplications.length }}</p>
         </div>
-        <div class="border border-slate-200 bg-white px-5 py-4">
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Pending</p>
-          <p class="mt-1 text-2xl font-black text-primary">{{ pendingCount }}</p>
+        <div class="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-3 sm:border-b-0 sm:border-r">
+          <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Pending</p><p class="text-lg font-semibold leading-none text-primary">{{ pendingCount }}</p>
         </div>
-        <div class="border border-slate-200 bg-white px-5 py-4">
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Agreed value</p>
-          <p class="mt-1 text-2xl font-black text-slate-900">{{ agreedValue }}</p>
+        <div class="flex h-14 items-center justify-between border border-slate-200 bg-white px-3">
+          <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Agreed value</p><p class="text-lg font-semibold leading-none text-slate-900">{{ agreedValue }}</p>
         </div>
       </div>
 
-      <div class="mb-4 flex flex-col gap-3 border border-slate-200 bg-white p-4 md:flex-row md:items-center md:justify-between">
+      <div class="mb-3 flex flex-col gap-2 border border-slate-200 bg-white p-3 md:flex-row md:items-center md:justify-between">
         <div class="relative w-full md:max-w-md">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input v-model="search" class="w-full border border-slate-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-primary" placeholder="Search applications, customer or property" />
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+          <input v-model="search" class="w-full border border-slate-200 py-1.5 pl-8 pr-2.5 text-xs outline-none focus:border-primary" placeholder="Search applications, customer or property" />
         </div>
-        <button type="button" @click="load" :disabled="loading" class="border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">
+        <button type="button" @click="load" :disabled="loading" class="border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60">
           <i :class="['fas fa-sync-alt mr-2', loading ? 'fa-spin' : '']"></i>Refresh
         </button>
       </div>
@@ -70,7 +60,12 @@
                 <td class="px-5 py-4">
                   <div class="flex justify-end gap-2">
                     <router-link :to="{ name: 'OffplanApplication-detail', params: { id: item.id } }" class="border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:border-primary hover:text-primary">View</router-link>
-                    <button type="button" @click="openEdit(item.id)" class="border border-primary/20 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10">Edit</button>
+                    <select :value="normalizedStatus(item.application_status)" @change="changeStatus(item, $event.target.value)" class="border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 outline-none focus:border-primary" :disabled="statusSavingId === item.id">
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approve</option>
+                      <option value="rejected">Reject</option>
+                      <option value="cancelled">Cancel</option>
+                    </select>
                   </div>
                 </td>
               </tr>
@@ -86,21 +81,18 @@
 </template>
 
 <script>
-import AddOffplanApplication from "./AddOffplanApplication.vue";
 import EditOffplanApplication from "./EditOffplanApplication.vue";
 
 export default {
   name: "ViewOffplanApplication",
-  components: { AddOffplanApplication, EditOffplanApplication },
+  components: { EditOffplanApplication },
   data() {
     return {
       applications: [],
       loading: false,
       error: "",
       search: "",
-      addOpen: false,
-      editOpen: false,
-      selectedId: null
+      statusSavingId: null
     };
   },
   computed: {
@@ -148,9 +140,22 @@ export default {
         this.loading = false;
       }
     },
-    openEdit(id) {
-      this.selectedId = id;
-      this.editOpen = true;
+    normalizedStatus(value) {
+      return value ? String(value).toLowerCase() : "pending";
+    },
+    async changeStatus(item, status) {
+      const previous = this.normalizedStatus(item.application_status);
+      if (status === previous) return;
+      this.statusSavingId = item.id;
+      this.error = "";
+      try {
+        await this.$apiPatch("/update_offplan_application_status", item.id, { application_status: status });
+        item.application_status = status;
+      } catch (e) {
+        this.error = e?.message || "Unable to update the application status.";
+      } finally {
+        this.statusSavingId = null;
+      }
     },
     display(value) {
       return String(value || "—").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
