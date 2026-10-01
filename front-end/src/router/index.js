@@ -179,17 +179,6 @@ const routes = [
         component: () => import('../views/closed/Offplans/offplan property/ViewOffplanProperty.vue'),
       },
       {
-        path: "offplan-properties/add",
-        name: "OffplanProperty-add",
-        component: () => import('../views/closed/Offplans/offplan property/AddOffplanProperty.vue'),
-      },
-      {
-        path: "offplan-properties/edit/:id",
-        name: "OffplanProperty-edit",
-        component: () => import('../views/closed/Offplans/offplan property/EditOffplanProperty.vue'),
-        props: true,
-      },
-      {
         path: "offplan-properties/detail/:id",
         name: "OffplanProperty-detail",
         component: () => import('../views/closed/Offplans/offplan property/OffplanPropertyDetail.vue'),
