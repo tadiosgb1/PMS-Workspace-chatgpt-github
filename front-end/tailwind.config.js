@@ -54,12 +54,12 @@ export default {
       colors: {//text-color,....
         darkBackground: '#1a202c', // Example of a dark background color
         darkText: '#ffffff', // White text for dark mode
-        icon:'var(--color-icon)',
+        icon: 'rgb(var(--color-icon) / <alpha-value>)',
         // primary: '#FA7118',
-          secondary: 'var(--color-secondary)',
+          secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
           
-          dprimary:'var(--color-dprimary)',
-          primary: 'var(--color-primary)',
+          dprimary: 'rgb(var(--color-dprimary) / <alpha-value>)',
+          primary: 'rgb(var(--color-primary) / <alpha-value>)',
 
           // dprimary:'#1ce670',
           // primary: '#27dd73',
@@ -67,13 +67,13 @@ export default {
           // primary: '#008bcf',
 
 
-        tertiary: 'var(--color-tertiary)',
-        background: 'var(--color-background)',
+        tertiary: 'rgb(var(--color-tertiary) / <alpha-value>)',
+        background: 'rgb(var(--color-background) / <alpha-value>)',
         default: '#fff',
         'custom-dark': '#1e1e1e',
         'custom-light': '#ffffff',
-        main: 'var(--color-main)', // Your main color for light mode
-        'main-dark': 'var(--color-main-dark)', // Your main color for dark mode
+        main: 'rgb(var(--color-main) / <alpha-value>)', // Your main color for light mode
+        'main-dark': 'rgb(var(--color-main-dark) / <alpha-value>)', // Your main color for dark mode
       },
       fontFamily: {//font-sans
         sans: ['Inter', 'Helvetica', 'Arial', 'sans-serif'],
