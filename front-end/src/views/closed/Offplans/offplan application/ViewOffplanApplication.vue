@@ -141,7 +141,12 @@ export default {
         this.loading = false;
       }
     },
-    shortError(error, fallback) {\n      const raw = String(error?.response?.data?.detail || error?.response?.data?.message || error?.message || fallback);\n      const cleaned = raw.replace(/<[^>]*>/g, " ").replace(/\\s+/g, " ").trim();\n      return cleaned.length > 140 ? `${cleaned.slice(0, 137)}...` : cleaned;\n    },\n    normalizedStatus(value) {
+    shortError(error, fallback) {
+      const raw = String(error?.response?.data?.detail || error?.response?.data?.message || error?.message || fallback);
+      const cleaned = raw.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      return cleaned.length > 140 ? `${cleaned.slice(0, 137)}...` : cleaned;
+    },
+    normalizedStatus(value) {
       return value ? String(value).toLowerCase() : "pending";
     },
     async changeStatus(item, status) {
