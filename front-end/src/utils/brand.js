@@ -11,20 +11,35 @@ export const DEFAULT_BRANDS = {
 
 export const BRAND_STORAGE_KEY = "alpha_pms_brand";
 
+function hexToRgbChannels(value) {
+  const hex = String(value || "").trim().replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+  return hex.match(/.{2}/g).map(part => parseInt(part, 16)).join(" ");
+}
+
 export function applyBrandTheme(brand = DEFAULT_BRANDS) {
   if (typeof document === "undefined") return;
 
   const palette = { ...DEFAULT_BRANDS, ...(brand || {}) };
   const root = document.documentElement;
 
-  root.style.setProperty("--color-primary", palette.primary, "");
-  root.style.setProperty("--color-dprimary", palette.dprimary, "");
-  root.style.setProperty("--color-secondary", palette.secondary, "");
-  root.style.setProperty("--color-tertiary", palette.tertiary, "");
-  root.style.setProperty("--color-icon", palette.icon, "");
-  root.style.setProperty("--color-background", palette.background, "");
-  root.style.setProperty("--color-main", palette.main, "");
-  root.style.setProperty("--color-main-dark", palette.mainDark, "");
+  const variables = {
+    "--color-primary": palette.primary,
+    "--color-dprimary": palette.dprimary,
+    "--color-secondary": palette.secondary,
+    "--color-tertiary": palette.tertiary,
+    "--color-icon": palette.icon,
+    "--color-background": palette.background,
+    "--color-main": palette.main,
+    "--color-main-dark": palette.mainDark,
+  };
+
+  Object.entries(variables).forEach(([name, value]) => {
+    const channels = hexToRgbChannels(value);
+    if (channels) {
+      root.style.setProperty(name, channels);
+    }
+  });
 }
 
 export function loadBrandTheme() {
