@@ -54,7 +54,7 @@
             <select v-model.number="form.application" class="input" required>
               <option :value="0" disabled>Select application</option>
               <option v-for="item in applications" :key="item.id" :value="item.id">
-                #{{ item.id }} — {{ applicationLabel(item) }}
+                {{ applicationOption(item) }}
               </option>
             </select>
           </Field>
@@ -133,15 +133,23 @@ export default {
         this.error = "Unable to load applications.";
       }
     },
-    applicationLabel(item) {
-      return (
-        item?.customer?.name ||
-        item?.customer?.full_name ||
-        item?.customer ||
-        item?.offplan_property?.name ||
-        item?.offplan_property ||
-        "Application"
-      );
+    applicationOption(item) {
+      const customer = item?.customer;
+      const customerName =
+        [customer?.first_name, customer?.middle_name, customer?.last_name]
+          .filter(Boolean)
+          .join(" ") ||
+        customer?.name ||
+        customer?.full_name ||
+        "Unknown customer";
+      const property = item?.offplan_property;
+      const developer = property?.developer || "Unknown developer";
+      const zone = property?.property_zone?.name;
+      const propertyType = property?.property_type;
+      const propertyLabel = zone
+        ? zone + (propertyType ? " · " + propertyType : "")
+        : propertyType || "Offplan property";
+      return "#" + item?.id + " · " + customerName + " · " + developer + " · " + propertyLabel;
     },
     close() {
       if (!this.saving) this.$emit("close");
