@@ -20,7 +20,7 @@ import rentPay from '../views/closed/rent/view.vue'
 import PropertyZoneDetail from '../views/closed/Zones/propertyZoneDetail.vue';
 import PropertyZone from '../views/closed/Zones/view.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
-import Payments from '../views/closed/payments/view.vue';
+import Payments from '../views/closed/Payments/view.vue';
 import Rents from '../views/closed/rent/view.vue';
 import RentDetail from '../views/closed/rent/rentDetail.vue';
 import OverdueRents from '../views/closed/rent/OverdueRents.vue';
