@@ -84,8 +84,12 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        const res = await this.$apiGet("/get_offplan_applications");\n        const data = res?.data?.data || res?.data || res?.applications || res;\n        const items = Array.isArray(data) ? data : (Array.isArray(data?.results) ? data.results : []);\n        const item = items.find(row => String(row?.id) === String(this.id));\n        if (!item) throw new Error("Application not found.");\n        this.form = item;
-        this.form = res?.data?.data || res?.data || res?.application || res;
+        const res = await this.$apiGet("/get_offplan_applications");
+        const data = res?.data?.data || res?.data || res?.applications || res;
+        const items = Array.isArray(data) ? data : (Array.isArray(data?.results) ? data.results : []);
+        const item = items.find(row => String(row?.id) === String(this.id));
+        if (!item) throw new Error("Application not found.");
+        this.form = item;
       } catch (e) {
         this.error = e?.message || "Unable to load the application.";
       } finally {
