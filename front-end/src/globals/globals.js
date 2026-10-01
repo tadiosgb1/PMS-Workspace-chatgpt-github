@@ -1,15 +1,17 @@
 import axios from "axios";
 import { Logger } from "../utils/logger";
+import { loadBrandTheme } from "../utils/brand.js";
 import {
   reloadPage, apiGet, apiGetById, apiPost, apiPut,
   apiPatch, apiDelete, isStrongPassword, validateField,
   gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
   processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
-  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getRole
 } from "../utils/utils"; // Adjust the path to match your project structure
 export default {
 
   install(app) {
+    loadBrandTheme();
     // Check environment and set base URL
     const isProduction = import.meta.env.MODE === "production";
     const baseUrl = isProduction
@@ -93,7 +95,8 @@ export default {
       $getTenants:getTenants,
       $getCoworkingSpaces:getCoworkingSpaces,
       $getWorkspaceRentals:getWorkspaceRentals,
-      $getWorkspacePayments:getWorkspacePayments
+      $getWorkspacePayments:getWorkspacePayments,
+      $getRole: getRole
     };
     // Assign to the global properties in the Vue app
     app.config.globalProperties = {
