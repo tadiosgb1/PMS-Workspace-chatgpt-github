@@ -109,7 +109,3 @@ export default {
   }
 };
 </script>
-
-<script>
-export default { name: "OffplanApplicationDetailInfo" };
-</script>
