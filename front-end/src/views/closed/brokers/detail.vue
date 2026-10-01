@@ -241,7 +241,7 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import Loading from "@/components/Loading.vue";
-import UpdateBroker from "./update.vue";
+import UpdateBroker from "./Update.vue";
 
 export default {
   name: "BrokerDetail",
