@@ -179,6 +179,14 @@ export default {
             { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin"] },
           ],
         },
+           // ── Notifications ───────────────────────────────────────────────
+        {
+          id: "notifications",
+          name: "Notifications",
+          route: "notifications",
+          icon: "fas fa-bell",
+          minRole: "manager",
+        },
         // ── Settings ─────────────────────────────────────────────────────
         {
           id: "Settings",
@@ -278,16 +286,6 @@ export default {
           route: "payments",
           minRole: "staff",
           id: "fin_pay"
-        },
-     
-       
-           // ── Notifications ───────────────────────────────────────────────
-        {
-          id: "notifications",
-          name: "Notifications",
-          route: "notifications",
-          icon: "fas fa-bell",
-          minRole: "manager",
         },
 
       ],
