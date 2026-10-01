@@ -45,7 +45,7 @@
 
     <!-- ── Portfolio Summary Cards ── -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group min-h-[72px]">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -58,7 +58,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Total Properties</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group min-h-[72px]">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -71,7 +71,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Occupancy Rate</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group min-h-[72px]">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -93,7 +93,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-2">Allocations</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-sky-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group min-h-[72px]">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
