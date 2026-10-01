@@ -161,7 +161,8 @@ export default {
           children: [
             { id: "prop_types", name: "Property Types", route: "PropertyTypes-view", explicitRoles: ["superuser", "super_staff"] },
             { id: "prop_zones", name: "Zones",           route: "zones",             minRole: "manager" },
-            { id: "prop_list",  name: "Properties",     route: "properties" },\n            { id: "offplan_prop", name: "Offplan Properties", route: "OffplanProperty-view", minRole: "manager" },
+            { id: "prop_list",  name: "Properties",     route: "properties" },
+            { id: "offplan_prop", name: "Offplan Properties", route: "OffplanProperty-view", minRole: "manager" },
           ],
         },
         // ── Co-work Spaces ──────────────────────────────────────────────
