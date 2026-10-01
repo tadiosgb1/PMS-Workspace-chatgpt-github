@@ -27,7 +27,9 @@
         </button>
       </div>
 
-      <div v-if="error" class="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
+      <div v-if="error" class="mb-3 flex min-h-8 max-h-8 items-center overflow-hidden border border-red-200 bg-red-50 px-3 text-xs text-red-700" :title="error">
+        <i class="fas fa-exclamation-circle mr-2 shrink-0"></i><span class="truncate">{{ error }}</span>
+      </div>
 
       <div class="overflow-hidden border border-slate-200 bg-white">
         <div v-if="loading" class="p-12 text-center text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Loading applications…</div>
@@ -134,12 +136,12 @@ export default {
         const data = res?.data?.data || res?.data || res?.applications || res;
         this.applications = Array.isArray(data) ? data : (Array.isArray(data?.results) ? data.results : []);
       } catch (e) {
-        this.error = e?.message || "Unable to load offplan applications.";
+        this.error = this.shortError(e, "Unable to load offplan applications.");
       } finally {
         this.loading = false;
       }
     },
-    normalizedStatus(value) {
+    shortError(error, fallback) {\n      const raw = String(error?.response?.data?.detail || error?.response?.data?.message || error?.message || fallback);\n      const cleaned = raw.replace(/<[^>]*>/g, " ").replace(/\\s+/g, " ").trim();\n      return cleaned.length > 140 ? `${cleaned.slice(0, 137)}...` : cleaned;\n    },\n    normalizedStatus(value) {
       return value ? String(value).toLowerCase() : "pending";
     },
     async changeStatus(item, status) {
@@ -151,7 +153,7 @@ export default {
         await this.$apiPatch("/update_offplan_application_status", item.id, { application_status: status });
         item.application_status = status;
       } catch (e) {
-        this.error = e?.message || "Unable to update the application status.";
+        this.error = this.shortError(e, "Unable to update the application status.");
       } finally {
         this.statusSavingId = null;
       }
