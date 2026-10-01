@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import OffplanField from "./OffplanField.vue";
 const emptyForm = () => ({
   property_type: "residential", completion_status: "ready", price: "", bedrooms: "", bathrooms: "", area_or_size: "",
   sale_type: "initial_sale", project_completion: "under_25", pre_handover_payment: "under_25",
@@ -92,7 +93,7 @@ const emptyForm = () => ({
 
 export default {
   name: "AddOffplanProperty",
-  components: { Field: { props: ["label"], template: '<div><label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">{{ label }}</label><slot /></div>' } },
+  components: { Field: OffplanField },
   data() {
     return {
       form: emptyForm(), loading: false, error: "",
