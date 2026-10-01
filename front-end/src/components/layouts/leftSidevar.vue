@@ -9,7 +9,7 @@
           class="flex items-center gap-3 px-5 py-4 bg-white border-b border-slate-200 sticky top-0 z-10"
         >
           <div class="w-9 h-9 rounded-lg overflow-hidden shrink-0 shadow-sm ring-1 ring-slate-100">
-            <div class="h-full w-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-base">
+            <div class="h-full w-full bg-primary/10 flex items-center justify-center text-primary font-black text-base">
               α
             </div>
           </div>
@@ -57,7 +57,7 @@
                 <transition name="fade">
                   <ul
                     v-if="openMenuIndex === index"
-                    class="mt-0.5 mb-1 ml-4 pl-3.5 space-y-0.5 border-l-2 border-blue-100"
+                    class="mt-0.5 mb-1 ml-4 pl-3.5 space-y-0.5 border-l-2 border-primary/20"
                   >
                     <li v-for="child in item.children" :key="child.id || (child.name + child.route)">
                       <router-link
