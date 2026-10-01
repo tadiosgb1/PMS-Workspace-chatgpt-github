@@ -64,27 +64,26 @@
           <table class="min-w-[1100px] w-full border-collapse text-left">
             <thead class="bg-slate-50">
               <tr class="border-b border-slate-200">
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Property / Developer</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Type</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Price</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Beds / Baths</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Area</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Project</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Completion</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Property / Developer</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Type</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Price</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Beds / Baths</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Area</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Project</th>
+                <th class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Completion</th>
                 <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="item in filteredProperties" :key="item.id" class="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
-                <td class="px-4 py-3">
+                <td class="px-3 py-2">
                   <div class="font-medium text-slate-900">{{ item.developer || "—" }}</div>
-                  <div class="mt-0.5 text-xs text-slate-500">ID: {{ item.id || "—" }}</div>
                 </td>
                 <td class="px-4 py-3 text-sm text-slate-700">{{ display(item.property_type) }}</td>
                 <td class="px-4 py-3 text-sm font-semibold text-slate-900">{{ item.price || "—" }}</td>
                 <td class="px-4 py-3 text-sm text-slate-700">{{ item.bedrooms || "—" }} / {{ item.bathrooms || "—" }}</td>
                 <td class="px-4 py-3 text-sm text-slate-700">{{ item.area_or_size || "—" }}</td>
-                <td class="px-4 py-3">
+                <td class="px-3 py-2">
                   <span :class="statusClass(item.project_status)" class="inline-flex border px-2 py-1 text-xs font-medium">{{ display(item.project_status) }}</span>
                 </td>
                 <td class="px-4 py-3">
@@ -108,7 +107,7 @@
     <EditOffplanProperty :open="editOpen" :id="selectedId" @close="closeEdit" @saved="loadProperties" />
 
     <div v-if="detailOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" @click.self="detailOpen=false">
-      <div class="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-slate-200 bg-white shadow-2xl">
+      <div class="w-full max-w-none max-h-[92vh] overflow-y-auto border border-slate-200 bg-white shadow-2xl">
         <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
             <h2 class="text-lg font-semibold text-slate-900">Offplan property details</h2>
