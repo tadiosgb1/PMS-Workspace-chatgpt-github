@@ -4,7 +4,7 @@ import { getTenantContext } from '../composables/useTenant.js';
 // --- Views Imports ---
 import Login from '../views/opened/auth/login.vue'
 import Pricing from '../views/opened/landing/PricingPage.vue'
-import Home from "../views/opened/landing/home.vue";
+import Home from "../views/opened/landing/Home.vue";
 import ResetPassword from '../views/opened/auth/ResetPassword.vue'
 import ForgotPasssword from '../views/opened/auth/forgotPassword.vue'
 import ActivateEmailMessage from '../views/opened/landing/activateEmailMessage.vue'
