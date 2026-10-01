@@ -202,6 +202,17 @@ const routes = [
         props: true,
       },
       {
+        path: "offplan-milestones",
+        name: "OffplanMilestone-view",
+        component: () => import('../views/closed/Offplans/offplan milestone/ViewOffplanMilestone.vue'),
+      },
+      {
+        path: "offplan-milestones/detail/:id",
+        name: "OffplanMilestone-detail",
+        component: () => import('../views/closed/Offplans/offplan milestone/OffplanMilestoneDetail.vue'),
+        props: true,
+      },
+      {
         path: "tenantspropertsalerequests",
         name: "TenantPropertySaleRequest-view",
         component: () => import('../views/closed/TenantsPropertSaleRequests/TenantPropertySaleRequestView.vue'),
