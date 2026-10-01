@@ -17,14 +17,14 @@ export function applyBrandTheme(brand = DEFAULT_BRANDS) {
   const palette = { ...DEFAULT_BRANDS, ...(brand || {}) };
   const root = document.documentElement;
 
-  root.style.setProperty("--color-primary", palette.primary);
-  root.style.setProperty("--color-dprimary", palette.dprimary);
-  root.style.setProperty("--color-secondary", palette.secondary);
-  root.style.setProperty("--color-tertiary", palette.tertiary);
-  root.style.setProperty("--color-icon", palette.icon);
-  root.style.setProperty("--color-background", palette.background);
-  root.style.setProperty("--color-main", palette.main);
-  root.style.setProperty("--color-main-dark", palette.mainDark);
+  root.style.setProperty("--color-primary", palette.primary, "");
+  root.style.setProperty("--color-dprimary", palette.dprimary, "");
+  root.style.setProperty("--color-secondary", palette.secondary, "");
+  root.style.setProperty("--color-tertiary", palette.tertiary, "");
+  root.style.setProperty("--color-icon", palette.icon, "");
+  root.style.setProperty("--color-background", palette.background, "");
+  root.style.setProperty("--color-main", palette.main, "");
+  root.style.setProperty("--color-main-dark", palette.mainDark, "");
 }
 
 export function loadBrandTheme() {
