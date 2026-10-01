@@ -45,7 +45,7 @@
 
     <!-- ── Core KPI Grid ── -->
     <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group min-h-[72px]">
         <div class="w-8 h-8 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center mb-3 transition-colors">
           <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -54,7 +54,7 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_properties || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Properties</p>
       </div>
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-sky-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group min-h-[72px]">
         <div class="w-8 h-8 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center mb-3 transition-colors">
           <svg class="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
@@ -63,7 +63,7 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_zones || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Zones</p>
       </div>
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-purple-300 transition-all group min-h-[72px]">
         <div class="w-8 h-8 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center mb-3 transition-colors">
           <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -72,7 +72,7 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_coworking_spaces || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Coworking</p>
       </div>
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group min-h-[72px]">
         <div class="w-8 h-8 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center mb-3 transition-colors">
           <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -81,7 +81,7 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_users || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Users</p>
       </div>
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group min-h-[72px]">
         <div class="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center mb-3 transition-colors">
           <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
@@ -90,7 +90,7 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.active_subscriptions || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Subscriptions</p>
       </div>
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-300 transition-all group">
+      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-teal-300 transition-all group min-h-[72px]">
         <div class="w-8 h-8 rounded-xl bg-teal-50 group-hover:bg-teal-100 flex items-center justify-center mb-3 transition-colors">
           <svg class="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
