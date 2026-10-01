@@ -179,7 +179,8 @@ export default {
             { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin"] },
           ],
         },
-        // ── Settings ─────────────────────────────────────────────────────
+
+// ── Settings ─────────────────────────────────────────────────────
         {
           id: "Settings",
           name: "Settings",
