@@ -111,6 +111,7 @@
 <script>
 const ROLE_LEVELS = {
   superuser: 100,
+  admin: 95,
   super_staff: 90,
   owner: 4,
   staff: 3,
@@ -165,7 +166,7 @@ export default {
             { id: "offplan_prop", name: "Offplan Properties", route: "OffplanProperty-view", minRole: "manager" },
           ],
         },
-        { id: "brands", name: "Brands", route: "Brands-view", explicitRoles: ["superuser", "owner"] },
+        { id: "brands", name: "Brands", route: "Brands-view", explicitRoles: ["superuser", "admin", "super_staff", "owner"] },
         // ── Co-work Spaces ──────────────────────────────────────────────
         {
           id: "cowork_spaces",
@@ -371,29 +372,8 @@ export default {
 
   mounted() {
     try {
-      const isSuperuser = localStorage.getItem("is_superuser") === "true";
-      const storedRole = localStorage.getItem("role");
-      let groups = [];
-
-      try {
-        const rawGroups = localStorage.getItem("groups");
-        if (rawGroups) {
-          const cleanRaw = rawGroups.replace(/groups\s*\[/, "[");
-          groups = JSON.parse(cleanRaw);
-        }
-      } catch (e) {
-        groups = [];
-      }
-
-      if (isSuperuser) {
-        this.userRole = "superuser";
-      } else if (storedRole === "super_staff") {
-        this.userRole = "super_staff";
-      } else if (Array.isArray(groups) && groups.length > 0) {
-        this.userRole = groups[0];
-      } else {
-        this.userRole = storedRole || "tenant";
-      }
+      // Use the same centralized role resolution used throughout the application.
+      this.userRole = typeof this.$getRole === "function" ? this.$getRole() : "tenant";
     } catch {
       this.userRole = "tenant";
     }
