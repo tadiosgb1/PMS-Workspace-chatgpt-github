@@ -32,15 +32,15 @@
                   @click="toggleMenu(index)"
                   class="w-full flex items-center justify-between px-3.5 py-2 rounded-lg transition-all duration-150 group"
                   :class="openMenuIndex === index
-                    ? 'bg-blue-50 text-blue-700'
+                    ?  'bg-primary/10 text-primary'
                     : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'"
                 >
                   <div class="flex items-center gap-3 min-w-0">
                     <div
                       class="w-7 h-7 flex items-center justify-center rounded-lg shrink-0 transition-colors"
                       :class="openMenuIndex === index
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'bg-slate-50 text-blue-600 group-hover:bg-blue-50'"
+                        ?  'bg-primary/10 text-primary'
+                        :  'bg-primary/10 text-primary group-hover:bg-primary/15'"
                     >
                       <i :class="[item.icon, 'text-sm']"></i>
                     </div>
@@ -49,7 +49,7 @@
                   <i
                     class="fas text-[10px] transition-transform duration-200 shrink-0 ml-2"
                     :class="[
-                      openMenuIndex === index ? 'fa-chevron-down text-blue-500' : 'fa-chevron-right text-slate-400',
+                      openMenuIndex === index ?  'fa-chevron-down text-primary' : 'fa-chevron-right text-slate-400',
                     ]"
                   ></i>
                 </button>
@@ -64,12 +64,12 @@
                         :to="{ name: child.route }"
                         class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150"
                         :class="$route.name === child.route
-                          ? 'bg-blue-600 text-white shadow-sm'
-                          : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700'"
+                          ?  'bg-primary text-white shadow-sm'
+                          :  'text-slate-600 hover:bg-primary/10 hover:text-primary'"
                       >
                         <span
                           class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-                          :class="$route.name === child.route ? 'bg-white' : 'bg-blue-300'"
+                          :class="$route.name === child.route ? 'bg-white' :  'bg-primary/50'"
                         ></span>
                         <span class="truncate">{{ child.name }}</span>
                       </router-link>
@@ -84,14 +84,14 @@
                 :to="{ name: item.route }"
                 class="flex items-center gap-3 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all duration-150 group"
                 :class="$route.name === item.route
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ?  'bg-primary text-white shadow-sm'
                   : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'"
               >
                 <div
                   class="w-7 h-7 flex items-center justify-center rounded-lg shrink-0 transition-colors"
                   :class="$route.name === item.route
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-slate-50 text-blue-600 group-hover:bg-blue-50'"
+                    ?  'bg-primary text-white'
+                    :  'bg-primary/10 text-primary group-hover:bg-primary/15'"
                 >
                   <i :class="[item.icon, 'text-sm']"></i>
                 </div>
