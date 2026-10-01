@@ -179,7 +179,31 @@ export default {
             { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin"] },
           ],
         },
-        { id: "brands", name: "Brands", route: "Brands-view", explicitRoles: ["superuser", "admin"] },
+        // ── Settings ─────────────────────────────────────────────────────
+        {
+          id: "Settings",
+          name: "Settings",
+          icon: "fas fa-gear",
+          explicitRoles: ["superuser", "admin"],
+          children: [
+            { name: "Roles", route: "groups", permission: "auth.view_group", explicitRoles: ["superuser"] },
+            { name: "Permissions", route: "permissions_view", permission: "auth.view_permission", explicitRoles: ["superuser"] },
+            {
+              id: "configurations",
+              name: "Configurations",
+              route: "configurations",
+              icon: "fas fa-gear",
+              explicitRoles: ["superuser"],
+            },
+            {
+              id: "brands",
+              name: "Brands",
+              route: "Brands-view",
+              icon: "fas fa-palette",
+              explicitRoles: ["superuser", "admin"],
+            },
+          ],
+        },
         // ── Co-work Spaces ──────────────────────────────────────────────
         {
           id: "cowork_spaces",
@@ -257,9 +281,6 @@ export default {
         },
      
        
-        // ── User Management ─────────────────────────────────────────────
-     
-
           {
           id: "Settings",
           name: "Settings",
