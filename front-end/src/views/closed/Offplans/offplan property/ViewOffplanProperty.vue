@@ -3,9 +3,7 @@
     <div class="mx-auto max-w-[1600px]">
       <header class="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-primary">Property portfolio</div>
           <h1 class="text-lg font-semibold text-slate-900">Offplan properties</h1>
-          <p class="mt-1 text-xs text-slate-500">A clean register for project pricing, delivery progress and property features.</p>
         </div>
         <button @click="openAdd" class="inline-flex items-center justify-center gap-2 border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90">
           <i class="fas fa-plus"></i> Add offplan property
