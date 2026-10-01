@@ -54,12 +54,12 @@ export default {
       colors: {//text-color,....
         darkBackground: '#1a202c', // Example of a dark background color
         darkText: '#ffffff', // White text for dark mode
-        icon:'#FF6B00',
+        icon:'var(--color-icon)',
         // primary: '#FA7118',
-          secondary: '#FF6B00',
+          secondary: 'var(--color-secondary)',
           
-          dprimary:'#5f5ffc',
-          primary: '#5f5ffc',
+          dprimary:'var(--color-dprimary)',
+          primary: 'var(--color-primary)',
 
           // dprimary:'#1ce670',
           // primary: '#27dd73',
@@ -67,13 +67,13 @@ export default {
           // primary: '#008bcf',
 
 
-        tertiary: '#c7d2fe',
-        background: '#f0f4f8',
+        tertiary: 'var(--color-tertiary)',
+        background: 'var(--color-background)',
         default: '#fff',
         'custom-dark': '#1e1e1e',
         'custom-light': '#ffffff',
-        main: '#3490dc', // Your main color for light mode
-        'main-dark': '#1e3a8a', // Your main color for dark mode
+        main: 'var(--color-main)', // Your main color for light mode
+        'main-dark': 'var(--color-main-dark)', // Your main color for dark mode
       },
       fontFamily: {//font-sans
         sans: ['Inter', 'Helvetica', 'Arial', 'sans-serif'],
