@@ -19,30 +19,6 @@
   <!-- Main -->
   <div v-else class="space-y-6 max-w-[1600px] mx-auto p-5 bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 min-h-screen">
 
-    <!-- ── Header ── -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200 rounded-none px-6 py-4 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-md">
-          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-base font-bold text-slate-900 tracking-tight">Platform Overview</h2>
-          <p v-if="report?.generated_at" class="text-xs text-slate-400 mt-0.5 font-medium">
-            Updated {{ formatDate(report.generated_at) }}
-          </p>
-        </div>
-      </div>
-      <button @click="fetchReport"
-        class="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition-all shadow-sm active:scale-95">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-        </svg>
-        Refresh
-      </button>
-    </div>
-
     <!-- ── Core KPI Grid ── -->
     <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
       <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group h-16 flex items-center gap-3">
