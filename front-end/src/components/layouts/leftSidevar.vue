@@ -163,9 +163,9 @@ export default {
             { id: "prop_zones", name: "Zones",           route: "zones",             minRole: "manager" },
             { id: "prop_list",  name: "Properties",     route: "properties" },
             { id: "offplan_prop", name: "Offplan Properties", route: "OffplanProperty-view", minRole: "manager" },
-            { id: "brands", name: "Brands", route: "Brands-view", explicitRoles: ["superuser", "owner"] },
           ],
         },
+        { id: "brands", name: "Brands", route: "Brands-view", explicitRoles: ["superuser", "owner"] },
         // ── Co-work Spaces ──────────────────────────────────────────────
         {
           id: "cowork_spaces",
