@@ -124,7 +124,7 @@
 
 <script>
 import Toast from "@/components/Toast.vue";
-import AddSpace from "./Add.vue";
+import AddSpace from "./add.vue";
 import UpdateCoworkspace from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Loading from "@/components/Loading.vue";
