@@ -56,6 +56,7 @@ import BrokerDetail from '../views/closed/brokers/detail.vue'
 import brokerDetail from '../views/closed/brokers/brokerDetail.vue'
 import subDetail from '../views/closed/subscriptions/subDetail.vue'
 import workSpaceDetail from '../views/closed/coworkingSpace/detail.vue'
+import Brands from "../views/closed/brands/BrandsView.vue";
 import workSpaceRentalDetail from '../views/closed/workspaceRental/detail.vue'
 
 const routes = [
@@ -172,6 +173,11 @@ const routes = [
         name: "PropertyTypes-detail",
         component: () => import('../views/closed/PropertyTypes/PropertyTypesDetail.vue'),
         props: true,
+      },
+      {
+        path: "brands",
+        name: "Brands-view",
+        component: Brands,
       },
       {
         path: "offplan-properties",
