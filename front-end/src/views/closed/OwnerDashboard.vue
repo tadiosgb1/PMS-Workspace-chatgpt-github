@@ -9,7 +9,7 @@
 
   <!-- Error State -->
   <div v-else-if="error"
-    class="m-6 flex items-start gap-3 bg-rose-50 border border-rose-200 p-4 rounded-2xl text-sm text-rose-700 font-medium shadow-sm">
+    class="m-6 flex items-start gap-3 bg-rose-50 border border-rose-200 p-4 rounded-none text-sm text-rose-700 font-medium shadow-sm">
     <svg class="w-5 h-5 mt-0.5 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
     </svg>
@@ -20,7 +20,7 @@
   <div v-else class="space-y-6 max-w-[1600px] mx-auto p-5 bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 min-h-screen">
 
     <!-- ── Header ── -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200 rounded-none px-6 py-4 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-md">
           <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -45,7 +45,7 @@
 
     <!-- ── Portfolio Summary Cards ── -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group min-h-[72px]">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group h-16 flex items-center gap-3">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -58,7 +58,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Total Properties</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group min-h-[72px]">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group h-16 flex items-center gap-3">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -71,7 +71,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Occupancy Rate</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group min-h-[72px]">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group h-16 flex items-center gap-3">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -93,7 +93,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-2">Allocations</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group min-h-[72px]">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group h-16 flex items-center gap-3">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -111,7 +111,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- Property Status Donut -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -125,7 +125,7 @@
       </div>
 
       <!-- Financial Overview Bar -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -142,7 +142,7 @@
     </div>
 
     <!-- ── Financial Insights Panel ── -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
       <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">
@@ -158,7 +158,7 @@
         </span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
-        <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
+        <div class="bg-rose-50 border border-rose-100 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -168,7 +168,7 @@
           <p class="text-2xl font-black text-rose-700 tracking-tight">{{ report?.financials?.outstanding_rent || 0 }}</p>
           <p class="text-[10px] font-bold text-rose-400 mt-0.5">ETB</p>
         </div>
-        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+        <div class="bg-slate-50 border border-slate-200 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -178,7 +178,7 @@
           <p class="text-2xl font-black text-slate-900 tracking-tight">{{ report?.financials?.collected_this_month || 0 }}</p>
           <p class="text-[10px] font-bold text-slate-400 mt-0.5">ETB</p>
         </div>
-        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -188,7 +188,7 @@
           <p class="text-2xl font-black text-indigo-700 tracking-tight">{{ report?.financials?.net_income || 0 }}</p>
           <p class="text-[10px] font-bold text-indigo-400 mt-0.5">ETB</p>
         </div>
-        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+        <div class="bg-amber-50 border border-amber-100 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -200,7 +200,7 @@
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div class="flex justify-between items-center px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+        <div class="flex justify-between items-center px-4 py-3 bg-slate-50 border border-slate-200 rounded-none text-xs">
           <div class="flex items-center gap-2">
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
@@ -209,7 +209,7 @@
           </div>
           <span class="font-mono font-extrabold text-slate-900">{{ report?.financials?.pms_fees_deducted || 0 }} ETB</span>
         </div>
-        <div class="flex justify-between items-center px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+        <div class="flex justify-between items-center px-4 py-3 bg-slate-50 border border-slate-200 rounded-none text-xs">
           <div class="flex items-center gap-2">
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -225,7 +225,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Tenant Allocations & Lease Pipeline -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm space-y-4">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div class="flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center">
@@ -261,7 +261,7 @@
             Lease Pipeline Alerts
           </p>
           <div v-for="lease in report.tenant_metrics.upcoming_expirations" :key="lease.id"
-            class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-3 rounded-xl text-[11px] text-slate-900 space-y-1">
+            class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-3 rounded-none text-[11px] text-slate-900 space-y-1">
             <div class="flex justify-between font-bold">
               <span class="text-slate-900">{{ lease.property_name }}</span>
               <span class="text-amber-700 font-mono text-[10px] bg-amber-100 px-2 py-0.5 rounded-full">Ends: {{ formatDateShort(lease.end_date) }}</span>
@@ -275,7 +275,7 @@
       </div>
 
       <!-- Coworking Ecosystem -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm space-y-4">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
           <div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -305,7 +305,7 @@
         <div v-if="report?.coworking?.spaces?.length" class="space-y-2 pt-1">
           <p class="text-[10px] uppercase font-bold tracking-wide text-slate-400">Locations Status</p>
           <div v-for="space in report.coworking.spaces" :key="space.id"
-            class="bg-gradient-to-r from-slate-50 to-purple-50 border border-slate-200 p-3 rounded-xl text-[11px] text-slate-900 flex justify-between items-center hover:border-purple-200 transition-colors">
+            class="bg-gradient-to-r from-slate-50 to-purple-50 border border-slate-200 p-3 rounded-none text-[11px] text-slate-900 flex justify-between items-center hover:border-purple-200 transition-colors">
             <div>
               <p class="font-bold text-slate-900">{{ space.name }}</p>
               <p class="text-[10px] text-slate-400 font-medium mt-0.5">{{ space.location }} · {{ space.capacity }} seats</p>
@@ -322,7 +322,7 @@
       </div>
 
       <!-- Work Orders + Chart -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm flex flex-col">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -334,19 +334,19 @@
         </div>
         <!-- Mini stat row -->
         <div class="grid grid-cols-4 gap-2 text-center mb-3">
-          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-none">
             <div class="text-lg font-extrabold text-slate-900">{{ report?.maintenance?.total || 0 }}</div>
             <div class="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Total</div>
           </div>
-          <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl">
+          <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-none">
             <div class="text-lg font-extrabold text-amber-700">{{ report?.maintenance?.pending || 0 }}</div>
             <div class="text-[9px] font-bold text-amber-500 uppercase mt-0.5">Pending</div>
           </div>
-          <div class="p-2.5 bg-sky-50 border border-sky-200 rounded-xl">
+          <div class="p-2.5 bg-sky-50 border border-sky-200 rounded-none">
             <div class="text-lg font-extrabold text-sky-700">{{ report?.maintenance?.open || 0 }}</div>
             <div class="text-[9px] font-bold text-sky-500 uppercase mt-0.5">Open</div>
           </div>
-          <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-none">
             <div class="text-lg font-extrabold text-emerald-700">{{ report?.maintenance?.resolved || 0 }}</div>
             <div class="text-[9px] font-bold text-emerald-500 uppercase mt-0.5">Resolved</div>
           </div>

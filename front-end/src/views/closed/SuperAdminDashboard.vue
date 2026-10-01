@@ -9,7 +9,7 @@
 
   <!-- Error -->
   <div v-else-if="error"
-    class="m-6 flex items-start gap-3 bg-rose-50 border border-rose-200 p-4 rounded-2xl text-sm text-rose-700 font-medium shadow-sm">
+    class="m-6 flex items-start gap-3 bg-rose-50 border border-rose-200 p-4 rounded-none text-sm text-rose-700 font-medium shadow-sm">
     <svg class="w-5 h-5 mt-0.5 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
     </svg>
@@ -20,7 +20,7 @@
   <div v-else class="space-y-6 max-w-[1600px] mx-auto p-5 bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 min-h-screen">
 
     <!-- ── Header ── -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200 rounded-none px-6 py-4 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-md">
           <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -45,8 +45,8 @@
 
     <!-- ── Core KPI Grid ── -->
     <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group min-h-[72px]">
-        <div class="w-8 h-8 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center mb-3 transition-colors">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group h-16 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center shrink-0 transition-colors">
           <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
           </svg>
@@ -54,8 +54,8 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_properties || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Properties</p>
       </div>
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group min-h-[72px]">
-        <div class="w-8 h-8 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center mb-3 transition-colors">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group h-16 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center shrink-0 transition-colors">
           <svg class="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
           </svg>
@@ -63,8 +63,8 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_zones || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Zones</p>
       </div>
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-purple-300 transition-all group min-h-[72px]">
-        <div class="w-8 h-8 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center mb-3 transition-colors">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-purple-300 transition-all group h-16 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center shrink-0 transition-colors">
           <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
           </svg>
@@ -72,8 +72,8 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_coworking_spaces || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Coworking</p>
       </div>
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group min-h-[72px]">
-        <div class="w-8 h-8 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center mb-3 transition-colors">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group h-16 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center shrink-0 transition-colors">
           <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
@@ -81,8 +81,8 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.total_users || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Users</p>
       </div>
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group min-h-[72px]">
-        <div class="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center mb-3 transition-colors">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group h-16 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center shrink-0 transition-colors">
           <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
           </svg>
@@ -90,8 +90,8 @@
         <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.platform_overview?.active_subscriptions || 0 }}</p>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Subscriptions</p>
       </div>
-      <div class="bg-white border border-slate-200 p-3 rounded-none shadow-sm hover:shadow-md hover:border-teal-300 transition-all group min-h-[72px]">
-        <div class="w-8 h-8 rounded-xl bg-teal-50 group-hover:bg-teal-100 flex items-center justify-center mb-3 transition-colors">
+      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-teal-300 transition-all group h-16 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-teal-50 group-hover:bg-teal-100 flex items-center justify-center shrink-0 transition-colors">
           <svg class="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
           </svg>
@@ -105,7 +105,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Users by Role – Donut (replaces list) -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -121,7 +121,7 @@
       </div>
 
       <!-- Revenue Comparison – Grouped Bar (30d vs All Time) -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm lg:col-span-2">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm lg:col-span-2">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -139,7 +139,7 @@
     </div>
 
     <!-- ── Revenue & Billing Metrics ── -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
       <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-sm">
@@ -154,7 +154,7 @@
         </span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-gradient-to-br from-slate-50 to-indigo-50/30 border border-slate-200 p-4 rounded-xl">
+        <div class="bg-gradient-to-br from-slate-50 to-indigo-50/30 border border-slate-200 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -164,7 +164,7 @@
           <p class="text-2xl font-black text-slate-900 tracking-tight">{{ report?.revenue_billing?.total_revenue_all_time || 0 }}</p>
           <p class="text-[10px] font-bold text-indigo-500 mt-0.5">ETB</p>
         </div>
-        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+        <div class="bg-slate-50 border border-slate-200 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -186,7 +186,7 @@
           </p>
           <p class="text-[10px] font-semibold text-slate-500 mt-0.5">{{ report?.revenue_billing?.overdue_invoices?.amount || 0 }} ETB</p>
         </div>
-        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+        <div class="bg-slate-50 border border-slate-200 p-4 rounded-none">
           <div class="flex items-center gap-2 mb-2">
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -202,7 +202,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Tenant & Landlord -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm space-y-4">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
           <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -214,7 +214,7 @@
         <div class="space-y-2 text-xs">
           <div class="flex justify-between items-center py-2 px-3 bg-slate-50 rounded-xl border border-slate-100">
             <span class="text-slate-500 font-medium">Owners / Tenants</span>
-            <span class="px-2 py-0.5 bg-white border border-slate-200 text-slate-900 rounded-lg font-mono font-bold">
+            <span class="px-2 py-0.5 bg-white border border-slate-200 text-slate-900 rounded-none font-mono font-bold">
               {{ report?.tenant_landlord?.totals?.owners || 0 }} / {{ report?.tenant_landlord?.totals?.tenants || 0 }}
             </span>
           </div>
@@ -236,15 +236,15 @@
           </div>
         </div>
         <div class="pt-2 border-t border-slate-100 grid grid-cols-3 gap-2 text-center text-xs">
-          <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl">
+          <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-none">
             <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">Active</p>
             <p class="font-extrabold text-indigo-700 text-lg mt-0.5">{{ report?.tenant_landlord?.active_rents || 0 }}</p>
           </div>
-          <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+          <div class="bg-rose-50 border border-rose-100 p-3 rounded-none">
             <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">Terminated</p>
             <p class="font-extrabold text-rose-700 text-lg mt-0.5">{{ report?.tenant_landlord?.terminated_rents || 0 }}</p>
           </div>
-          <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
+          <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-none">
             <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">New (30d)</p>
             <p class="font-extrabold text-emerald-700 text-lg mt-0.5">{{ report?.tenant_landlord?.new_rents_last_30_days || 0 }}</p>
           </div>
@@ -252,7 +252,7 @@
       </div>
 
       <!-- Coworking -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -290,7 +290,7 @@
       </div>
 
       <!-- Rent Activity Donut -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-teal-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -307,7 +307,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- Maintenance – stats + bar chart -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -318,19 +318,19 @@
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Maintenance Requests</h3>
         </div>
         <div class="grid grid-cols-4 gap-2 text-center mb-4">
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-none">
             <div class="text-xl font-extrabold text-slate-900">{{ report?.maintenance?.total || 0 }}</div>
             <div class="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Total</div>
           </div>
-          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-none">
             <div class="text-xl font-extrabold text-amber-700">{{ report?.maintenance?.pending || 0 }}</div>
             <div class="text-[9px] font-bold text-amber-500 uppercase mt-0.5">Pending</div>
           </div>
-          <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl">
+          <div class="p-3 bg-sky-50 border border-sky-200 rounded-none">
             <div class="text-xl font-extrabold text-sky-700">{{ report?.maintenance?.open || 0 }}</div>
             <div class="text-[9px] font-bold text-sky-500 uppercase mt-0.5">Open</div>
           </div>
-          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-none">
             <div class="text-xl font-extrabold text-emerald-700">{{ report?.maintenance?.resolved || 0 }}</div>
             <div class="text-[9px] font-bold text-emerald-500 uppercase mt-0.5">Resolved</div>
           </div>
@@ -339,7 +339,7 @@
       </div>
 
       <!-- Audit Events -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-none p-4 shadow-sm">
         <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
           <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
             <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -356,15 +356,15 @@
           <!-- Audit actions bar chart -->
           <apexchart type="bar" height="140" :options="auditActionsBarOptions" :series="auditActionsBarSeries" />
           <div class="flex flex-wrap gap-2 py-2 px-3 bg-slate-50 rounded-xl border border-slate-100">
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium text-[11px] shadow-sm">
+            <span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 text-slate-700 rounded-none font-medium text-[11px] shadow-sm">
               <svg class="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
               Create: <strong class="font-mono text-slate-900 ml-1">{{ report?.audit?.by_action?.create || 0 }}</strong>
             </span>
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium text-[11px] shadow-sm">
+            <span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 text-slate-700 rounded-none font-medium text-[11px] shadow-sm">
               <svg class="w-3 h-3 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
               Update: <strong class="font-mono text-slate-900 ml-1">{{ report?.audit?.by_action?.update || 0 }}</strong>
             </span>
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium text-[11px] shadow-sm">
+            <span class="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 text-slate-700 rounded-none font-medium text-[11px] shadow-sm">
               <svg class="w-3 h-3 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               Delete: <strong class="font-mono text-slate-900 ml-1">{{ report?.audit?.by_action?.delete || 0 }}</strong>
             </span>
@@ -379,9 +379,9 @@
               Top Actors
             </p>
             <div v-for="(actor, idx) in report?.audit?.top_actors" :key="idx"
-              class="bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 p-2.5 rounded-xl flex justify-between items-center font-mono text-[11px] text-slate-900 mb-1.5">
+              class="bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 p-2.5 rounded-none flex justify-between items-center font-mono text-[11px] text-slate-900 mb-1.5">
               <span class="text-slate-600 font-medium truncate max-w-[70%]">{{ actor.actor__email || 'None' }} / {{ actor.actor__phone_number || 'None' }}</span>
-              <span class="shrink-0 ml-2 px-2.5 py-1 bg-white border border-slate-200 text-slate-900 font-bold rounded-lg shadow-sm text-[10px]">{{ actor.events }} events</span>
+              <span class="shrink-0 ml-2 px-2.5 py-1 bg-white border border-slate-200 text-slate-900 font-bold rounded-none shadow-sm text-[10px]">{{ actor.events }} events</span>
             </div>
           </div>
         </div>
