@@ -1,5 +1,13 @@
 <template>
-  <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" @keydown.esc="close">
+  <div v-if="open && !canAccess" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+    <div class="w-full max-w-md border border-red-200 bg-white p-6 shadow-2xl" role="alertdialog" aria-modal="true">
+      <h2 class="text-base font-semibold text-slate-900">Access restricted</h2>
+      <p class="mt-2 text-sm text-slate-600">Only owners, super users and super staff can access offplan properties.</p>
+      <button type="button" @click="close" class="mt-5 border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Close</button>
+    </div>
+  </div>
+
+  <div v-if="open && canAccess" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" @keydown.esc="close">
     <div class="w-full max-w-5xl max-h-[92vh] overflow-hidden border border-slate-200 bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="edit-offplan-title">
       <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
         <div>
@@ -28,9 +36,36 @@
           <Field label="Pre-handover payment"><select v-model="form.pre_handover_payment" class="input"><option value="under_25">Under 25%</option><option value="25_50">25% – 50%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
           <Field label="Project status"><select v-model="form.project_status" class="input"><option value="under_construction">Under construction</option><option value="planned">Planned</option><option value="completed">Completed</option></select></Field>
           <Field label="Developer"><input v-model="form.developer" class="input" /></Field>
-          <Field label="Property zone"><input v-model.number="form.property_zone" class="input" type="number" min="0" /></Field>
-          <Field label="Owner"><input v-model.number="form.owner" class="input" type="number" min="0" /></Field>
-          <Field label="Manager"><input v-model.number="form.manager" class="input" type="number" min="0" /></Field>
+          <Field label="Property zone" required>
+            <div class="space-y-2">
+              <input v-model="zoneSearch" class="input" placeholder="Search property zones…" autocomplete="off" />
+              <select v-model.number="form.property_zone" class="input" required>
+                <option :value="0" disabled>Select a property zone</option>
+                <option v-for="zone in filteredZones" :key="zone.id" :value="zone.id">{{ zone.name }}</option>
+              </select>
+            </div>
+          </Field>
+          <Field label="Owner" required>
+            <template v-if="isElevatedUser">
+              <div class="space-y-2">
+                <input v-model="ownerSearch" class="input" placeholder="Search owners…" autocomplete="off" />
+                <select v-model.number="form.owner" class="input" required>
+                  <option :value="0" disabled>Select an owner</option>
+                  <option v-for="owner in filteredOwners" :key="owner.id" :value="owner.id">{{ owner.name }}</option>
+                </select>
+              </div>
+            </template>
+            <input v-else :value="ownerDisplayName" class="input bg-slate-50" readonly />
+          </Field>
+          <Field label="Manager" required>
+            <div class="space-y-2">
+              <input v-model="managerSearch" class="input" placeholder="Search managers…" autocomplete="off" />
+              <select v-model.number="form.manager" class="input" required>
+                <option :value="0" disabled>Select a manager</option>
+                <option v-for="manager in filteredManagers" :key="manager.id" :value="manager.id">{{ manager.name }}</option>
+              </select>
+            </div>
+          </Field>
         </div>
 
         <div class="border-b border-slate-200 p-6">
@@ -91,30 +126,113 @@ export default {
       ]
     };
   },
+  mounted() {
+    if (this.open) this.initializeLookups();
+  },
   watch: {
     open(value) {
       if (value) this.load();
     }
   },
-  methods: {
-    close() {
-      if (!this.saving) this.$emit("close");
+  computed: {
+    role() {
+      return String(this.$getRole ? this.$getRole() : localStorage.getItem("role") || "tenant").trim().toLowerCase();
     },
-    async load() {
-      if (!this.id) return;
+    isElevatedUser() {
+      return this.role === "superuser" || this.role === "super_staff";
+    },
+    canAccess() {
+      return this.isElevatedUser || this.role === "owner";
+    },
+    filteredZones() {
+      const q = this.zoneSearch.trim().toLowerCase();
+      return q ? this.zones.filter(item => item.name.toLowerCase().includes(q)) : this.zones;
+    },
+    filteredOwners() {
+      const q = this.ownerSearch.trim().toLowerCase();
+      return q ? this.owners.filter(item => item.name.toLowerCase().includes(q)) : this.owners;
+    },
+    filteredManagers() {
+      const q = this.managerSearch.trim().toLowerCase();
+      return q ? this.managers.filter(item => item.name.toLowerCase().includes(q)) : this.managers;
+    },
+    ownerDisplayName() {
+      const owner = this.owners.find(item => Number(item.id) === Number(this.form.owner));
+      return owner?.name || (this.form.owner ? "Owner #" + this.form.owner : "Assigned owner");
+    }
+  },
+  methods: {
+    normalizeList(response, keys = []) {
+      const raw = response?.data ?? response;
+      if (Array.isArray(raw)) return raw;
+      for (const key of keys) if (Array.isArray(raw?.[key])) return raw[key];
+      return [];
+    },
+    normalizePerson(item) {
+      const id = item?.id ?? item?.user_id ?? item?.owner_id ?? item?.manager_id;
+      const name = item?.name || item?.full_name || [item?.first_name, item?.middle_name, item?.last_name].filter(Boolean).join(" ") || item?.username || item?.email || ("#" + id);
+      return { id: Number(id), name: String(name).trim() };
+    },
+    normalizeZone(item) {
+      const id = item?.id ?? item?.property_zone_id ?? item?.zone_id;
+      const name = item?.name || item?.zone_name || item?.title || ("Zone #" + id);
+      return { id: Number(id), name: String(name).trim() };
+    },
+    getLoggedInUserId() {
+      const value = localStorage.getItem("userId") || localStorage.getItem("user_id") || localStorage.getItem("id");
+      return value ? Number(value) : 0;
+    },
+    async initializeLookups() {
+      if (!this.canAccess) return;
       this.loadingData = true;
       this.error = "";
       try {
-        const res = await this.$apiGetById("/get_offplan_property", this.id);
-        const item = res?.data?.data || res?.data || res?.property || res;
-        this.form = { ...defaults, ...item };
+        const zoneResponse = await this.$apiGet("/get_property_zones", { page: 1, page_size: 1000 });
+        this.zones = this.normalizeList(zoneResponse, ["zones", "results"]).map(this.normalizeZone).filter(item => item.id);
+        if (this.isElevatedUser) {
+          const ownerResponse = await this.$apiGet("/get_owners", { page: 1, page_size: 1000 });
+          const managerResponse = await this.$apiGet("/get_managers", { page: 1, page_size: 1000 });
+          this.owners = this.normalizeList(ownerResponse, ["owners", "results"]).map(this.normalizePerson).filter(item => item.id);
+          this.managers = this.normalizeList(managerResponse, ["managers", "results"]).map(this.normalizePerson).filter(item => item.id);
+        } else {
+          const ownerId = this.getLoggedInUserId();
+          if (!ownerId) throw new Error("Unable to determine the logged-in owner.");
+          this.form.owner = ownerId;
+          const managerResponse = await this.$apiGet("/get_owner_managers", { owner_id: ownerId, page: 1, page_size: 1000 });
+          this.managers = this.normalizeList(managerResponse, ["managers", "results"]).map(this.normalizePerson).filter(item => item.id);
+        }
+        await this.loadProperty();
       } catch (e) {
-        this.error = e?.message || "Unable to load the property.";
+        this.error = e?.message || "Unable to load property zones, owners or managers.";
       } finally {
         this.loadingData = false;
       }
     },
+    close() {
+      if (!this.saving) this.$emit("close");
+    },
+    async loadProperty() {
+      if (!this.id) return;
+      const res = await this.$apiGetById("/get_offplan_property", this.id);
+      const item = res?.data?.data || res?.data || res?.property || res;
+      this.form = { ...defaults, ...item };
+      if (!this.isElevatedUser) this.form.owner = this.getLoggedInUserId();
+    },
+    async load() {
+      if (!this.canAccess || !this.id) return;
+      await this.initializeLookups();
+    },
     async submitForm() {
+      if (!this.canAccess) return;
+      if (!this.form.property_zone || !this.form.manager) {
+        this.error = "Property zone and manager are required.";
+        return;
+      }
+      if (!this.isElevatedUser) this.form.owner = this.getLoggedInUserId();
+      if (!this.form.owner) {
+        this.error = "Please select an owner.";
+        return;
+      }
       this.saving = true;
       this.error = "";
       try {
