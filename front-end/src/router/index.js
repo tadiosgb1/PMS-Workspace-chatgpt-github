@@ -191,6 +191,17 @@ const routes = [
         props: true,
       },
       {
+        path: "offplan-applications",
+        name: "OffplanApplication-view",
+        component: () => import('../views/closed/Offplans/offplan application/ViewOffplanApplication.vue'),
+      },
+      {
+        path: "offplan-applications/detail/:id",
+        name: "OffplanApplication-detail",
+        component: () => import('../views/closed/Offplans/offplan application/OffplanApplicationDetail.vue'),
+        props: true,
+      },
+      {
         path: "tenantspropertsalerequests",
         name: "TenantPropertySaleRequest-view",
         component: () => import('../views/closed/TenantsPropertSaleRequests/TenantPropertySaleRequestView.vue'),
