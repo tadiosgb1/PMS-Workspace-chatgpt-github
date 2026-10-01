@@ -1,0 +1,2 @@
+<template><div><label class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">{{ label }}</label><slot /></div></template>
+<script>export default { name:"OffplanField", props:{label:{type:String,required:true}} };</script>
