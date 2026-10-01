@@ -168,6 +168,7 @@ export default {
         },
         { id: "brands", name: "Brands", route: "Brands-view", explicitRoles: ["superuser", "admin"] },
         { id: "offplan_applications", name: "Offplan Applications", route: "OffplanApplication-view", explicitRoles: ["superuser", "admin"] },
+        { id: "offplan_milestones", name: "Offplan Milestones", route: "OffplanMilestone-view", explicitRoles: ["superuser", "admin"] },
         // ── Co-work Spaces ──────────────────────────────────────────────
         {
           id: "cowork_spaces",
