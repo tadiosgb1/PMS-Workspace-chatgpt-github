@@ -105,9 +105,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        const r = await this.$apiGet("/get_offplan_payments");
-        const d = r?.data?.data || r?.data || r?.payments || r;
-        this.items = Array.isArray(d) ? d : (d?.results || []);
+        this.items = await this.$getOffplanPayments();
       } catch (e) {
         this.error = this.shortError(e, "Unable to load payments.");
       } finally {

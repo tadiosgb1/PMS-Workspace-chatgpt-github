@@ -84,9 +84,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        const res = await this.$apiGet("/get_offplan_applications");
-        const data = res?.data?.data || res?.data || res?.applications || res;
-        const items = Array.isArray(data) ? data : (Array.isArray(data?.results) ? data.results : []);
+        const items = await this.$getOffplanApplications();
         const item = items.find(row => String(row?.id) === String(this.id));
         if (!item) throw new Error("Application not found.");
         this.form = item;
