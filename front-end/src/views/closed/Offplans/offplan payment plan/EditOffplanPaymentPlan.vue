@@ -125,7 +125,7 @@ export default {
   methods: {
     async loadApplications() {
       try {
-        const r = await this.$apiGet("/get_offplan_applications");
+        const r = await this.$getOffplanApplications();
         const d = r?.data?.data || r?.data || r?.applications || r;
         const rows = Array.isArray(d) ? d : d?.results || [];
         this.applications = rows;
