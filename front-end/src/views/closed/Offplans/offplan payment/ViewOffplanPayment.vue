@@ -105,7 +105,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        const r = await this.$apiGet("/get_offplan_payments");
+        const r = await this.$getOffplanPayments();
         const d = r?.data?.data || r?.data || r?.payments || r;
         this.items = Array.isArray(d) ? d : (d?.results || []);
       } catch (e) {
