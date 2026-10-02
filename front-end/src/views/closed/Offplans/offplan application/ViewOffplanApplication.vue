@@ -128,9 +128,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        const res = await this.$apiGet("/get_offplan_applications");
-        const data = res?.data?.data || res?.data || res?.applications || res;
-        this.applications = Array.isArray(data) ? data : (Array.isArray(data?.results) ? data.results : []);
+        this.applications = await this.$getOffplanApplications();
       } catch (e) {
         this.error = this.shortError(e, "Unable to load offplan applications.");
       } finally {
