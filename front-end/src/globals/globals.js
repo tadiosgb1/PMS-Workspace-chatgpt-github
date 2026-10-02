@@ -6,7 +6,7 @@ import {
   apiPatch, apiDelete, isStrongPassword, validateField,
   gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
   processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
-  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getRole
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getRole, getOffplanApplications, getOffplanProperties, getOffplanPayments, getOffplanPaymentPlans, getOffplanMilestones, getOffplanBankFinancings
 } from "../utils/utils"; // Adjust the path to match your project structure
 export default {
 
@@ -96,7 +96,13 @@ export default {
       $getCoworkingSpaces:getCoworkingSpaces,
       $getWorkspaceRentals:getWorkspaceRentals,
       $getWorkspacePayments:getWorkspacePayments,
-      $getRole: getRole
+      $getRole: getRole,
+      $getOffplanApplications: getOffplanApplications,
+      $getOffplanProperties: getOffplanProperties,
+      $getOffplanPayments: getOffplanPayments,
+      $getOffplanPaymentPlans: getOffplanPaymentPlans,
+      $getOffplanMilestones: getOffplanMilestones,
+      $getOffplanBankFinancings: getOffplanBankFinancings
     };
     // Assign to the global properties in the Vue app
     app.config.globalProperties = {
