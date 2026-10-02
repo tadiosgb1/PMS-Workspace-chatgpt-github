@@ -636,12 +636,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
 }
 
 
-// ─── Offplan scoped data fetchers ─────────────────────────────────────────────
-
-function getLoggedInUserId() {
-  const value = localStorage.getItem("userId") || localStorage.getItem("user_id") || localStorage.getItem("id");
-  return value ? Number(value) : 0;
-}
+// ─── Offplan centralized data fetchers ───────────────────────────────────────
 
 function offplanList(response, keys = []) {
   const raw = response?.data ?? response;
@@ -650,71 +645,41 @@ function offplanList(response, keys = []) {
   return Array.isArray(raw?.results) ? raw.results : [];
 }
 
-function idOf(value) {
-  if (value === null || value === undefined || value === "") return 0;
-  if (typeof value === "object") return Number(value.id ?? value.user_id ?? value.owner_id ?? value.manager_id ?? value.customer_id ?? 0);
-  return Number(value) || 0;
-}
-
-function relatedId(record, keys) {
-  for (const key of keys) {
-    const value = key.split(".").reduce((item, part) => item?.[part], record);
-    const id = idOf(value);
-    if (id) return id;
-  }
-  return 0;
-}
-
-function scopeOffplanRecords(records, resource) {
-  const role = getRole();
-  const userId = getLoggedInUserId();
-  if (!userId || role === "superuser" || role === "super_staff") return records;
-
-  const rules = {
-    properties: role === "owner" ? ["owner", "owner_id"] : role === "manager" ? ["manager", "manager_id"] : ["owner", "owner_id", "manager", "manager_id"],
-    applications: role === "tenant" || role === "customer" ? ["customer", "customer_id"] : role === "owner" ? ["offplan_property.owner", "offplan_property.owner_id", "owner", "owner_id"] : ["offplan_property.manager", "offplan_property.manager_id", "manager", "manager_id"],
-    payments: role === "tenant" || role === "customer" ? ["application.customer", "application.customer_id", "customer", "customer_id"] : role === "owner" ? ["application.offplan_property.owner", "application.offplan_property.owner_id", "offplan_property.owner", "offplan_property.owner_id", "owner", "owner_id"] : ["application.offplan_property.manager", "application.offplan_property.manager_id", "offplan_property.manager", "offplan_property.manager_id", "manager", "manager_id"],
-    paymentPlans: role === "tenant" || role === "customer" ? ["application.customer", "application.customer_id", "customer", "customer_id"] : role === "owner" ? ["application.offplan_property.owner", "application.offplan_property.owner_id", "offplan_property.owner", "offplan_property.owner_id", "owner", "owner_id"] : ["application.offplan_property.manager", "application.offplan_property.manager_id", "offplan_property.manager", "offplan_property.manager_id", "manager", "manager_id"],
-    milestones: role === "owner" ? ["offplan_property.owner", "offplan_property.owner_id", "property.owner", "property.owner_id", "owner", "owner_id"] : role === "manager" ? ["offplan_property.manager", "offplan_property.manager_id", "property.manager", "property.manager_id", "manager", "manager_id"] : ["offplan_property.owner", "offplan_property.owner_id", "property.owner", "property.owner_id", "owner", "owner_id"],
-    bankFinancings: role === "tenant" || role === "customer" ? ["application.customer", "application.customer_id", "customer", "customer_id"] : role === "owner" ? ["application.offplan_property.owner", "application.offplan_property.owner_id", "offplan_property.owner", "offplan_property.owner_id", "owner", "owner_id"] : ["application.offplan_property.manager", "application.offplan_property.manager_id", "offplan_property.manager", "offplan_property.manager_id", "manager", "manager_id"]
-  };
-  const keys = rules[resource] || [];
-  if (!keys.length) return records;
-  return records.filter(record => keys.some(key => relatedId(record, [key]) === userId));
-}
-
-async function getScopedOffplan(url, keys, resource, params = {}) {
+async function getOffplanCollection(url, keys, params = {}) {
   try {
-    const response = await this.$apiGet(url, { page: 1, page_size: 1000, ...params });
-    return scopeOffplanRecords(offplanList(response, keys), resource);
+    // These collection getters intentionally do not apply role-based filtering yet.
+    // Role/ownership rules will be implemented once the backend role relationships
+    // are fully defined. The backend remains the authorization boundary.
+    const response = await apiGet(url, { page: 1, page_size: 1000, ...params });
+    return offplanList(response, keys);
   } catch (err) {
-    console.error("Error fetching " + resource + ":", err);
+    console.error("Error fetching " + url + ":", err);
     return [];
   }
 }
 
 export function getOffplanApplications(params = {}) {
-  return getScopedOffplan("/get_offplan_applications", ["applications"], "applications", params);
+  return getOffplanCollection("/get_offplan_applications", ["applications"], params);
 }
 
 export function getOffplanProperties(params = {}) {
-  return getScopedOffplan("/get_offplan_properties", ["properties"], "properties", params);
+  return getOffplanCollection("/get_offplan_properties", ["properties"], params);
 }
 
 export function getOffplanPayments(params = {}) {
-  return getScopedOffplan("/get_offplan_payments", ["payments"], "payments", params);
+  return getOffplanCollection("/get_offplan_payments", ["payments"], params);
 }
 
 export function getOffplanPaymentPlans(params = {}) {
-  return getScopedOffplan("/get_offplan_payment_plans", ["payment_plans"], "paymentPlans", params);
+  return getOffplanCollection("/get_offplan_payment_plans", ["payment_plans"], params);
 }
 
 export function getOffplanMilestones(params = {}) {
-  return getScopedOffplan("/get_offplan_milestones", ["milestones"], "milestones", params);
+  return getOffplanCollection("/get_offplan_milestones", ["milestones"], params);
 }
 
 export function getOffplanBankFinancings(params = {}) {
-  return getScopedOffplan("/get_offplan_bank_financings", ["financings"], "bankFinancings", params);
+  return getOffplanCollection("/get_offplan_bank_financings", ["financings"], params);
 }
 
 // ─── Authentication / Role Helper ────────────────────────────────────────────
