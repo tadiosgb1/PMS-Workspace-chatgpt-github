@@ -685,7 +685,7 @@ function scopeOffplanRecords(records, resource) {
 
 async function getScopedOffplan(url, keys, resource, params = {}) {
   try {
-    const response = await this.$apiGet(url, params);
+    const response = await this.$apiGet(url, { page: 1, page_size: 1000, ...params });
     return scopeOffplanRecords(offplanList(response, keys), resource);
   } catch (err) {
     console.error("Error fetching " + resource + ":", err);
