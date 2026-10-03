@@ -168,11 +168,11 @@ export default {
           minRole: "manager",
           children: [
             { id: "offplan_prop", name: "Offplan Properties", route: "OffplanProperty-view", minRole: "manager" },
-            { id: "offplan_applications", name: "Offplan Applications", route: "OffplanApplication-view", explicitRoles: ["superuser", "admin"] },
-            { id: "offplan_milestones", name: "Offplan Milestones", route: "OffplanMilestone-view", explicitRoles: ["superuser", "admin"] },
-            { id: "offplan_bank_financing", name: "Offplan Bank Financing", route: "OffplanBankFinancing-view", explicitRoles: ["superuser", "admin"] },
-            { id: "offplan_payments", name: "Offplan Payments", route: "OffplanPayment-view", explicitRoles: ["superuser", "admin"] },
-            { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin"] },
+            { id: "offplan_applications", name: "Offplan Applications", route: "OffplanApplication-view", explicitRoles: ["superuser", "admin", "super_staff", "owner", "manager", "staff"] },
+            { id: "offplan_milestones", name: "Offplan Milestones", route: "OffplanMilestone-view", explicitRoles: ["superuser", "admin", "super_staff", "owner", "manager", "staff"] },
+            { id: "offplan_bank_financing", name: "Offplan Bank Financing", route: "OffplanBankFinancing-view", explicitRoles: ["superuser", "admin", "super_staff", "owner", "manager", "staff"] },
+            { id: "offplan_payments", name: "Offplan Payments", route: "OffplanPayment-view", explicitRoles: ["superuser", "admin", "super_staff", "owner", "manager", "staff"] },
+            { id: "offplan_payment_plans", name: "Offplan Payment Plans", route: "OffplanPaymentPlan-view", explicitRoles: ["superuser", "admin", "super_staff", "owner", "manager", "staff"] },
           ],
         },
         {
