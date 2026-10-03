@@ -132,39 +132,39 @@
 
                   <!-- Status Action Buttons -->
                   <div class="flex flex-wrap gap-1 justify-center">
-                    <button v-if="p.status === 'available'" @click="markForRent(p)" class="status-btn bg-blue-50 text-blue-600 hover:bg-blue-600" title="List for Rent">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'available'" @click="markForRent(p)" class="status-btn bg-blue-50 text-blue-600 hover:bg-blue-600" title="List for Rent">
                       <i class="fas fa-home text-xs"></i>
                     </button>
-                    <button v-if="p.status === 'available'" @click="markForSale(p)" class="status-btn bg-orange-50 text-orange-600 hover:bg-orange-600" title="List for Sale">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'available'" @click="markForSale(p)" class="status-btn bg-orange-50 text-orange-600 hover:bg-orange-600" title="List for Sale">
                       <i class="fas fa-tag text-xs"></i>
                     </button>
                     
-                    <button v-if="p.status === 'for_rent'" @click="markAsRented(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark as Rented">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_rent'" @click="markAsRented(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark as Rented">
                       <i class="fas fa-check text-xs"></i>
                     </button>
-                    <button v-if="p.status === 'for_rent'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Rent">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_rent'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Rent">
                       <i class="fas fa-times text-xs"></i>
                     </button>
                     
-                    <button v-if="p.status === 'for_sale'" @click="markAsSold(p)" class="status-btn bg-purple-50 text-purple-600 hover:bg-purple-600" title="Mark as Sold">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="markAsSold(p)" class="status-btn bg-purple-50 text-purple-600 hover:bg-purple-600" title="Mark as Sold">
                       <i class="fas fa-handshake text-xs"></i>
                     </button>
-                    <button v-if="p.status === 'for_sale'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Sale">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Sale">
                       <i class="fas fa-times text-xs"></i>
                     </button>
                     
-                    <button v-if="p.status === 'rent'" @click="endRental(p)" class="status-btn bg-yellow-50 text-yellow-600 hover:bg-yellow-600" title="End Rental">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'rent'" @click="endRental(p)" class="status-btn bg-yellow-50 text-yellow-600 hover:bg-yellow-600" title="End Rental">
                       <i class="fas fa-door-open text-xs"></i>
                     </button>
                     
-                    <button v-if="p.status === 'sale'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Reset to Available">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'sale'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Reset to Available">
                       <i class="fas fa-undo text-xs"></i>
                     </button>
                     
-                    <button v-if="p.status !== 'under_maintenance'" @click="markMaintenance(p)" class="status-btn bg-red-50 text-red-600 hover:bg-red-600" title="Mark for Maintenance">
+                    <button v-if="$hasPermission('pms.change_property') && p.status !== 'under_maintenance'" @click="markMaintenance(p)" class="status-btn bg-red-50 text-red-600 hover:bg-red-600" title="Mark for Maintenance">
                       <i class="fas fa-tools text-xs"></i>
                     </button>
-                    <button v-if="p.status === 'under_maintenance'" @click="markAvailable(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark Fixed">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'under_maintenance'" @click="markAvailable(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark Fixed">
                       <i class="fas fa-check-circle text-xs"></i>
                     </button>
                   </div>
@@ -172,7 +172,7 @@
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button @click="goToDetail(p.id)" class="btn-action btn-gray" title="View Details"><i class="fas fa-eye"></i></button>
+                  <button v-if="$hasPermission('pms.view_property')" @click="goToDetail(p.id)" class="btn-action btn-gray" title="View Details"><i class="fas fa-eye"></i></button>
                   <button v-if="$hasPermission('pms.change_property')" @click="editProperty(p)" class="btn-action btn-blue" title="Edit Property"><i class="fas fa-edit"></i></button>
                   
                   <!-- Payment Related Actions -->
@@ -180,7 +180,7 @@
                   <button v-if="p.status === 'sale'" @click="salesPay(p.id)" class="btn-action bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white" title="Sales Payments"><i class="fas fa-dollar-sign"></i></button>
                   
                   <!-- Listing Actions -->
-                  <button v-if="p.status === 'available' || p.status === 'for_sale'" @click="openSaleModal(p.id)" class="btn-action btn-orange" title="List for Sale"><i class="fas fa-tag"></i></button>
+                  <button v-if="$hasPermission('pms.change_property') && (p.status === 'available' || p.status === 'for_sale')" @click="openSaleModal(p.id)" class="btn-action btn-orange" title="List for Sale"><i class="fas fa-tag"></i></button>
                   
                   <button v-if="$hasPermission('pms.delete_property')" @click="askDeleteConfirmation(p)" class="btn-action btn-red" title="Delete Property"><i class="fas fa-trash-alt"></i></button>
                 </div>
@@ -293,6 +293,10 @@ export default {
     askDeleteConfirmation(p) { this.propertyToDelete = p; this.confirmVisible = true; },
     async confirmDelete() {
       this.confirmVisible = false;
+      if (!this.$hasPermission("pms.delete_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to delete properties.", "error");
+        return;
+      }
       try {
         const res = await this.$apiDelete(`/delete_property/${this.propertyToDelete.id}`);
         this.$root.$refs.toast.showToast(res.message || "Deleted", "success");
@@ -300,7 +304,13 @@ export default {
       } catch (e) { this.$root.$refs.toast.showToast("Failed to delete", "error"); }
       this.propertyToDelete = null;
     },
-    openSaleModal(id) { this.salePropertyId = id; this.saleVisible = true; },
+    openSaleModal(id) {
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change property listings.", "error");
+        return;
+      }
+      this.salePropertyId = id; this.saleVisible = true;
+    },
     goToUserDetail(id) { if (id) this.$router.push(`/user_detail/${id}`); },
     goToZoneDetail(id) { if (id) this.$router.push(`/zones/${id}`); },
     goToDetail(id) { if (id) this.$router.push({ name: "PropertyDetail", params: { id } }); },
@@ -321,6 +331,10 @@ export default {
     },
 
     async updatePropertyStatus(property, newStatus, successMessage) {
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change property status.", "error");
+        return;
+      }
       try {
         const res = await this.$apiPatch(`/update_property`, property.id, {
           id: property.id,
