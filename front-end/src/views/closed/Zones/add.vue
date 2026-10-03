@@ -144,7 +144,7 @@
 
         <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
           <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
-          <button form="zoneForm" type="submit" :disabled="loading" class="btn-primary disabled:opacity-50 flex items-center gap-2">
+          <button v-if="$hasPermission('pms.add_propertyzone')" form="zoneForm" type="submit" :disabled="loading" class="btn-primary disabled:opacity-50 flex items-center gap-2">
             <i v-if="loading" class="fas fa-spinner fa-spin text-xs"></i>
             <i v-else class="fas fa-save text-xs"></i>
             {{ loading ? "Saving Zone..." : "Save Zone" }}
@@ -435,6 +435,10 @@ export default {
     },
 
     async submitForm() {
+      if (!this.$hasPermission("pms.add_propertyzone")) {
+        this.showError("You do not have permission to add zones.");
+        return;
+      }
       this.loading = true;
       this.form.description = this.buildDescription();
       try {
