@@ -181,7 +181,7 @@ import Loading from "@/components/Loading.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
-  template: `<span class="inline-block ml-1 text-gray-400">
+  template: `<span class="inline-block ml-1 text-primary">
     <svg v-if="sortKey !== field" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
     <svg v-else-if="sortAsc" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/></svg>
     <svg v-else class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
@@ -301,6 +301,6 @@ export default {
 
 <style scoped>
 .btn-page {
-  @apply flex items-center gap-1.5 px-3 py-1.5 border border-primary/20 bg-white rounded-lg text-xs font-semibold text-gray-700 hover:bg-primary hover:text-white hover:border-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all;
+  @apply flex items-center gap-1.5 px-3 py-1.5 border border-primary/20 bg-white rounded-lg text-xs font-semibold text-gray-700 hover:bg-primary hover:text-white hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all;
 }
 </style>
