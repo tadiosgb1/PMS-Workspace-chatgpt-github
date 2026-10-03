@@ -45,6 +45,12 @@ import staffs from '../views/closed/stafs/view.vue'
 import Notifications from '../views/closed/notifications/view.vue'
 import notificationDetail from '../views/closed/notifications/notificationDeatil.vue'
 import Reports from '../views/closed/report/view.vue'
+import ClientReport from '../views/closed/report/ClientReport.vue'
+import SubscriptionReport from '../views/closed/report/SubscriptionReport.vue'
+import PropertiesReport from '../views/closed/report/PropertiesReport.vue'
+import OffplanPropertiesReport from '../views/closed/report/OffplanPropertiesReport.vue'
+import RevenuesReport from '../views/closed/report/RevenuesReport.vue'
+import WorkspaceReport from '../views/closed/report/WorkspaceReport.vue'
 import CowrkingSpaces from '../views/closed/coworkingSpace/view.vue'
 import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
 import Contacts from '../views/closed/contacts/view.vue'
@@ -346,6 +352,12 @@ const routes = [
       { path: '/tenants', name: 'tenants', component: Tenants },
       { path: '/payments', name: 'payments', component: Payments },
       { path: '/reports', name: 'reports', component: Reports },
+      { path: '/reports/clients', name: 'ClientReport-view', component: ClientReport, meta: { role: 'superuser' } },
+      { path: '/reports/subscriptions', name: 'SubscriptionReport-view', component: SubscriptionReport, meta: { role: 'superuser' } },
+      { path: '/reports/properties', name: 'PropertiesReport-view', component: PropertiesReport },
+      { path: '/reports/offplan-properties', name: 'OffplanPropertiesReport-view', component: OffplanPropertiesReport },
+      { path: '/reports/revenues', name: 'RevenuesReport-view', component: RevenuesReport, meta: { role: 'superuser' } },
+      { path: '/reports/workspace', name: 'WorkspaceReport-view', component: WorkspaceReport },
       { path: '/notifications', name: 'notifications', component: Notifications },
       { path: 'notification/:id', name: 'notificationDetail', component: notificationDetail },
       { path: '/contacts', name: 'contacts', component: Contacts },
