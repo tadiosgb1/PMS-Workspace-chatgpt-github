@@ -140,6 +140,10 @@ export default {
     },
     async submitForm() {
       this.updateModalVisible = false;
+      if (!this.$hasPermission("pms.change_propertyzonepicture")) {
+        this.$root.$refs.toast.showToast("You do not have permission to update zone pictures.", "error");
+        return;
+      }
       try {
         // Check for validation errors before submitting
         if (this.errorMessage) {
