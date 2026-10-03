@@ -168,8 +168,8 @@ export default {
   methods: {
     async fetchProperties() {
       try {
-        const res = await this.$apiGet('/get_properties');
-        this.properties = res.data || res;
+        const res = await this.$getProperties({ page: 1, page_size: 1000 });
+        this.properties = res.properties || [];
       } catch (err) {
         console.error('Failed to fetch properties', err);
       }
