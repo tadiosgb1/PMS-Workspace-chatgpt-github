@@ -4,8 +4,8 @@
     <header class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <div class="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-primary">Alpha PMS · Executive Report</div>
-        <h1 class="text-2xl font-black tracking-tight text-slate-900">Revenues Report</h1>
-        <p class="mt-1 text-xs text-slate-500">Successful operating transactions only · SaaS owner subscriptions are excluded from revenue</p>
+        
+        
       </div>
       <button @click="exportCsv" class="rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white"><i class="fas fa-download mr-2"></i>Export Transactions</button>
     </header>
