@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-gray-100 min-h-screen">
+  <div class="pms-brand-page" class="p-6 bg-gray-100 min-h-screen">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
