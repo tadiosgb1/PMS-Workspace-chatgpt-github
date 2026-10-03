@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-gray-100 min-h-screen text-sm text-slate-800">
+  <div class="pms-brand-page" class="p-6 bg-gray-100 min-h-screen text-sm text-slate-800">
     <Toast ref="toast" />
     <Loading :visible="loading" message="Loading overdue rentals..." />
 
