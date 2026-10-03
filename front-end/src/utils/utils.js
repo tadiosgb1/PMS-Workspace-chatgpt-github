@@ -507,23 +507,22 @@ export async function getManagers(searchTerm = "") {
 /**
  * Fetch all properties. superuser and super_staff see everything.
  */
-export async function getProperties(
-  url = "/get_properties?page=1&page_size=10",
-  extraParams = null
-) {
+export async function getProperties(options = null, pageSize = 10) {
   try {
     let params = {};
-
-    if (extraParams && typeof extraParams === "object") {
-      params = { ...params, ...extraParams };
+    if (typeof options === "string") {
+      const urlObj = new URL(options, window.location.origin);
+      params = Object.fromEntries(urlObj.searchParams.entries());
+    } else if (options && typeof options === "object") {
+      params = { ...options };
     }
 
-    const urlObj   = new URL(url, window.location.origin);
-    const page     = params.page     || urlObj.searchParams.get("page")      || 1;
-    const pageSize = params.page_size || urlObj.searchParams.get("page_size") || 10;
-    const finalUrl = `/get_properties?page=${page}&page_size=${pageSize}`;
+    const page = Number(params.page || 1);
+    const size = Number(params.page_size || params.pageSize || pageSize);
+    const requestParams = { ...params, page, page_size: size };
+    delete requestParams.pageSize;
 
-    const response   = await this.$apiGet(finalUrl, params);
+    const response = await this.$apiGet("/get_properties", requestParams);
     const properties = response.data || [];
 
     await Promise.all(
@@ -571,6 +570,20 @@ export async function getProperties(
 }
 
 /**
+ * Fetch a single property zone through the centralized zone data handler.
+ * The API remains authoritative for tenant/role filtering.
+ */
+export async function getPropertyZone(id) {
+  if (!id) return null;
+  try {
+    return await this.$apiGetById("/get_property_zone", id);
+  } catch (err) {
+    console.error("Error fetching property zone:", err);
+    return null;
+  }
+}
+
+/**
  * Fetch all tenants. superuser and super_staff see everything.
  */
 export async function getTenants(url = null, pageSize = 10, searchTerm = "") {
@@ -596,11 +609,23 @@ export async function getTenants(url = null, pageSize = 10, searchTerm = "") {
 /**
  * Fetch all coworking spaces. superuser and super_staff see everything.
  */
-export async function getCoworkingSpaces(url = null, pageSize = 10) {
+export async function getCoworkingSpaces(options = null, pageSize = 10) {
   try {
-    const apiUrl   = url || `/get_coworking_spaces?page=1&page_size=${pageSize}`;
-    const response = await this.$apiGet(apiUrl, {});
-    const spaces   = response.data || [];
+    let params = {};
+    if (typeof options === "string") {
+      const urlObj = new URL(options, window.location.origin);
+      params = Object.fromEntries(urlObj.searchParams.entries());
+    } else if (options && typeof options === "object") {
+      params = { ...options };
+    }
+
+    const page = Number(params.page || 1);
+    const size = Number(params.page_size || params.pageSize || pageSize);
+    const requestParams = { ...params, page, page_size: size };
+    delete requestParams.pageSize;
+
+    const response = await this.$apiGet("/get_coworking_spaces", requestParams);
+    const spaces = response.data || [];
 
     return {
       spaces,
