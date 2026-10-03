@@ -3,3 +3,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* PMS branded compact UI for operational modules */
+.pms-brand-page {
+  color: #334155;
+  font-size: 0.8125rem;
+}
+.pms-brand-page h1 { font-size: 1.125rem !important; line-height: 1.35; font-weight: 700; }
+.pms-brand-page h2 { font-size: 0.95rem !important; line-height: 1.35; font-weight: 700; }
+.pms-brand-page h3 { font-size: 0.8125rem !important; line-height: 1.35; font-weight: 700; }
+.pms-brand-page p,
+.pms-brand-page label,
+.pms-brand-page span,
+.pms-brand-page td,
+.pms-brand-page th,
+.pms-brand-page input,
+.pms-brand-page select,
+.pms-brand-page textarea { font-size: 0.75rem; }
+.pms-brand-page button:not([class*="bg-red-"]):not([class*="bg-green-"]):not([class*="bg-primary"]):not([class*="bg-secondary"]) {
+  border-color: rgba(250,113,24,.32) !important;
+  color: #FA7118 !important;
+}
+.pms-brand-page button:not([class*="bg-red-"]):not([class*="bg-green-"]):not([class*="bg-primary"]):not([class*="bg-secondary"]):hover {
+  background-color: rgba(250,113,24,.07) !important;
+  border-color: #FA7118 !important;
+  color: #ea580c !important;
+}
+.pms-brand-page button [class*="fa-"],
+.pms-brand-page a [class*="fa-"],
+.pms-brand-page .text-gray-900 [class*="fa-"],
+.pms-brand-page .text-gray-800 [class*="fa-"],
+.pms-brand-page .text-gray-700 [class*="fa-"],
+.pms-brand-page .text-slate-900 [class*="fa-"],
+.pms-brand-page .text-slate-800 [class*="fa-"] {
+  color: #FA7118 !important;
+}
+.pms-brand-page .text-black { color: #334155 !important; }
+.pms-brand-page .border-black { border-color: rgba(250,113,24,.32) !important; }
+.pms-brand-page .bg-black { background-color: #FA7118 !important; }
+.pms-brand-page .bg-gray-900,
+.pms-brand-page .bg-slate-900 { background-color: #FA7118 !important; }
+.pms-brand-page .hover\\:bg-gray-900:hover,
+.pms-brand-page .hover\\:bg-slate-900:hover { background-color: #ea580c !important; }
