@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pms-brand-page">
     <Toast ref="toast" />
     <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
       <div class="bg-white w-full max-w-xl md:max-w-3xl lg:max-w-5xl rounded-xl shadow-xl flex flex-col max-h-[92vh] overflow-hidden">
