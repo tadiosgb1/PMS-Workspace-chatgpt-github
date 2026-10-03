@@ -179,8 +179,8 @@ export default {
   methods: {
     async fetchProperties() {
       try {
-        const res = await this.$apiGet('/get_properties');
-        this.properties = res.data || res;
+        const res = await this.$getProperties({ page: 1, page_size: 1000 });
+        this.properties = res.properties || [];
       } catch (err) {
         console.error('Failed to fetch properties', err);
       }
@@ -249,6 +249,10 @@ export default {
     },
     async submitForm() {
       this.updateModalVisible = false;
+      if (!this.$hasPermission("pms.change_propertypicture")) {
+        this.$root.$refs.toast.showToast("You do not have permission to update property pictures.", "error");
+        return;
+      }
       
       if (this.errorMessage || !this.form.file) return;
 
