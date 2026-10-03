@@ -84,6 +84,16 @@
                     <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">All caught up!</p>
                   </li>
                 </ul>
+
+                <div class="border-t border-slate-100 bg-white px-5 py-3">
+                  <button
+                    type="button"
+                    @click="goToAllNotifications"
+                    class="w-full text-center text-[11px] font-bold text-primary hover:text-dprimary transition-colors"
+                  >
+                    View all notifications
+                  </button>
+                </div>
               </div>
             </transition>
           </div>
@@ -316,6 +326,10 @@ export default {
     },
     toggleNotificationDropdown() {
       this.isNotificationDropdownOpen = !this.isNotificationDropdownOpen;
+    },
+    goToAllNotifications() {
+      this.isNotificationDropdownOpen = false;
+      this.$router.push({ name: "notifications" });
     },
     logout() {
       localStorage.clear();
