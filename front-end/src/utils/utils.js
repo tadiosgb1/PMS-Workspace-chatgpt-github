@@ -584,20 +584,6 @@ export async function getPropertyZone(id) {
 }
 
 /**
- * Fetch a single property through the centralized property data handler.
- * The API remains authoritative for tenant/role filtering.
- */
-export async function getProperty(id) {
-  if (!id) return null;
-  try {
-    return await this.$apiGetById("/get_property", id);
-  } catch (err) {
-    console.error("Error fetching property:", err);
-    return null;
-  }
-}
-
-/**
  * Fetch all tenants. superuser and super_staff see everything.
  */
 export async function getTenants(url = null, pageSize = 10, searchTerm = "") {
