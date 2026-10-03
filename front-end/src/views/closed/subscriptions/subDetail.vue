@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-gray-100 min-h-screen text-sm">
+  <div class="pms-brand-page" class="p-6 bg-gray-100 min-h-screen text-sm">
 
     <div v-if="loading" class="text-center text-gray-400 py-16 italic">Loading subscription...</div>
     <div v-else-if="error" class="text-center text-red-500 py-16">{{ error }}</div>
