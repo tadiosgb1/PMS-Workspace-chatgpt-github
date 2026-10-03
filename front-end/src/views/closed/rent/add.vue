@@ -279,8 +279,8 @@ export default {
 
     async fetchProperties() {
       try {
-        const res = await this.$apiGet("/get_properties", { search: this.propertySearch });
-        this.properties = res.data || [];
+        const res = await this.$getProperties({ page: 1, page_size: 1000, search: this.propertySearch });
+        this.properties = res.properties || [];
       } catch (e) {}
     },
 
