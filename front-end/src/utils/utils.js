@@ -386,16 +386,42 @@ export async function getFullNameById(id) {
   }
 }
 
-// ─── Data Fetchers (superuser / super_staff — no tenant-level filtering) ─────
+// ─── Centralized Data Fetchers ────────────────────────────────────────────────
 
 /**
- * Fetch all property zones. superuser and super_staff see everything.
+ * Fetch property zones through the single zone endpoint handler.
+ * Tenant/role authorization must remain enforced by the API; this helper does
+ * not accept or trust client-supplied tenant or role filters.
  */
-export async function getZones(url = null, pageSize = 1000) {
+export async function getZones(options = null, pageSize = 1000) {
   try {
-    const apiUrl  = url || `/get_property_zones?page=1&page_size=${pageSize}`;
+    let apiUrl;
+
+    // Keep backwards compatibility for existing callers that pass a URL string,
+    // while allowing all new zone requests to be built through this one helper.
+    if (typeof options === "string") {
+      apiUrl = options;
+    } else {
+      const config = options && typeof options === "object" ? options : {};
+      const page = Number(config.page ?? 1);
+      const size = Number(config.pageSize ?? config.page_size ?? pageSize);
+      const params = new URLSearchParams({
+        page: String(page),
+        page_size: String(size),
+      });
+
+      if (config.search && String(config.search).trim()) {
+        params.set("search", String(config.search).trim());
+      }
+      if (config.ordering && String(config.ordering).trim()) {
+        params.set("ordering", String(config.ordering).trim());
+      }
+
+      apiUrl = `/get_property_zones?${params.toString()}`;
+    }
+
     const response = await this.$apiGet(apiUrl, {});
-    const zones   = response.data || [];
+    const zones = response.data || [];
 
     for (const zone of zones) {
       try {
