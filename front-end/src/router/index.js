@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import { getTenantContext } from '../composables/useTenant.js';
+import { getRole } from '../utils/utils';
 // --- Views Imports ---
 import Login from '../views/opened/auth/login.vue'
 import Pricing from '../views/opened/landing/PricingPage.vue'
@@ -403,6 +404,7 @@ const routes = [
       { path: '/subDetail/:id', name: 'subDetail', component: subDetail, props: true },
     ]
   },
+  { path: "/access-denied", name: "access-denied", component: AccessDenied },
   { path: "/forgot-password-root", name: "forgotPassword", component: ForgotPassword },
   { path: "/reset/:token", name: "reset", component: Reset, meta: { requiresGuest: true } },
   { path: "/:pathMatch(.*)*", name: "accessDenied", component: AccessDenied, meta: { requiresGuest: true } },
@@ -415,8 +417,8 @@ const router = createRouter({
 
 // --- DYNAMIC INTERCEPT GUARD ---
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem("access");
-  const userRole = localStorage.getItem("role");
+  const isAuthenticated = Boolean(localStorage.getItem("access"));
+  const userRole = getRole();
   const tenantType = getTenantContext().tenantType;
 
   // 1. DYNAMIC INITIAL LOAD INTERCEPTION (The core request)
@@ -436,8 +438,7 @@ router.beforeEach((to, from, next) => {
     if (!isAuthenticated) {
       return next("/login");
     } else if (requiredRole && userRole !== requiredRole) {
-      localStorage.clear();
-      return next("/login");
+      return next("/access-denied");
     } else {
       return next();
     }
