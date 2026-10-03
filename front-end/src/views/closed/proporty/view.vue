@@ -396,12 +396,18 @@ export default {
           dataset = this.properties;
         } else if (type === "all") {
           // Direct API query hitting maximum bounds with matching parameters to process background pipeline
-          const basePageUrl = `/get_properties?page=1&page_size=1000000&search=${this.searchTerm}&ordering=${this.ordering}`;
-          const params = { status: this.status };
-          if (this.$route.query.zone_id || this.zone_id) params.property_zone_id = this.$route.query.zone_id || this.zone_id;
-          if (this.searchTerm) params.search = this.searchTerm;
+          const params = {
+            page: 1,
+            page_size: 1000000,
+            search: this.searchTerm,
+            ordering: this.ordering,
+            status: this.status,
+          };
+          if (this.$route.query.zone_id || this.zone_id) {
+            params.property_zone_id = this.$route.query.zone_id || this.zone_id;
+          }
 
-          const result = await this.$getProperties(basePageUrl, params);
+          const result = await this.$getProperties(params);
           dataset = result.properties || [];
         }
 
