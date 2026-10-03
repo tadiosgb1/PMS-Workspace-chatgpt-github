@@ -6,7 +6,7 @@ import {
   apiPatch, apiDelete, isStrongPassword, validateField,
   gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
   processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
-  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getOffplanApplications, getOffplanProperties, getOffplanPayments, getOffplanPaymentPlans, getOffplanMilestones, getOffplanBankFinancings
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getProperty, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getOffplanApplications, getOffplanProperties, getOffplanPayments, getOffplanPaymentPlans, getOffplanMilestones, getOffplanBankFinancings
 } from "../utils/utils";
 import { getRole } from "../utils/authRole";
 export default {
@@ -91,6 +91,7 @@ export default {
       $convertImageToBase64: convertImageToBase64,
       $getZones: getZones,
       $getProperties: getProperties,
+      $getProperty: getProperty,
       $getManagers: getManagers,
       $hasPermission: hasPermission,
       $getTenants:getTenants,
