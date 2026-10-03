@@ -142,12 +142,12 @@ export default {
           icon: "fas fa-users-gear",
           explicitRoles: ["superuser", "owner", "manager", "staff"],
           children: [
-            { name: "Super Staffs",           route: "user_view",        permission: "pms.view_user",         explicitRoles: ["superuser"] },
-            { name: "Owners",                 route: "owners",           explicitRoles: ["superuser"] },
-            { name: "Brokers",                route: "brokers",          explicitRoles: ["superuser"] },
-            { name: "Property Managers",      route: "managers",         explicitRoles: ["owner"] },
-            { name: "Operational Staffs",     route: "staffs",           explicitRoles: ["owner", "manager", "staff"] },
-            { name: "Tenants",       route: "tenants",          explicitRoles: ["owner", "manager", "staff", "superuser"] },
+            { name: "Super Staffs",       route: "user_view",  permission: "pms.view_user", explicitRoles: ["superuser"] },
+            { name: "Owners",             route: "owners",     explicitRoles: ["superuser"] },
+            { name: "Brokers",            route: "brokers",    explicitRoles: ["superuser"] },
+            { name: "Property Managers",  route: "managers",   explicitRoles: ["owner"] },
+            { name: "Operational Staffs", route: "staffs",     explicitRoles: ["owner", "manager", "staff"] },
+            { name: "Tenants",             route: "tenants",    explicitRoles: ["owner", "manager", "staff", "superuser"] },
           ],
         },
         {
@@ -160,6 +160,13 @@ export default {
             { id: "prop_zones", name: "Zones",           route: "zones",             minRole: "manager" },
             { id: "prop_list",  name: "Properties",     route: "properties" },
           ],
+        },
+        {
+          id: "cowork_spaces",
+          name: "Co-work Spaces",
+          icon: "fas fa-people-roof",
+          route: "coworking-spaces",
+          minRole: "manager",
         },
         {
           id: "offplans",
@@ -176,35 +183,23 @@ export default {
           ],
         },
         {
+          id: "sales",
+          name: "Sales",
+          icon: "fas fa-money-bill-wave",
+          minRole: "manager",
+          children: [
+            { id: "sale_broker", name: "Broker/Tenant For Sale", route: "BrokerListSales-view", explicitRoles: ["superuser", "super_staff"] },
+            { id: "sale_house",  name: "For Sale",              route: "propertiesListForSale" },
+          ],
+        },
+        {
           id: "rentals",
           name: "Rentals",
           icon: "fas fa-file-contract",
           minRole: "manager",
           children: [
-            { id: "rent_house",   name: "Property Rentals",  route: "rents" },
-            { id: "rent_cowork",  name: "Workspace Rentals", route: "coworking-space-rentals" },
-            { id: "rent_overdue", name: "Overdue Rentals",   route: "overdue-rents" },
-          ],
-        },
-        {
-          id: "sales_superuser",
-          name: "Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["superuser", "super_staff"],
-          children: [
-            { id: "sale_broker",   name: "Broker/Tenant For Sale",   route: "BrokerListSales-view" },
-            { id: "sale_house",    name: "House Sales",       route: "propertiesListForSale" },
-            { id: "sale_all_pay",  name: "All Sale Payments", route: "sales_payments" },
-          ],
-        },
-        {
-          id: "sales_pms",
-          name: "My Sales",
-          icon: "fas fa-money-bill-wave",
-          explicitRoles: ["owner", "manager", "staff"],
-          children: [
-            { id: "my_sale_house", name: "House Sales",    route: "propertiesListForSale" },
-            { id: "my_sale_pay",   name: "Sale Payments",  route: "sales_payments" },
+            { id: "rent_property", name: "Property Rentals",  route: "rents" },
+            { id: "rent_workspace", name: "Workspace Rentals", route: "coworking-space-rentals" },
           ],
         },
         {
@@ -215,30 +210,11 @@ export default {
           explicitRoles: ["superuser", "super_staff", "owner", "staff", "manager"],
         },
         {
-          id: "subscriptions",
-          name: "Subscriptions",
-          route: "subscriptions_view",
-          icon: "fas fa-clipboard-list",
-          explicitRoles: ["superuser", "super_staff", "owner"],
-        },
-        {
           id: "finance",
           name: "Finance",
           icon: "fas fa-coins",
           route: "payments",
-          minRole: "staff",
-          id: "fin_pay"
-        },
-        {
-          id: "cowork_spaces",
-          name: "Co-work Spaces",
-          icon: "fas fa-people-roof",
-          minRole: "manager",
-          children: [
-            { id: "co_spaces",   name: "Spaces",   route: "coworking-spaces" },
-            { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
-            { id: "co_payments", name: "Payments", route: "coworking-payments" },
-          ],
+          minRole: "staff"
         },
         {
           id: "reports",
@@ -254,16 +230,22 @@ export default {
             { id: "report_revenues", name: "Revenues Report", route: "RevenuesReport-view", explicitRoles: ["superuser"] },
           ],
         },
-
-{
+        {
+          id: "subscriptions",
+          name: "Subscriptions",
+          route: "subscriptions_view",
+          icon: "fas fa-clipboard-list",
+          explicitRoles: ["superuser", "super_staff", "owner"],
+        },
+        {
           id: "notifications",
           name: "Notifications",
           route: "notifications",
           icon: "fas fa-bell",
           minRole: "manager",
         },
-{
-          id: "Settings",
+        {
+          id: "settings",
           name: "Settings",
           icon: "fas fa-gear",
           explicitRoles: ["superuser", "admin"],
@@ -286,7 +268,6 @@ export default {
             },
           ],
         },
-
       ],
     };
   },
@@ -310,13 +291,6 @@ export default {
         .map(item => {
           let parentName = item.name;
 
-          if (this.isPMSContext) {
-            if (item.id === "properties")    parentName = "My Properties";
-            if (item.id === "cowork_spaces") parentName = "My Co-work Spaces";
-            if (item.id === "rentals")       parentName = "My Rentals";
-            if (item.id === "finance")       parentName = "My Finance";
-          }
-
           if (!item.children) {
             if (!this.isRoleAllowed(item.minRole, item.explicitRoles)) return null;
             if (item.permission && !this.checkPermission(item.permission)) return null;
@@ -331,17 +305,6 @@ export default {
             })
             .map(child => {
               let childName = child.name;
-
-              if (this.isPMSContext) {
-                if (child.id === "prop_zones")   childName = "My Zones";
-                if (child.id === "prop_list")    childName = "My Properties";
-                if (child.id === "co_spaces")    childName = "Co-work Spaces";
-                if (child.id === "co_rentals")   childName = "Workspace Rentals";
-                if (child.id === "co_payments")  childName = "Rental Payments";
-                if (child.id === "rent_house")   childName = "House Rentals";
-                if (child.id === "rent_pay")     childName = "Rent Payments";
-                if (child.id === "fin_pay")      childName = "All Payments";
-              }
 
               return { ...child, name: childName };
             });
