@@ -319,6 +319,10 @@ const routes = [
         props: true,
       },
       {
+        path: "",
+        redirect: { name: "first-dash" },
+      },
+      {
         path: "first-dash", 
         name: "first-dash",
         component: first_dash,
