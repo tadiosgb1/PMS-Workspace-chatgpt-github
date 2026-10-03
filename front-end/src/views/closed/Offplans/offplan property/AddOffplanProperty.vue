@@ -223,8 +223,8 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        const zoneResponse = await this.$apiGet("/get_property_zones", { page: 1, page_size: 1000 });
-        this.zones = this.normalizeList(zoneResponse, ["zones", "results"]).map(this.normalizeZone).filter(item => item.id);
+        const zoneResponse = await this.$getZones({ page: 1, pageSize: 1000 });
+        this.zones = (zoneResponse.zones || []).map(this.normalizeZone).filter(item => item.id);
         if (this.isElevatedUser) {
           const ownerResponse = await this.$apiGet("/get_owners", { page: 1, page_size: 1000 });
           const managerResponse = await this.$apiGet("/get_managers", { page: 1, page_size: 1000 });
