@@ -1,5 +1,5 @@
 <template>
-  <div class="pms-brand-page" class="min-h-screen bg-gray-100 p-4 md:p-6">
+  <div class="pms-brand-page min-h-screen bg-gray-100 p-4 md:p-6">
     <Toast ref="toast" />
     <Loading :visible="loading" message="Loading space details..." />
 
