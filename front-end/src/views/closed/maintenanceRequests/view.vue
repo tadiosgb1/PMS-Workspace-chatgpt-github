@@ -1,5 +1,5 @@
 <template>
-  <div class="pms-brand-page" class="mt-4">
+  <div class="pms-brand-page mt-4">
     <Loading :visible="loading" message="Loading maintenance requests..." />
 
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
