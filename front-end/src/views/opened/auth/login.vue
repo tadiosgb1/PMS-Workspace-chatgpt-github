@@ -11,7 +11,7 @@
             <p class="text-xs font-medium text-slate-500 mt-1">Access your enterprise dashboard</p>
           </div>
 
-          <form @submit.prevent="login" class="space-y-5">
+          <form @submit.prevent="login" autocomplete="off" class="space-y-5">
 
             <div class="space-y-1.5">
               <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Phone Number</label>
@@ -19,6 +19,7 @@
                 <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-primary transition-colors"></i>
                 <input
                   type="tel"
+                  autocomplete="off"
                   v-model="form.phone_number"
                   required
                   placeholder="Enter your phone number"
@@ -38,6 +39,7 @@
                   :type="showPassword ? 'text' : 'password'"
                   v-model="form.password"
                   required
+                  autocomplete="new-password"
                   placeholder="Enter your password"
                   class="w-full pl-9 pr-10 py-2.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-sm text-slate-800 placeholder:text-slate-400"
                 />
@@ -131,6 +133,11 @@ export default {
         this.loading = false;
       }
     },
+  },
+  mounted() {
+    // Clear any browser-restored login values whenever the login page opens.
+    this.form.phone_number = "";
+    this.form.password = "";
   },
 };
 </script>
