@@ -26,6 +26,7 @@ export default {
       serviceBanks: [],
       blockBanks: [],
       inactivityTimeout: null, // Timeout for inactivity
+      bankRefreshInterval: null,
     };
   },
   computed: {
@@ -35,24 +36,40 @@ export default {
   },
   created() {
     this.$store.dispatch('fetchBanks');
-    setInterval(() => {
+    this.bankRefreshInterval = setInterval(() => {
       this.$store.dispatch('fetchBanks');
     }, 60000); // Fetch every 60 seconds
   },
   mounted() {
     // Add global event listeners to track user activity
     document.addEventListener('mousemove', this.resetInactivityTimer);
-    document.addEventListener('keypress', this.resetInactivityTimer);
+    document.addEventListener('mousedown', this.resetInactivityTimer);
     document.addEventListener('click', this.resetInactivityTimer);
+    document.addEventListener('keydown', this.resetInactivityTimer);
+    document.addEventListener('touchstart', this.resetInactivityTimer);
+    document.addEventListener('scroll', this.resetInactivityTimer, true);
 
     // Start the initial inactivity timer
     this.resetInactivityTimer();
   },
-  beforeDestroy() {
-    // Remove the event listeners to avoid memory leaks
+  beforeUnmount() {
+    // Remove the event listeners and timers to avoid memory leaks
     document.removeEventListener('mousemove', this.resetInactivityTimer);
-    document.removeEventListener('keypress', this.resetInactivityTimer);
+    document.removeEventListener('mousedown', this.resetInactivityTimer);
     document.removeEventListener('click', this.resetInactivityTimer);
+    document.removeEventListener('keydown', this.resetInactivityTimer);
+    document.removeEventListener('touchstart', this.resetInactivityTimer);
+    document.removeEventListener('scroll', this.resetInactivityTimer, true);
+
+    if (this.inactivityTimeout) {
+      clearTimeout(this.inactivityTimeout);
+      this.inactivityTimeout = null;
+    }
+
+    if (this.bankRefreshInterval) {
+      clearInterval(this.bankRefreshInterval);
+      this.bankRefreshInterval = null;
+    }
   },
   methods: {
     resetInactivityTimer() {
@@ -61,13 +78,14 @@ export default {
       }
       this.inactivityTimeout = setTimeout(() => {
         this.handleInactivity();
-      }, 30 * 60 * 1000); // 30 minutes
+      }, 60 * 1000); // 1 minute
     },
     handleInactivity() {
       if (this.$route.meta.requiresAuth) {
-        console.log('User has been inactive for 30 minutes. Logging out.');
+        console.log('User has been inactive for 1 minute. Logging out.');
+        localStorage.removeItem('access');
         localStorage.removeItem('token');
-        this.$router.push('/');
+        this.$router.push('/login');
       }
     },
   },
