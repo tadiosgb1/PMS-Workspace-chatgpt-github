@@ -391,7 +391,7 @@
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-gray-700">Photos</h2>
-            <button @click="addPictureVisible = true"
+            <button v-if="$hasPermission('pms.add_propertypicture')" @click="addPictureVisible = true"
               class="text-xs font-semibold text-primary border border-primary/30 bg-primary/5 px-3 py-1 rounded-lg hover:bg-primary/10 transition">
               <i class="fas fa-plus text-[10px] mr-1"></i> Add
             </button>
@@ -405,11 +405,11 @@
                   class="object-cover w-full h-full cursor-pointer transition-transform duration-300 group-hover:scale-105"
                   @click="previewImage(pic.property_image)" />
                 <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                  <button @click.stop="openUpdatePicture(pic)"
+                  <button v-if="$hasPermission('pms.change_propertypicture')" @click.stop="openUpdatePicture(pic)"
                     class="w-7 h-7 bg-white rounded-full text-blue-600 text-xs shadow flex items-center justify-center hover:bg-blue-600 hover:text-white transition">
                     <i class="fas fa-pen"></i>
                   </button>
-                  <button @click.stop="askDeletePicture(pic)"
+                  <button v-if="$hasPermission('pms.delete_propertypicture')" @click.stop="askDeletePicture(pic)"
                     class="w-7 h-7 bg-white rounded-full text-red-600 text-xs shadow flex items-center justify-center hover:bg-red-600 hover:text-white transition">
                     <i class="fas fa-trash"></i>
                   </button>
@@ -527,7 +527,10 @@ export default {
     }); 
   },
   methods: {
-    editProperty(p) { this.propertyToEdit = p; this.updateVisible = true; },
+    editProperty(p) {
+      if (!this.$hasPermission("pms.change_property")) return;
+      this.propertyToEdit = p; this.updateVisible = true;
+    },
     async fetchProperty() {
       this.loading = true;
       try {
@@ -539,6 +542,11 @@ export default {
     askDeletePicture(pic) { this.pictureToDelete = pic; this.confirmDeleteVisible = true; },
     async confirmDeletePicture() {
       this.confirmDeleteVisible = false;
+      if (!this.$hasPermission("pms.delete_propertypicture")) {
+        this.$root.$refs.toast.showToast("You do not have permission to delete property pictures.", "error");
+        this.pictureToDelete = null;
+        return;
+      }
       if (!this.pictureToDelete) return;
       try {
         await this.$apiDelete(`/delete_property_picture/${this.pictureToDelete.id}`);
@@ -628,6 +636,10 @@ export default {
     },
 
     async updateStatus(newStatus) {
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change property status.", "error");
+        return;
+      }
       try {
         const res = await this.$apiPatch(`/update_property`, this.property.id, {
           id: this.property.id,
