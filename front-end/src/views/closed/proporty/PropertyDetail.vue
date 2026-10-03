@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 md:p-6 bg-gray-50 min-h-screen">
+  <div class="pms-brand-page" class="p-4 md:p-6 bg-gray-50 min-h-screen">
     <Loading :visible="loading" message="Loading property..." />
 
     <div v-if="property" class="max-w-6xl mx-auto space-y-5">
