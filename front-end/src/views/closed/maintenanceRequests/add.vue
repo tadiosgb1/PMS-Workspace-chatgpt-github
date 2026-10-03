@@ -83,8 +83,12 @@ export default {
   methods: {
     async fetchProperties(url = null) {
       try {
-        const pageUrl = url || `/get_properties?search=${this.propertySearch}&ordering=${this.ordering}`;
-        const result = await this.$getProperties(pageUrl);
+        const result = await this.$getProperties({
+          page: 1,
+          page_size: 1000,
+          search: this.propertySearch,
+          ordering: this.ordering,
+        });
         this.properties = result.properties;
       } catch (err) { console.error(err); }
     },
