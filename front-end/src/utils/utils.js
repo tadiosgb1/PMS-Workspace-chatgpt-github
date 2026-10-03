@@ -681,5 +681,4 @@ export function getOffplanBankFinancings(params = {}) {
 }
 
 import { getRole } from './authRole';
-export { getRole } from './authRole';import { getRole } from './authRole';
-export { getRole } from './authRole';
+export { getRole };
