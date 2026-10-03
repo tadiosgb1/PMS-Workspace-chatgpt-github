@@ -253,7 +253,6 @@ export default {
             { id: "report_revenues", name: "Revenues Report", route: "RevenuesReport-view", explicitRoles: ["superuser"] },
           ],
         },
-        },
 
 {
           id: "notifications",
