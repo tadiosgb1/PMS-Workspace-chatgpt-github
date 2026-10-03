@@ -1,49 +1,49 @@
 <template>
-  <div class="p-6 bg-gray-100 min-h-screen text-sm">
+  <div class="p-6 bg-background min-h-screen text-sm">
     <Toast ref="toast" />
     <Loading :visible="loading" message="Loading property types..." />
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
       <div>
-        <h1 class="text-xl font-black text-gray-800 tracking-tight">Property Types</h1>
+        <h1 class="text-xl font-black text-primary tracking-tight">Property Types</h1>
         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">Manage Property Categories</p>
       </div>
       <button 
         @click="visible = true"
-        class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors"
+        class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors"
       >
         <i class="fas fa-plus text-xs"></i> Add Property Type
       </button>
     </div>
 
     <!-- Search + Filter -->
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-gray-100">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-primary/10">
       <div class="relative flex-1 max-w-sm">
         <input 
           v-model="searchTerm" 
           @input="onSearchInput" 
           type="search" 
           placeholder="Search property types..." 
-          class="border border-gray-200 rounded-lg px-4 py-2 text-sm w-full bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition" 
+          class="border border-primary/20 rounded-lg px-4 py-2 text-sm w-full bg-white focus:outline-none focus:ring-2 focus:ring-primary transition" 
         />
       </div>
 
       <div class="flex items-center gap-2 text-xs text-gray-500">
         <label class="font-semibold">Show</label>
-        <select v-model="pageSize" @change="fetchPropertyTypes(1)" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition cursor-pointer">
+        <select v-model="pageSize" @change="fetchPropertyTypes(1)" class="border border-primary/20 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary transition cursor-pointer">
           <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
         </select>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-lg border border-primary/10 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+          <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-primary/10">
             <tr>
-              <th class="px-4 py-3 text-left cursor-pointer hover:text-gray-700 transition" @click="sortBy('name')">
+              <th class="px-4 py-3 text-left cursor-pointer hover:text-primary transition" @click="sortBy('name')">
                 Type Name <SortIcon field="name" :sort-key="sortKey" :sort-asc="sortAsc" />
               </th>
               <th class="px-4 py-3 text-left">Description</th>
@@ -54,23 +54,23 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <tr v-for="type in propertyTypes" :key="type.id" class="hover:bg-gray-50 transition-colors">
+            <tr v-for="type in propertyTypes" :key="type.id" class="hover:bg-primary/5 transition-colors">
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center uppercase shrink-0">
+                  <div class="w-8 h-8 rounded-lg bg-background text-gray-700 font-bold text-xs flex items-center justify-center uppercase shrink-0">
                     {{ (type.name || '').substring(0, 2) }}
                   </div>
-                  <span class="font-semibold text-gray-800">{{ type.name }}</span>
+                  <span class="font-semibold text-primary">{{ type.name }}</span>
                 </div>
               </td>
               <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">{{ type.description || '—' }}</td>
               <td class="px-4 py-3 text-center">
                 <div class="flex items-center justify-center gap-1">
-                  <span :class="type.is_sellable ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'"
+                  <span :class="type.is_sellable ? 'bg-green-100 text-green-700' : 'bg-background text-gray-400'"
                     class="px-2 py-0.5 rounded-full text-[10px] font-semibold">
                     {{ type.is_sellable ? 'Sell' : 'No Sell' }}
                   </span>
-                  <span :class="type.is_rentable ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'"
+                  <span :class="type.is_rentable ? 'bg-blue-100 text-blue-700' : 'bg-background text-gray-400'"
                     class="px-2 py-0.5 rounded-full text-[10px] font-semibold">
                     {{ type.is_rentable ? 'Rent' : 'No Rent' }}
                   </span>
@@ -93,14 +93,14 @@
                 <div class="flex items-center justify-end gap-1">
                   <button
                     @click="viewDetail(type.id)"
-                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs"
+                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white hover:text-white transition text-xs"
                     title="View Detail"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
                   <button
                     @click="editPropertyType(type)"
-                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white transition text-xs"
+                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-background text-gray-700 hover:bg-gray-600 hover:text-white transition text-xs"
                     title="Edit"
                   >
                     <i class="fas fa-edit"></i>
@@ -127,7 +127,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3 bg-white px-4 py-3 rounded-lg border border-gray-100">
+    <div class="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3 bg-white px-4 py-3 rounded-lg border border-primary/10">
       <span class="text-xs text-gray-500">
         Page <span class="font-semibold text-gray-700">{{ currentPage }}</span> of 
         <span class="font-semibold text-gray-700">{{ totalPages }}</span>
@@ -136,7 +136,7 @@
         <button :disabled="!previous" @click="fetchPropertyTypes(previous)" class="btn-page">
           <i class="fas fa-chevron-left text-[10px]"></i> Prev
         </button>
-        <span class="px-3 py-1.5 bg-gray-800 text-white rounded-lg text-xs font-bold min-w-[2rem] text-center">
+        <span class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold min-w-[2rem] text-center">
           {{ currentPage }}
         </span>
         <button :disabled="!next" @click="fetchPropertyTypes(next)" class="btn-page">
@@ -301,6 +301,6 @@ export default {
 
 <style scoped>
 .btn-page {
-  @apply flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all;
+  @apply flex items-center gap-1.5 px-3 py-1.5 border border-primary/20 bg-white rounded-lg text-xs font-semibold text-gray-700 hover:bg-primary hover:text-white hover:border-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all;
 }
 </style>
