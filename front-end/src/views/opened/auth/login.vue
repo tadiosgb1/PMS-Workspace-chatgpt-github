@@ -105,8 +105,13 @@ export default {
         const response = await this.$apiPost("/token", this.form);
         const { refresh, access, permissions, id, is_superuser, phone_number, groups } = response;
 
+        // Authentication remains in localStorage because the API currently
+        // expects these credentials there. lastActivityAt is used to detect
+        // sessions that survived a computer shutdown/browser process kill.
         localStorage.setItem("refresh", refresh);
         localStorage.setItem("access", access);
+        localStorage.setItem("lastActivityAt", String(Date.now()));
+        localStorage.removeItem("pmsTabClosed");
         localStorage.setItem("permissions", JSON.stringify(permissions));
         localStorage.setItem("groups", JSON.stringify(groups));
         localStorage.setItem("userId", id);
