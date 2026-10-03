@@ -82,7 +82,7 @@
 
         <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
           <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
-          <button form="editZoneForm" type="submit" class="btn-primary flex items-center gap-2">
+          <button v-if="$hasPermission('pms.change_propertyzone')" form="editZoneForm" type="submit" class="btn-primary flex items-center gap-2">
             <i class="fas fa-save text-xs"></i> Update Zone
           </button>
         </div>
@@ -94,7 +94,7 @@
         <p class="text-sm font-bold text-gray-800 mb-5">Are you sure you want to apply these updates?</p>
         <div class="flex justify-end gap-3">
           <button @click="updateModalVisible = false" class="btn-cancel">Cancel</button>
-          <button @click="submitForm" class="btn-primary flex items-center gap-1.5">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="submitForm" class="btn-primary flex items-center gap-1.5">
             <i class="fas fa-check text-xs"></i> Confirm Updates
           </button>
         </div>
@@ -128,6 +128,10 @@ export default {
     },
     buildDescription() { return this.amenities.filter(a => a.amenity && a.value).map(a => `${a.amenity}:${a.value}`).join(","); },
     async submitForm() {
+      if (!this.$hasPermission("pms.change_propertyzone")) {
+        this.$root.$refs.toast.showToast("You do not have permission to edit zones.", "error");
+        return;
+      }
       this.updateModalVisible = false;
       this.form.description = this.buildDescription();
       try {
