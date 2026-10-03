@@ -304,6 +304,10 @@ export default {
     },
 
     async submitForm() {
+      if (!this.$hasPermission("pms.add_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to add properties.", "error");
+        return;
+      }
       // Zero-out the pricing field that doesn't apply to the selected status
       if (this.form.status === 'available') {
         this.form.rent = 0;
