@@ -9,9 +9,16 @@
   color: #334155;
   font-size: 0.8125rem;
 }
+
+/* Keep the compact, square visual language used by Offplan Property pages. */
+.pms-brand-page h1,
+.pms-brand-page h2 {
+  color: #FA7118 !important;
+}
 .pms-brand-page h1 { font-size: 1.125rem !important; line-height: 1.35; font-weight: 700; }
 .pms-brand-page h2 { font-size: 0.95rem !important; line-height: 1.35; font-weight: 700; }
 .pms-brand-page h3 { font-size: 0.8125rem !important; line-height: 1.35; font-weight: 700; }
+
 .pms-brand-page p,
 .pms-brand-page label,
 .pms-brand-page span,
@@ -20,23 +27,71 @@
 .pms-brand-page input,
 .pms-brand-page select,
 .pms-brand-page textarea { font-size: 0.75rem; }
+
+/* Operational actions: use the platform primary rather than black/gray/blue/orange. */
+.pms-brand-page button.bg-black,
+.pms-brand-page button.bg-gray-900,
+.pms-brand-page button.bg-gray-800,
+.pms-brand-page button.bg-gray-700,
+.pms-brand-page button.bg-gray-600,
+.pms-brand-page button.bg-blue-600,
+.pms-brand-page button.bg-orange-500 {
+  background-color: #FA7118 !important;
+  border-color: #FA7118 !important;
+  color: #fff !important;
+}
+.pms-brand-page button.bg-black:hover,
+.pms-brand-page button.bg-gray-900:hover,
+.pms-brand-page button.bg-gray-800:hover,
+.pms-brand-page button.bg-gray-700:hover,
+.pms-brand-page button.bg-gray-600:hover,
+.pms-brand-page button.bg-blue-600:hover,
+.pms-brand-page button.bg-orange-500:hover {
+  background-color: #ea580c !important;
+  border-color: #ea580c !important;
+  color: #fff !important;
+}
+
+/* Light action buttons/icons stay branded without competing with semantic red/green actions. */
+.pms-brand-page button.bg-blue-50,
+.pms-brand-page button.bg-orange-50,
+.pms-brand-page button.bg-gray-50,
+.pms-brand-page button.bg-gray-100 {
+  background-color: rgba(250,113,24,.07) !important;
+  border-color: rgba(250,113,24,.25) !important;
+  color: #FA7118 !important;
+}
+.pms-brand-page button.bg-blue-50:hover,
+.pms-brand-page button.bg-orange-50:hover,
+.pms-brand-page button.bg-gray-50:hover,
+.pms-brand-page button.bg-gray-100:hover {
+  background-color: #FA7118 !important;
+  border-color: #FA7118 !important;
+  color: #fff !important;
+}
+
+/* Buttons and form controls are square like the Offplan reference. */
+.pms-brand-page button { border-radius: 0 !important; }
+.pms-brand-page input,
+.pms-brand-page select,
+.pms-brand-page textarea { border-radius: 0 !important; }
+
+/* Square cards/panels; intentionally preserve rounded-full status/avatar elements. */
+.pms-brand-page .rounded-lg,
+.pms-brand-page .rounded-xl,
+.pms-brand-page .rounded-2xl { border-radius: 0 !important; }
+
 .pms-brand-page button:not([class*="bg-red-"]):not([class*="bg-green-"]):not([class*="bg-primary"]):not([class*="bg-secondary"]) {
   border-color: rgba(250,113,24,.32) !important;
-  color: #FA7118 !important;
-}
-.pms-brand-page button:not([class*="bg-red-"]):not([class*="bg-green-"]):not([class*="bg-primary"]):not([class*="bg-secondary"]):hover {
-  background-color: rgba(250,113,24,.07) !important;
-  border-color: #FA7118 !important;
-  color: #ea580c !important;
 }
 .pms-brand-page button [class*="fa-"],
-.pms-brand-page a [class*="fa-"],
-.pms-brand-page .text-gray-900 [class*="fa-"],
-.pms-brand-page .text-gray-800 [class*="fa-"],
-.pms-brand-page .text-gray-700 [class*="fa-"],
-.pms-brand-page .text-slate-900 [class*="fa-"],
-.pms-brand-page .text-slate-800 [class*="fa-"] {
+.pms-brand-page a [class*="fa-"] {
   color: #FA7118 !important;
+}
+.pms-brand-page button.bg-primary [class*="fa-"],
+.pms-brand-page button.bg-red- [class*="fa-"],
+.pms-brand-page button.bg-green- [class*="fa-"] {
+  color: inherit !important;
 }
 .pms-brand-page .text-black { color: #334155 !important; }
 .pms-brand-page .border-black { border-color: rgba(250,113,24,.32) !important; }
