@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pms-brand-page">
     <Toast ref="toast" />
     <div
       v-if="visible"
