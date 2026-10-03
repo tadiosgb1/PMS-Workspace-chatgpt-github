@@ -10,10 +10,11 @@
   font-size: 0.8125rem;
 }
 
-/* Keep the compact, square visual language used by Offplan Property pages. */
+/* Match the Offplan Property design: use the theme's primary token,
+   not a hard-coded orange/blue color. */
 .pms-brand-page h1,
 .pms-brand-page h2 {
-  color: #FA7118 !important;
+  color: rgb(var(--color-primary) / 1) !important;
 }
 .pms-brand-page h1 { font-size: 1.125rem !important; line-height: 1.35; font-weight: 700; }
 .pms-brand-page h2 { font-size: 0.95rem !important; line-height: 1.35; font-weight: 700; }
@@ -26,9 +27,11 @@
 .pms-brand-page th,
 .pms-brand-page input,
 .pms-brand-page select,
-.pms-brand-page textarea { font-size: 0.75rem; }
+.pms-brand-page textarea {
+  font-size: 0.75rem;
+}
 
-/* Operational actions: use the platform primary rather than black/gray/blue/orange. */
+/* Legacy dark/blue/orange action classes inherit the actual PMS primary theme. */
 .pms-brand-page button.bg-black,
 .pms-brand-page button.bg-gray-900,
 .pms-brand-page button.bg-gray-800,
@@ -36,8 +39,8 @@
 .pms-brand-page button.bg-gray-600,
 .pms-brand-page button.bg-blue-600,
 .pms-brand-page button.bg-orange-500 {
-  background-color: #FA7118 !important;
-  border-color: #FA7118 !important;
+  background-color: rgb(var(--color-primary) / 1) !important;
+  border-color: rgb(var(--color-primary) / 1) !important;
   color: #fff !important;
 }
 .pms-brand-page button.bg-black:hover,
@@ -47,56 +50,61 @@
 .pms-brand-page button.bg-gray-600:hover,
 .pms-brand-page button.bg-blue-600:hover,
 .pms-brand-page button.bg-orange-500:hover {
-  background-color: #ea580c !important;
-  border-color: #ea580c !important;
+  background-color: rgb(var(--color-dprimary) / 1) !important;
+  border-color: rgb(var(--color-dprimary) / 1) !important;
   color: #fff !important;
 }
 
-/* Light action buttons/icons stay branded without competing with semantic red/green actions. */
+/* Neutral/light actions follow the primary family while ordinary text stays slate. */
 .pms-brand-page button.bg-blue-50,
 .pms-brand-page button.bg-orange-50,
+.pms-brand-page button.bg-purple-50,
 .pms-brand-page button.bg-gray-50,
-.pms-brand-page button.bg-gray-100 {
-  background-color: rgba(250,113,24,.07) !important;
-  border-color: rgba(250,113,24,.25) !important;
-  color: #FA7118 !important;
+.pms-brand-page button.bg-gray-100,
+.pms-brand-page button.bg-yellow-50 {
+  background-color: rgb(var(--color-primary) / 0.07) !important;
+  border-color: rgb(var(--color-primary) / 0.25) !important;
+  color: rgb(var(--color-primary) / 1) !important;
 }
 .pms-brand-page button.bg-blue-50:hover,
 .pms-brand-page button.bg-orange-50:hover,
+.pms-brand-page button.bg-purple-50:hover,
 .pms-brand-page button.bg-gray-50:hover,
-.pms-brand-page button.bg-gray-100:hover {
-  background-color: #FA7118 !important;
-  border-color: #FA7118 !important;
+.pms-brand-page button.bg-gray-100:hover,
+.pms-brand-page button.bg-yellow-50:hover {
+  background-color: rgb(var(--color-primary) / 1) !important;
+  border-color: rgb(var(--color-primary) / 1) !important;
   color: #fff !important;
 }
 
-/* Buttons and form controls are square like the Offplan reference. */
+/* Square controls, matching ViewOffplanProperty.vue. */
 .pms-brand-page button { border-radius: 0 !important; }
 .pms-brand-page input,
 .pms-brand-page select,
 .pms-brand-page textarea { border-radius: 0 !important; }
-
-/* Square cards/panels; intentionally preserve rounded-full status/avatar elements. */
 .pms-brand-page .rounded-lg,
 .pms-brand-page .rounded-xl,
 .pms-brand-page .rounded-2xl { border-radius: 0 !important; }
 
-.pms-brand-page button:not([class*="bg-red-"]):not([class*="bg-green-"]):not([class*="bg-primary"]):not([class*="bg-secondary"]) {
-  border-color: rgba(250,113,24,.32) !important;
-}
+/* Icons in ordinary actions use primary; semantic red/green icons keep their meaning. */
 .pms-brand-page button [class*="fa-"],
 .pms-brand-page a [class*="fa-"] {
-  color: #FA7118 !important;
+  color: rgb(var(--color-primary) / 1) !important;
 }
 .pms-brand-page button.bg-primary [class*="fa-"],
 .pms-brand-page button.bg-red- [class*="fa-"],
 .pms-brand-page button.bg-green- [class*="fa-"] {
   color: inherit !important;
 }
+
 .pms-brand-page .text-black { color: #334155 !important; }
-.pms-brand-page .border-black { border-color: rgba(250,113,24,.32) !important; }
-.pms-brand-page .bg-black { background-color: #FA7118 !important; }
+.pms-brand-page .border-black { border-color: rgb(var(--color-primary) / 0.32) !important; }
+.pms-brand-page .bg-black,
 .pms-brand-page .bg-gray-900,
-.pms-brand-page .bg-slate-900 { background-color: #FA7118 !important; }
+.pms-brand-page .bg-slate-900 {
+  background-color: rgb(var(--color-primary) / 1) !important;
+}
 .pms-brand-page .hover\\:bg-gray-900:hover,
-.pms-brand-page .hover\\:bg-slate-900:hover { background-color: #ea580c !important; }
+.pms-brand-page .hover\\:bg-slate-900:hover {
+  background-color: rgb(var(--color-dprimary) / 1) !important;
+}
