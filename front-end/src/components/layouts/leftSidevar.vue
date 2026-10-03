@@ -239,7 +239,8 @@ export default {
             { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
             { id: "co_payments", name: "Payments", route: "coworking-payments" },
           ],
-{
+        },
+        {
           id: "reports",
           name: "Reports",
           icon: "fas fa-chart-column",
