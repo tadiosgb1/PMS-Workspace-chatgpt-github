@@ -55,23 +55,23 @@
           </button>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('active') class="status-action-card bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('active')" class="status-action-card bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100">
             <i class="fas fa-check-circle"></i>
             <span>Mark Active</span>
           </button>
-          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('development') class="status-action-card bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('development')" class="status-action-card bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
             <i class="fas fa-construction"></i>
             <span>Under Development</span>
           </button>
-          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('for_sale') class="status-action-card bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('for_sale')" class="status-action-card bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100">
             <i class="fas fa-tag"></i>
             <span>List for Sale</span>
           </button>
-          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('fully_occupied') class="status-action-card bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('fully_occupied')" class="status-action-card bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
             <i class="fas fa-users"></i>
             <span>Fully Occupied</span>
           </button>
-          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('maintenance') class="status-action-card bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('maintenance')" class="status-action-card bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
             <i class="fas fa-tools"></i>
             <span>Maintenance Required</span>
           </button>
