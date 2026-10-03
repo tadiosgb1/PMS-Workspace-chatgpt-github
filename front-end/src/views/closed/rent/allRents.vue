@@ -1,3 +1,3 @@
 <template>
-    <div>Rents</div>
+    <div class="pms-brand-page">Rents</div>
 </template>
