@@ -256,22 +256,29 @@ export default {
     async fetchProperties(url = null) {
       this.loading = true;
       try {
-        let pageUrl = url;
-        if (!pageUrl) {
-          
-          pageUrl = `/get_properties?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}&ordering=${this.ordering}`;
-        } else {
-          // Sync internal state counter if navigating with a raw URL from next/prev parameters
-          const urlObj = new URL(pageUrl, window.location.origin);
-          const pageParam = urlObj.searchParams.get("page");
-          if (pageParam) this.currentPage = parseInt(pageParam, 10);
+        let params = {
+          page: this.currentPage,
+          page_size: this.pageSize,
+          search: this.searchTerm,
+          ordering: this.ordering,
+          status: this.status,
+        };
+        if (this.$route.query.zone_id || this.zone_id) {
+          params.property_zone_id = this.$route.query.zone_id || this.zone_id;
         }
 
-        const params = { status: this.status };
-        if (this.$route.query.zone_id || this.zone_id) params.property_zone_id = this.$route.query.zone_id || this.zone_id;
-        if (this.searchTerm) params.search = this.searchTerm;
+        if (url) {
+          const urlObj = new URL(url, window.location.origin);
+          params = Object.fromEntries(urlObj.searchParams.entries());
+          const pageParam = urlObj.searchParams.get("page");
+          if (pageParam) this.currentPage = parseInt(pageParam, 10);
+          params.status = this.status;
+          if (this.$route.query.zone_id || this.zone_id) {
+            params.property_zone_id = this.$route.query.zone_id || this.zone_id;
+          }
+        }
 
-        const result = await this.$getProperties(pageUrl, params);
+        const result = await this.$getProperties(params);
         this.properties = result.properties || [];
         this.currentPage = result.currentPage || this.currentPage;
         this.totalPages = result.totalPages || 1;
