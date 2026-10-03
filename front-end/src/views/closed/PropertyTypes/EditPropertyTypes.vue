@@ -4,12 +4,12 @@
       <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl md:max-w-4xl my-4 sm:my-6 flex flex-col">
 
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 rounded-t-xl shrink-0">
+        <div class="px-6 py-4 border-b border-primary/10 flex items-center justify-between bg-primary/5 rounded-t-xl shrink-0">
           <div>
-            <h2 class="text-base font-bold text-gray-800">Edit Property Type</h2>
-            <p class="text-xs text-gray-500 mt-0.5">Update property category details</p>
+            <h2 class="text-base font-bold text-primary">Edit Property Type</h2>
+            <p class="text-xs text-gray-700 mt-0.5">Update property category details</p>
           </div>
-          <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">&times;</button>
+          <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition">&times;</button>
         </div>
 
         <!-- Form -->
@@ -33,7 +33,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <label v-for="feat in physicalFeatures" :key="feat.key" class="toggle-row">
                 <input type="checkbox" v-model="form[feat.key]" class="toggle-cb" />
-                <span class="text-xs text-gray-700">{{ feat.label }}</span>
+                <span class="text-xs text-gray-800">{{ feat.label }}</span>
               </label>
             </div>
           </div>
@@ -44,11 +44,11 @@
             <div class="grid grid-cols-2 gap-2">
               <label class="toggle-row">
                 <input type="checkbox" v-model="form.is_sellable" class="toggle-cb" />
-                <span class="text-xs text-gray-700">Is Sellable</span>
+                <span class="text-xs text-gray-800">Is Sellable</span>
               </label>
               <label class="toggle-row">
                 <input type="checkbox" v-model="form.is_rentable" class="toggle-cb" />
-                <span class="text-xs text-gray-700">Is Rentable</span>
+                <span class="text-xs text-gray-800">Is Rentable</span>
               </label>
             </div>
           </div>
@@ -60,7 +60,7 @@
               <div>
                 <label class="toggle-row mb-2">
                   <input type="checkbox" v-model="form.has_project_completion" class="toggle-cb" />
-                  <span class="text-xs font-semibold text-gray-700">Has Project Completion Year</span>
+                  <span class="text-xs font-semibold text-gray-800">Has Project Completion Year</span>
                 </label>
                 <input v-if="form.has_project_completion" v-model="form.project_completion_year"
                   type="text" maxlength="4" placeholder="e.g. 2026" class="form-input" />
@@ -68,7 +68,7 @@
               <div>
                 <label class="toggle-row mb-2">
                   <input type="checkbox" v-model="form.has_project_status" class="toggle-cb" />
-                  <span class="text-xs font-semibold text-gray-700">Has Project Status</span>
+                  <span class="text-xs font-semibold text-gray-800">Has Project Status</span>
                 </label>
                 <select v-if="form.has_project_status" v-model="form.project_status" class="form-input">
                   <option value="">Select status</option>
@@ -83,7 +83,7 @@
           <div>
             <label class="toggle-row mb-2">
               <input type="checkbox" v-model="form.has_pre_handover_payment" class="toggle-cb" />
-              <span class="text-xs font-semibold text-gray-700">Has Pre-handover Payment</span>
+              <span class="text-xs font-semibold text-gray-800">Has Pre-handover Payment</span>
             </label>
             <select v-if="form.has_pre_handover_payment" v-model="form.pre_handover_payment" class="form-input max-w-xs">
               <option value="">Select band</option>
@@ -97,7 +97,7 @@
         </form>
 
         <!-- Footer -->
-        <div class="border-t border-gray-100 px-6 py-4 bg-gray-50 flex justify-end gap-3 rounded-b-xl shrink-0">
+        <div class="border-t border-primary/10 px-6 py-4 bg-primary/5 flex justify-end gap-3 rounded-b-xl shrink-0">
           <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
           <button form="editPropertyTypeForm" type="submit" :disabled="saving" class="btn-primary flex items-center gap-2">
             <i v-if="saving" class="fas fa-spinner fa-spin text-xs"></i>
@@ -198,11 +198,11 @@ export default {
 </script>
 
 <style scoped>
-.form-label   { @apply block text-xs font-semibold text-gray-600 mb-1; }
-.form-input   { @apply w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 transition; }
-.section-label{ @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-gray-100 pb-1; }
-.toggle-row   { @apply flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 border border-gray-100 transition; }
-.toggle-cb    { @apply h-4 w-4 rounded border-gray-300 accent-gray-800 shrink-0; }
-.btn-cancel   { @apply px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition; }
-.btn-primary  { @apply px-5 py-2 text-sm font-bold text-white bg-gray-800 rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed; }
+.form-label   { @apply block text-xs font-semibold text-gray-700 mb-1; }
+.form-input   { @apply w-full border border-primary/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition; }
+.section-label{ @apply text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 border-b border-primary/10 pb-1; }
+.toggle-row   { @apply flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-primary/5 border border-primary/10 transition; }
+.toggle-cb    { @apply h-4 w-4 rounded border-gray-300 accent-primary shrink-0; }
+.btn-cancel   { @apply px-4 py-2 text-sm font-semibold text-gray-700 border border-primary/20 rounded-lg hover:bg-primary/10 transition; }
+.btn-primary  { @apply px-5 py-2 text-sm font-bold text-white bg-primary rounded-lg hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed; }
 </style>
