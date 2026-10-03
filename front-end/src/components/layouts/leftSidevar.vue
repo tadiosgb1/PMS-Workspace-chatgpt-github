@@ -239,6 +239,20 @@ export default {
             { id: "co_rentals",  name: "Rentals",  route: "coworking-space-rentals" },
             { id: "co_payments", name: "Payments", route: "coworking-payments" },
           ],
+{
+          id: "reports",
+          name: "Reports",
+          icon: "fas fa-chart-column",
+          minRole: "manager",
+          children: [
+            { id: "report_properties", name: "Properties Report", route: "PropertiesReport-view", minRole: "manager" },
+            { id: "report_offplan", name: "Off-plan Properties Report", route: "OffplanPropertiesReport-view", minRole: "manager" },
+            { id: "report_workspace", name: "Workspace Report", route: "WorkspaceReport-view", minRole: "manager" },
+            { id: "report_clients", name: "Client Report", route: "ClientReport-view", explicitRoles: ["superuser"] },
+            { id: "report_subscriptions", name: "Subscription Report", route: "SubscriptionReport-view", explicitRoles: ["superuser"] },
+            { id: "report_revenues", name: "Revenues Report", route: "RevenuesReport-view", explicitRoles: ["superuser"] },
+          ],
+        },
         },
 
 {
