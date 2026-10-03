@@ -238,13 +238,6 @@ export default {
           explicitRoles: ["superuser", "super_staff", "owner"],
         },
         {
-          id: "notifications",
-          name: "Notifications",
-          route: "notifications",
-          icon: "fas fa-bell",
-          minRole: "manager",
-        },
-        {
           id: "settings",
           name: "Settings",
           icon: "fas fa-gear",
