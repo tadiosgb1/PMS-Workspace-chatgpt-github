@@ -1,5 +1,5 @@
 <template>
-  <div class="pms-brand-page" class="p-6 bg-gray-100 min-h-screen text-sm">
+  <div class="pms-brand-page p-6 bg-gray-100 min-h-screen text-sm">
     <Toast ref="toast" />
     <Loading :visible="loading" message="Loading Notifications..." />
 
