@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { getTenantContext } from '../composables/useTenant.js';
 import { getRole } from '../utils/authRole';
+import { hasPermission } from '../utils/utils';
 // --- Views Imports ---
 import Login from '../views/opened/auth/login.vue'
 import Pricing from '../views/opened/landing/PricingPage.vue'
@@ -350,9 +351,9 @@ const routes = [
       },
       { path: '/properties', name: 'properties', component: Properties },
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
-      { path: '/zones/:id', name: 'zoneDetail', component: PropertyZoneDetail, props: true },
+      { path: '/zones/:id', name: 'zoneDetail', component: PropertyZoneDetail, props: true, meta: { permission: 'pms.view_propertyzone' } },
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },
-      { path: '/zones', name: 'zones', component: PropertyZone },
+      { path: '/zones', name: 'zones', component: PropertyZone, meta: { permission: 'pms.view_propertyzone' } },
       { path: '/pictures', name: 'pictures', component: PropertyPicture },
       { path: '/tenants', name: 'tenants', component: Tenants },
       { path: '/payments', name: 'payments', component: Payments },
@@ -458,11 +459,14 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
   const requiredRole = to.meta.role;
+  const requiredPermission = to.meta.permission;
 
   if (requiresAuth) {
     if (!isAuthenticated) {
       return next("/login");
     } else if (requiredRole && userRole !== requiredRole) {
+      return next("/access-denied");
+    } else if (requiredPermission && !hasPermission(requiredPermission)) {
       return next("/access-denied");
     } else {
       return next();
