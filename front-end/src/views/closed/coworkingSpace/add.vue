@@ -195,8 +195,7 @@ export default {
   },
     async fetchZones() {
       try {
-        const url = `/get_property_zones?search=${this.zoneSearch}`;
-        const result = await this.$getZones(url);
+        const result = await this.$getZones({ search: this.zoneSearch });
         this.zones = result.zones;
       } catch (err) {
         console.error("Failed to fetch zones:", err);
