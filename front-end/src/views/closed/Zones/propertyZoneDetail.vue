@@ -8,7 +8,7 @@
       <button @click="$router.back()" class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800 transition uppercase tracking-wider">
         <i class="fas fa-arrow-left text-[10px]"></i> Back
       </button>
-      <button @click="addPictureVisible = true" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
+      <button v-if="$hasPermission('pms.add_propertyzonepicture')" @click="addPictureVisible = true" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
         <i class="fas fa-camera text-xs"></i> Add Zone Picture
       </button>
     </div>
@@ -41,7 +41,7 @@
           </div>
           <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">Zone Management / Details</p>
         </div>
-        <button @click="updateZoneStatusVisible = true" class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition">
+        <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatusVisible = true" class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition">
           <i class="fas fa-cog text-xs"></i> Manage Status
         </button>
       </div>
@@ -55,23 +55,23 @@
           </button>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <button @click="updateZoneStatus('active')" class="status-action-card bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('active') class="status-action-card bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100">
             <i class="fas fa-check-circle"></i>
             <span>Mark Active</span>
           </button>
-          <button @click="updateZoneStatus('development')" class="status-action-card bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('development') class="status-action-card bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
             <i class="fas fa-construction"></i>
             <span>Under Development</span>
           </button>
-          <button @click="updateZoneStatus('for_sale')" class="status-action-card bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('for_sale') class="status-action-card bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100">
             <i class="fas fa-tag"></i>
             <span>List for Sale</span>
           </button>
-          <button @click="updateZoneStatus('fully_occupied')" class="status-action-card bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('fully_occupied') class="status-action-card bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
             <i class="fas fa-users"></i>
             <span>Fully Occupied</span>
           </button>
-          <button @click="updateZoneStatus('maintenance')" class="status-action-card bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
+          <button v-if="$hasPermission('pms.change_propertyzone')" @click="updateZoneStatus('maintenance') class="status-action-card bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
             <i class="fas fa-tools"></i>
             <span>Maintenance Required</span>
           </button>
@@ -314,10 +314,10 @@
               <img :src="BASE_URL + pic.property_image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" @click="previewImage(pic.property_image)" />
             </div>
             <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button @click.stop="openUpdatePicture(pic)" class="h-6 w-6 flex items-center justify-center rounded bg-white/90 text-gray-600 hover:text-gray-800 shadow text-xs" title="Update">
+              <button v-if="$hasPermission('pms.change_propertyzonepicture')" @click.stop="openUpdatePicture(pic)" class="h-6 w-6 flex items-center justify-center rounded bg-white/90 text-gray-600 hover:text-gray-800 shadow text-xs" title="Update">
                 <i class="fas fa-sync-alt"></i>
               </button>
-              <button @click.stop="askDeletePicture(pic)" class="h-6 w-6 flex items-center justify-center rounded bg-red-500 text-white shadow text-xs" title="Delete">
+              <button v-if="$hasPermission('pms.delete_propertyzonepicture')" @click.stop="askDeletePicture(pic)" class="h-6 w-6 flex items-center justify-center rounded bg-red-500 text-white shadow text-xs" title="Delete">
                 <i class="fas fa-trash-alt"></i>
               </button>
             </div>
@@ -461,6 +461,10 @@ export default {
     },
 
     async updateZoneStatus(newStatus) {
+      if (!this.$hasPermission("pms.change_propertyzone")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change zone status.", "error");
+        return;
+      }
       try {
         const res = await this.$apiPatch(`/update_property_zone`, this.zone.id, {
           id: this.zone.id,
@@ -536,6 +540,11 @@ export default {
 
     async confirmDeletePicture() {
       this.confirmDeleteVisible = false;
+      if (!this.$hasPermission("pms.delete_propertyzonepicture")) {
+        this.$root.$refs.toast.showToast("You do not have permission to delete zone pictures.", "error");
+        this.pictureToDelete = null;
+        return;
+      }
       if (!this.pictureToDelete) return;
       try {
         const res = await this.$apiDelete(`/delete_property_zone_picture/${this.pictureToDelete.id}`);
