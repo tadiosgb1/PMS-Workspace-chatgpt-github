@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="pms-brand-page" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 text-sm max-h-[90vh] overflow-y-auto">
 
       <div class="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
