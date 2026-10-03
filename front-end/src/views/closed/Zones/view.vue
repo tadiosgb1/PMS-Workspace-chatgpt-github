@@ -123,28 +123,28 @@
                   </div>
 
                   <div class="flex flex-wrap gap-1 justify-center">
-                    <button v-if="zone.status === 'active' || !zone.status" @click="markZoneForSale(zone)" class="zone-status-btn bg-orange-50 text-orange-600 hover:bg-orange-600" title="List Zone for Sale">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && (zone.status === 'active' || !zone.status)" @click="markZoneForSale(zone)" class="zone-status-btn bg-orange-50 text-orange-600 hover:bg-orange-600" title="List Zone for Sale">
                       <i class="fas fa-tag text-xs"></i>
                     </button>
-                    <button v-if="zone.status === 'active' || !zone.status" @click="markZoneDevelopment(zone)" class="zone-status-btn bg-blue-50 text-blue-600 hover:bg-blue-600" title="Mark Under Development">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && (zone.status === 'active' || !zone.status)" @click="markZoneDevelopment(zone)" class="zone-status-btn bg-blue-50 text-blue-600 hover:bg-blue-600" title="Mark Under Development">
                       <i class="fas fa-construction text-xs"></i>
                     </button>
                     
-                    <button v-if="zone.status === 'for_sale'" @click="markZoneSold(zone)" class="zone-status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark as Sold">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && zone.status === 'for_sale'" @click="markZoneSold(zone)" class="zone-status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark as Sold">
                       <i class="fas fa-handshake text-xs"></i>
                     </button>
-                    <button v-if="zone.status === 'for_sale'" @click="markZoneActive(zone)" class="zone-status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Sale">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && zone.status === 'for_sale'" @click="markZoneActive(zone)" class="zone-status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Sale">
                       <i class="fas fa-times text-xs"></i>
                     </button>
                     
-                    <button v-if="zone.status === 'development'" @click="markZoneActive(zone)" class="zone-status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Development Complete">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && zone.status === 'development'" @click="markZoneActive(zone)" class="zone-status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Development Complete">
                       <i class="fas fa-check text-xs"></i>
                     </button>
                     
-                    <button v-if="zone.status !== 'maintenance'" @click="markZoneMaintenance(zone)" class="zone-status-btn bg-red-50 text-red-600 hover:bg-red-600" title="Mark for Maintenance">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && zone.status !== 'maintenance'" @click="markZoneMaintenance(zone)" class="zone-status-btn bg-red-50 text-red-600 hover:bg-red-600" title="Mark for Maintenance">
                       <i class="fas fa-tools text-xs"></i>
                     </button>
-                    <button v-if="zone.status === 'maintenance'" @click="markZoneActive(zone)" class="zone-status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Maintenance Complete">
+                    <button v-if="$hasPermission('pms.change_propertyzone') && zone.status === 'maintenance'" @click="markZoneActive(zone)" class="zone-status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Maintenance Complete">
                       <i class="fas fa-check-circle text-xs"></i>
                     </button>
                   </div>
@@ -269,6 +269,10 @@ export default {
     },
 
     async updateZoneStatus(zone, newStatus, successMessage) {
+      if (!this.$hasPermission("pms.change_propertyzone")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change zone status.", "error");
+        return;
+      }
       try {
         const res = await this.$apiPatch(`/update_property_zone`, zone.id, {
           id: zone.id,
@@ -337,6 +341,11 @@ export default {
 
     async confirmDelete() {
       this.confirmVisible = false;
+      if (!this.$hasPermission("pms.delete_propertyzone")) {
+        this.$root.$refs.toast.showToast("You do not have permission to delete zones.", "error");
+        this.zoneToDelete = null;
+        return;
+      }
       try {
         const res = await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
         this.$root.$refs.toast.showToast(res.message || "Zone deleted", "success");
@@ -371,9 +380,12 @@ export default {
     async fetchZones() {
       this.loading = true;
       try {
-        const url = `/get_property_zones?page=${this.currentPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.searchTerm || "")}`;
-        
-        const result = await this.$getZones(url, { ordering: "-id" });
+        const result = await this.$getZones({
+          page: this.currentPage,
+          pageSize: this.pageSize,
+          search: this.searchTerm,
+          ordering: "-id",
+        });
         
         this.globalZones = result.zones || [];
         this.currentPage = result.currentPage || 1;
@@ -394,8 +406,12 @@ export default {
         if (type === "displayed") {
           dataset = this.filteredAndSortedZones;
         } else if (type === "all") {
-          const url = `/get_property_zones?page=1&page_size=1000000&search=${encodeURIComponent(this.searchTerm || "")}`;
-          const result = await this.$getZones(url, { ordering: "-id" });
+          const result = await this.$getZones({
+            page: 1,
+            pageSize: 1000000,
+            search: this.searchTerm,
+            ordering: "-id",
+          });
           dataset = result.zones || [];
         }
 
