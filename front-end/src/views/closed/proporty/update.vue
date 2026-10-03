@@ -350,6 +350,10 @@ export default {
     removeAmenity(i) { this.amenities.splice(i, 1); },
 
     async submitForm() {
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to edit properties.", "error");
+        return;
+      }
       this.saving = true;
 
       // Zero-out the pricing field that doesn't apply to the selected status
