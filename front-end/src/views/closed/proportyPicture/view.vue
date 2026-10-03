@@ -43,10 +43,10 @@
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ pic.property_id }}</td>
                   <td class="border border-gray-300 px-3 py-2 text-center space-x-2">
-                    <button @click="openEdit(pic)" class="text-blue-600 hover:text-blue-800" title="Edit">
+                    <button v-if="$hasPermission('pms.change_propertypicture')" @click="openEdit(pic)" class="text-blue-600 hover:text-blue-800" title="Edit">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button @click="askDeleteConfirmation(pic)" class="text-red-600 hover:text-red-800" title="Delete">
+                    <button v-if="$hasPermission('pms.delete_propertypicture')" @click="askDeleteConfirmation(pic)" class="text-red-600 hover:text-red-800" title="Delete">
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
