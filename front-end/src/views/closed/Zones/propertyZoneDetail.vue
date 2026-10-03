@@ -406,7 +406,11 @@ export default {
     async fetchZone() {
       this.loading = true;
       try {
-        const res = await this.$apiGet(`/get_property_zone/${this.$route.params.id}`);
+        if (!this.$hasPermission("pms.view_propertyzone")) {
+          this.$root.$refs.toast.showToast("You do not have permission to view this zone.", "error");
+          return;
+        }
+        const res = await this.$getPropertyZone(this.$route.params.id);
         this.zone = res.data || res;
         
         // Fetch zone-specific properties and coworking spaces
@@ -427,7 +431,7 @@ export default {
           property_zone_id: this.$route.params.id,
           page_size: 10 // Limit to recent properties for the detail view
         };
-        const result = await this.$getProperties('/get_properties', params);
+        const result = await this.$getProperties(params);
         this.recentProperties = result.properties || [];
       } catch (err) {
         console.error('Failed to fetch zone properties:', err);
@@ -439,8 +443,11 @@ export default {
       try {
         // Note: This assumes the API supports zone filtering for coworking spaces
         // You may need to adjust the API endpoint and parameters based on your backend
-        const url = `/get_coworking_spaces?zone__id=${this.$route.params.id}&page_size=10`;
-        const result = await this.$getCoworkingSpaces(url);
+        const result = await this.$getCoworkingSpaces({
+          zone__id: this.$route.params.id,
+          page: 1,
+          page_size: 10,
+        });
         this.recentCoworkingSpaces = result.spaces || [];
       } catch (err) {
         console.error('Failed to fetch zone coworking spaces:', err);
