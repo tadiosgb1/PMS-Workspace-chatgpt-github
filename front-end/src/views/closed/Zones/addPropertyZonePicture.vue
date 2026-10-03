@@ -61,7 +61,7 @@
 
         <div class="flex justify-end gap-2 px-6 py-4 border-t border-gray-100">
           <button type="button" @click="$emit('close')" class="px-4 py-2 border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 transition">Cancel</button>
-          <button form="pictureForm" type="submit" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
+          <button v-if="$hasPermission('pms.add_propertyzonepicture')" form="pictureForm" type="submit" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
             <i class="fas fa-save text-xs"></i> Save Picture
           </button>
         </div>
@@ -147,6 +147,10 @@ export default {
       if (el) el.value = '';
     },
     async submitForm() {
+      if (!this.$hasPermission("pms.add_propertyzonepicture")) {
+        this.errorMessage = "You do not have permission to add zone pictures.";
+        return;
+      }
       // Don't submit if there is an active file validation error banner showing
       if (this.errorMessage) return;
 
