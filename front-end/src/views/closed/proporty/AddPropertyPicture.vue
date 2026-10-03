@@ -123,8 +123,8 @@ export default {
   methods: {
     async fetchProperties() {
       try {
-        const res = await this.$apiGet('/get_properties');
-        this.properties = res.data || res;
+        const res = await this.$getProperties({ page: 1, page_size: 1000 });
+        this.properties = res.properties || [];
       } catch (err) {
         console.error('Failed to fetch properties', err);
       }
@@ -179,6 +179,10 @@ export default {
       this.form.preview = null;
     },
     async submitForm() {
+      if (!this.$hasPermission("pms.add_propertypicture")) {
+        this.errorMessage = "You do not have permission to add property pictures.";
+        return;
+      }
       try {
         // block upload execution if error parameters remain unresolved
         if (this.errorMessage) return;
