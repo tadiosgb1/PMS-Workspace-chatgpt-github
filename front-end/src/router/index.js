@@ -421,6 +421,27 @@ const router = createRouter({
 
 // --- DYNAMIC INTERCEPT GUARD ---
 router.beforeEach((to, from, next) => {
+  const lastActivity = Number(localStorage.getItem("lastActivityAt") || 0);
+  const sessionExpired =
+    Boolean(localStorage.getItem("access")) &&
+    lastActivity > 0 &&
+    Date.now() - lastActivity >= 60 * 1000;
+
+  if (sessionExpired) {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("token");
+    localStorage.removeItem("permissions");
+    localStorage.removeItem("groups");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("is_superuser");
+    localStorage.removeItem("phone_number");
+    localStorage.removeItem("name");
+    localStorage.removeItem("role");
+    localStorage.removeItem("lastActivityAt");
+    localStorage.removeItem("pmsTabClosed");
+  }
+
   const isAuthenticated = Boolean(localStorage.getItem("access"));
   const userRole = getRole();
   const tenantType = getTenantContext().tenantType;
