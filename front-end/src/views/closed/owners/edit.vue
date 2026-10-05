@@ -207,7 +207,11 @@ export default {
       }
 
       if (data?.message) return data.message;
-      if (error?.message) return error.message;
+      if (error?.message && typeof error.message === "object") {
+        if (typeof error.message.error === "string") return error.message.error;
+        if (typeof error.message.message === "string") return error.message.message;
+      }
+      if (typeof error?.message === "string") return error.message;
 
       return "Failed to update owner";
     },
