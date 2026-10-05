@@ -16,8 +16,7 @@
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Core Configuration</p>
               <div>
                 <label class="form-label">Zone Name <span class="text-red-500">*</span></label>
-                  <label class="form-label">Zone Name <span class="text-red-500">*</span></label>
-                  <input v-model="form.name" placeholder="e.g. North Sector" class="form-input" required />
+                <input v-model="form.name" placeholder="e.g. North Sector" class="form-input" required />
               </div>
             </section>
 
