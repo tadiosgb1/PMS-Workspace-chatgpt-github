@@ -170,7 +170,7 @@
                     Deactivate
                   </button>
                   <button
-                    v-if="isSubscriptionAdmin && (['terminated', 'expired'].includes(String(subscription.status || '').trim().toLowerCase()))"
+                    v-if="isSubscriptionAdmin && String(subscription.status || '').trim().toLowerCase() !== 'active'"
                     @click="askSubscriptionConfirmation(subscription, 'active')"
                     class="px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 hover:bg-green-600 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
