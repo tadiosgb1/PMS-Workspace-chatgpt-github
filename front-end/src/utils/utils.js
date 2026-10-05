@@ -732,3 +732,37 @@ export function getOffplanBankFinancings(params = {}) {
 }
 
 
+
+
+/**
+ * Return the current authenticated user's normalized role.
+ * Superusers are always treated as the "superuser" role.
+ */
+export function getRole() {
+  try {
+    const isSuperuser = String(localStorage.getItem("is_superuser") || "").trim().toLowerCase();
+    if (["true", "1"].includes(isSuperuser)) return "superuser";
+
+    const normalizeRole = (value) => String(value || "").trim().toLowerCase().replace(/[-\\s]+/g, "_");
+    const storedRole = normalizeRole(localStorage.getItem("role"));
+
+    const rawGroups = localStorage.getItem("groups");
+    if (rawGroups) {
+      const groups = JSON.parse(rawGroups);
+      if (Array.isArray(groups)) {
+        const roles = groups.map((group) => {
+          if (typeof group === "string") return normalizeRole(group);
+          return normalizeRole(group?.name || group?.group || group?.role);
+        }).filter(Boolean);
+        const adminRole = roles.find((role) => ["admin", "superuser", "super_staff"].includes(role));
+        if (adminRole) return adminRole;
+        if (roles.length) return roles[0];
+      }
+    }
+
+    return storedRole || "tenant";
+  } catch (error) {
+    console.error("Failed to determine authenticated user role:", error);
+    return "tenant";
+  }
+}
