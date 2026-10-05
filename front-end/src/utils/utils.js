@@ -734,35 +734,43 @@ export function getOffplanBankFinancings(params = {}) {
 
 
 
-/**
- * Return the current authenticated user's normalized role.
- * Superusers are always treated as the "superuser" role.
+/** 
+ * Return the current authenticated user's role from the `groups` localStorage value.
+ * `is_superuser` is the only separate superuser flag.
  */
 export function getRole() {
   try {
     const isSuperuser = String(localStorage.getItem("is_superuser") || "").trim().toLowerCase();
     if (["true", "1"].includes(isSuperuser)) return "superuser";
 
-    const normalizeRole = (value) => String(value || "").trim().toLowerCase().replace(/[-\\s]+/g, "_");
-    const storedRole = normalizeRole(localStorage.getItem("role"));
-
     const rawGroups = localStorage.getItem("groups");
-    if (rawGroups) {
-      const groups = JSON.parse(rawGroups);
-      if (Array.isArray(groups)) {
-        const roles = groups.map((group) => {
-          if (typeof group === "string") return normalizeRole(group);
-          return normalizeRole(group?.name || group?.group || group?.role);
-        }).filter(Boolean);
-        const adminRole = roles.find((role) => ["admin", "superuser", "super_staff"].includes(role));
-        if (adminRole) return adminRole;
-        if (roles.length) return roles[0];
-      }
-    }
+    if (!rawGroups) return "tenant";
 
-    return storedRole || "tenant";
+    const groups = JSON.parse(rawGroups);
+    if (!Array.isArray(groups)) return "tenant";
+
+    const normalizeGroup = (group) => {
+      if (typeof group === "string") {
+        return group.trim().toLowerCase().replace(/[-\s]+/g, "_");
+      }
+
+      if (group && typeof group === "object") {
+        return String(
+          group.name || group.group || group.role || ""
+        ).trim().toLowerCase().replace(/[-\s]+/g, "_");
+      }
+
+      return "";
+    };
+
+    const roles = groups.map(normalizeGroup).filter(Boolean);
+    const adminRole = roles.find((role) =>
+      ["admin", "superuser", "super_staff"].includes(role)
+    );
+
+    return adminRole || roles[0] || "tenant";
   } catch (error) {
-    console.error("Failed to determine authenticated user role:", error);
+    console.error("Failed to determine authenticated user role from groups:", error);
     return "tenant";
   }
 }
