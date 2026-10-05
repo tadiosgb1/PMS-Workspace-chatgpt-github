@@ -14,37 +14,10 @@
 
             <section class="space-y-3">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Core Configuration</p>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="relative">
-                  <label class="form-label">Zone Manager <span class="text-red-500">*</span></label>
-                  <input
-                    v-model="managerSearch"
-                    type="text"
-                    class="form-input"
-                    placeholder="Search manager..."
-                    @input="searchManagers"
-                    @focus="managerDropdown = true"
-                    @blur="hideDropdown"
-                  />
-                  <ul
-                    v-if="managers.length && managerDropdown"
-                    class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-48 overflow-y-auto"
-                  >
-                    <li
-                      v-for="manager in managers"
-                      :key="manager.manager.id"
-                      @mousedown.prevent="selectManager(manager)"
-                      class="px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-sm font-medium border-b border-gray-100 last:border-0 text-gray-900"
-                    >
-                      {{ manager.manager.first_name }} {{ manager.manager.last_name || "" }}
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
+              <div>
+                <label class="form-label">Zone Name <span class="text-red-500">*</span></label>
                   <label class="form-label">Zone Name <span class="text-red-500">*</span></label>
                   <input v-model="form.name" placeholder="e.g. North Sector" class="form-input" required />
-                </div>
               </div>
             </section>
 
@@ -211,10 +184,6 @@ export default {
   props: { visible: Boolean },
   data() {
     return {
-      managerSearch: "",
-      managerDropdown: false,
-      managers: [],
-      allManagers: [],
       loading: false,
       errorMessages: [],
       locating: false,
@@ -225,7 +194,6 @@ export default {
         address: "",
         city: "",
         state: "",
-        manager_id: "",
         latitude: "",
         longitude: "",
         description: "",
@@ -246,14 +214,7 @@ export default {
       }
     },
   },
-  async mounted() {
-    try {
-      const result = await this.$getManagers();
-      this.allManagers = result?.managers || [];
-      this.managers = [...this.allManagers];
-    } catch (e) {
-      console.error("Failed to load managers", e);
-    }
+  mounted() {
     if (this.visible) this.getCurrentLocation();
   },
   beforeDestroy() {
@@ -273,24 +234,6 @@ export default {
       }
     },
 
-    searchManagers() {
-      const q = (this.managerSearch || "").toLowerCase().trim();
-      if (!q) {
-        this.managers = [...this.allManagers];
-        return;
-      }
-      this.managers = this.allManagers.filter((m) =>
-        `${m.manager.first_name} ${m.manager.last_name || ""}`.toLowerCase().includes(q)
-      );
-    },
-    selectManager(manager) {
-      this.form.manager_id = manager.manager.id;
-      this.managerSearch = `${manager.manager.first_name} ${manager.manager.last_name || ""}`;
-      this.managerDropdown = false;
-    },
-    hideDropdown() {
-      setTimeout(() => (this.managerDropdown = false), 200);
-    },
     addAmenity() {
       this.amenities.push({ amenity: "", value: "" });
     },
