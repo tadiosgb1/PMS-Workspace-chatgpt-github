@@ -81,19 +81,20 @@
               </div>
             </div>
 
-            <div v-if="errorMessages.length" class="text-red-700 text-sm bg-red-50 border border-red-200 p-4 rounded-lg">
-              <ul class="space-y-1">
-                <li v-for="(message, index) in errorMessages" :key="index" class="flex items-start gap-2">
-                  <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></span>
-                  <span>{{ message }}</span>
-                </li>
-              </ul>
-            </div>
           </form>
         </div>
 
         <!-- Footer Actions -->
-        <div class="px-6 py-5 border-t bg-gray-50 flex justify-end gap-3">
+        <div class="px-6 py-5 border-t bg-gray-50">
+          <div v-if="errorMessages.length" class="text-red-700 text-sm bg-red-50 border border-red-200 p-4 rounded-lg">
+            <ul class="space-y-1">
+              <li v-for="(message, index) in errorMessages" :key="index" class="flex items-start gap-2">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></span>
+                <span>{{ message }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="flex justify-end gap-3">
           <button @click="close" class="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition">
             Cancel
           </button>
@@ -105,6 +106,7 @@
             <span v-if="loading" class="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full"></span>
             {{ loading ? 'Creating Owner...' : 'Create Owner' }}
           </button>
+          </div>
         </div>
       </div>
     </div>
