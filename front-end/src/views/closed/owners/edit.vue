@@ -61,8 +61,13 @@
               </div>
             </div>
 
-            <div v-if="errorMessage" class="text-red-600 text-sm bg-red-50 border border-red-200 p-3 rounded-lg">
-              {{ errorMessage }}
+            <div v-if="errorMessages.length" class="text-red-700 text-sm bg-red-50 border border-red-200 p-4 rounded-lg">
+              <ul class="space-y-1">
+                <li v-for="(message, index) in errorMessages" :key="index" class="flex items-start gap-2">
+                  <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></span>
+                  <span>{{ message }}</span>
+                </li>
+              </ul>
             </div>
           </form>
         </div>
@@ -106,7 +111,7 @@ export default {
       },
       plans: [],
       loading: false,
-      errorMessage: "",
+      errorMessages: [],
     };
   },
   watch: {
@@ -143,7 +148,7 @@ export default {
         start_date: owner.start_date || "",
         end_date: owner.end_date || "",
       };
-      this.errorMessage = "";
+      this.errorMessages = [];
     },
 
     async fetchPlans() {
@@ -162,7 +167,7 @@ export default {
 
     async submitForm() {
       if (!this.form.id) {
-        this.errorMessage = "Owner ID is missing.";
+        this.errorMessages = ["Owner ID is missing."];
         return;
       }
 
@@ -189,40 +194,39 @@ export default {
         this.close();
       } catch (error) {
         const msg = this.getApiErrorMessage(error);
-        this.errorMessage = msg;
-        this.$root.$refs.toast?.showToast(msg, "error");
+        this.errorMessages = this.getApiErrorMessages(error);
       } finally {
         this.loading = false;
       }
     },
 
-    getApiErrorMessage(error) {
+    getApiErrorMessages(error) {
       const data = error?.response?.data;
       const source = data ?? (error?.message && typeof error.message === "object" ? error.message : null);
 
-      const format = (value) => {
-        if (typeof value === "string" && value.trim()) return value;
-        if (Array.isArray(value)) return value.filter(Boolean).map(String).join(" ");
+      const flatten = (value, field = "") => {
+        if (typeof value === "string" && value.trim()) return [value.trim()];
+        if (Array.isArray(value)) return value.flatMap((item) => flatten(item, field));
         if (value && typeof value === "object") {
-          return Object.entries(value)
-            .flatMap(([field, messages]) => {
-              const items = Array.isArray(messages) ? messages : [messages];
-              return items.filter(Boolean).map((message) => {
-                const text = typeof message === "string" ? message : message?.message;
-                return text ? (field === "non_field_errors" ? text : field.replace(/_/g, " ") + ": " + text) : "";
-              });
-            })
-            .filter(Boolean)
-            .join(" ");
+          return Object.entries(value).flatMap(([key, messages]) => {
+            const label = key === "non_field_errors" ? "" : key.replace(/_/g, " ");
+            return flatten(messages, label);
+          });
         }
-        return "";
+        return [];
       };
 
-      for (const candidate of [source?.error, source?.message, source, error?.message]) {
-        const message = format(candidate);
-        if (message) return message;
+      const candidates = [source?.error, source?.message, source, error?.message];
+      for (const candidate of candidates) {
+        const messages = flatten(candidate);
+        if (messages.length) {
+          return messages.map((message) => {
+            // Field names are already represented by the backend object structure.
+            return message;
+          });
+        }
       }
-      return "Failed to update owner";
+      return ["Failed to update owner"];
     },
   },
 };
