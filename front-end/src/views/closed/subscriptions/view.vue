@@ -325,7 +325,19 @@ export default {
   },
   computed: {
     isSubscriptionAdmin() {
-      const role = String(this.$getRole ? this.$getRole() : "").trim().toLowerCase();
+      const isSuperuser = String(
+        localStorage.getItem("is_superuser") ?? localStorage.getItem("is_super_user") ?? ""
+      ).trim().toLowerCase();
+
+      if (["true", "1"].includes(isSuperuser)) {
+        return true;
+      }
+
+      const role = String(this.$getRole ? this.$getRole() : "")
+        .trim()
+        .toLowerCase()
+        .replace(/[-\\s]+/g, "_");
+
       return ["admin", "superuser", "super_staff"].includes(role);
     },
     filteredSubscriptions() {
