@@ -200,12 +200,24 @@ export default {
         this.$emit("success");
         this.close();
       } catch (error) {
-        const msg = error.response?.data?.error || error.response?.data?.message || "Failed to create owner";
+        const msg = this.getApiErrorMessage(error);
         this.errorMessage = msg;
         this.$root.$refs.toast?.showToast(msg, "error");
       } finally {
         this.loading = false;
       }
+    },
+
+    getApiErrorMessage(error) {
+      const data = error?.response?.data;
+      if (typeof data === "string" && data.trim()) return data;
+      if (data?.error) {
+        if (typeof data.error === "string") return data.error;
+        if (data.error?.message) return data.error.message;
+      }
+      if (data?.message) return data.message;
+      if (error?.message) return error.message;
+      return "Failed to create owner";
     },
   },
 };
