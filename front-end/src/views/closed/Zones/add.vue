@@ -142,13 +142,23 @@
           </form>
         </div>
 
-        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+          <div v-if="errorMessages.length" class="mb-4 text-red-700 text-sm bg-red-50 border border-red-200 p-4 rounded-lg">
+            <ul class="space-y-1">
+              <li v-for="(message, index) in errorMessages" :key="index" class="flex items-start gap-2">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></span>
+                <span>{{ message }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="flex justify-end gap-3">
           <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
           <button v-if="$hasPermission('pms.add_propertyzone')" form="zoneForm" type="submit" :disabled="loading" class="btn-primary disabled:opacity-50 flex items-center gap-2">
             <i v-if="loading" class="fas fa-spinner fa-spin text-xs"></i>
             <i v-else class="fas fa-save text-xs"></i>
             {{ loading ? "Saving Zone..." : "Save Zone" }}
           </button>
+          </div>
         </div>
 
       </div>
@@ -206,6 +216,7 @@ export default {
       managers: [],
       allManagers: [],
       loading: false,
+      errorMessages: [],
       locating: false,
       amenities: [{ amenity: "", value: "" }],
       form: {
@@ -434,20 +445,39 @@ export default {
       this.closeMapPicker();
     },
 
+    getApiErrorMessages(error) {
+      const data = error?.response?.data;
+      const source = data ?? (error?.message && typeof error.message === "object" ? error.message : null);
+      const flatten = (value) => {
+        if (typeof value === "string" && value.trim()) return [value.trim()];
+        if (Array.isArray(value)) return value.flatMap((item) => flatten(item));
+        if (value && typeof value === "object") {
+          return Object.values(value).flatMap((item) => flatten(item));
+        }
+        return [];
+      };
+      const candidates = [source?.error, source?.message, source, error?.message];
+      for (const candidate of candidates) {
+        const messages = flatten(candidate);
+        if (messages.length) return messages;
+      }
+      return ["Failed to save zone"];
+    },
+
     async submitForm() {
       if (!this.$hasPermission("pms.add_propertyzone")) {
         this.showError("You do not have permission to add zones.");
         return;
       }
       this.loading = true;
+      this.errorMessages = [];
       this.form.description = this.buildDescription();
       try {
         await this.$apiPost("post_property_zone", this.form);
         this.$reloadPage();
         this.$emit("close");
       } catch (err) {
-        this.$emit("close");
-        this.showError(err?.[0] || "Failed to save zone");
+        this.errorMessages = this.getApiErrorMessages(err);
         console.error(err);
       } finally {
         this.loading = false;
