@@ -105,11 +105,81 @@ export default {
       this.loading = true;
       try {
         const response = await this.$apiPost("/token", this.form);
-        const { refresh, access, permissions, id, is_superuser, phone_number, groups } = response;
+        const {
+          refresh,
+          access,
+          permissions,
+          id,
+          is_superuser,
+          phone_number,
+          groups,
+          role,
+        } = response;
 
-        // Authentication remains in localStorage because the API currently
-        // expects these credentials there. lastActivityAt is used to detect
-        // sessions that survived a computer shutdown/browser process kill.
+        // Admin access is restricted to the admin application.
+        // Development:
+        //   - port 3000 = admin application
+        //   - port 3001 = property application
+        // Production:
+        //   - adminproperty.alpha.com.et = admin application
+        //   - property.alpha.com.et = property application
+        const normalizedGroups = Array.isArray(groups)
+          ? groups
+              .map((group) => {
+                if (typeof group === "string") return group;
+                return group?.name || group?.group || group?.role || "";
+              })
+              .map((group) => String(group).trim().toLowerCase())
+              .filter(Boolean)
+          : [];
+
+        const normalizedRole = String(
+          typeof role === "string" ? role : role?.name || role?.group || ""
+        )
+          .trim()
+          .toLowerCase();
+
+        const isSuperuser =
+          is_superuser === true ||
+          String(is_superuser).toLowerCase() === "true";
+
+        const isAdminUser =
+          isSuperuser ||
+          ["admin", "superuser", "super_staff"].some(
+            (adminRole) =>
+              normalizedRole === adminRole ||
+              normalizedGroups.includes(adminRole)
+          );
+
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+
+        const isAdminProductionDomain =
+          hostname === "adminproperty.alpha.com.et";
+        const isPropertyProductionDomain =
+          hostname === "property.alpha.com.et";
+
+        const isAdminDevelopmentPort = port === "3000";
+        const isPropertyDevelopmentPort = port === "3001";
+
+        let allowed = false;
+
+        if (isAdminProductionDomain) {
+          allowed = isAdminUser;
+        } else if (isPropertyProductionDomain) {
+          allowed = !isAdminUser;
+        } else if (isAdminDevelopmentPort) {
+          allowed = isAdminUser;
+        } else if (isPropertyDevelopmentPort) {
+          allowed = !isAdminUser;
+        }
+
+        if (!allowed) {
+          this.error = "You have no permission to login from this domain.";
+          return;
+        }
+
+        // Store the session only after the domain/role check succeeds.
         localStorage.setItem("refresh", refresh);
         localStorage.setItem("access", access);
         localStorage.setItem("lastActivityAt", String(Date.now()));
