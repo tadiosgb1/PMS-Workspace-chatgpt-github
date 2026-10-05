@@ -501,11 +501,12 @@ export default {
 
       const subscriptionId = this.subscriptionToAD.id;
       const nextStatus = this.subscriptionAction;
+      const payload = { status: nextStatus };
 
       this.confirmVisible = false;
 
       try {
-        await this.$apiPatch("/update_subscription", subscriptionId, { status: nextStatus });
+        await this.$apiPatch("/update_subscription", subscriptionId, payload);
         this.$root.$refs.toast.showToast(
           nextStatus === "active"
             ? "Subscription activated successfully"
