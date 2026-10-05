@@ -94,8 +94,10 @@
           <button v-if="$hasPermission('pms.change_propertyzone')" form="editZoneForm" type="submit" class="btn-primary flex items-center gap-2">
             <i class="fas fa-save text-xs"></i> Update Zone
           </button>
+          </div>
         </div>
       </div>
+    </div>
     </div>
 
     <div v-if="updateModalVisible" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" @click.self="updateModalVisible = false">
