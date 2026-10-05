@@ -145,32 +145,28 @@
                   <button
                     v-if="is_super_user != 'true' && subscription.status === 'pending'"
                     @click="pay(subscription)"
-                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition text-xs"
-                    title="Pay Now"
+                    class="px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 hover:bg-green-600 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
-                    <i class="fas fa-credit-card"></i>
+                    Pay Now
                   </button>
                   <button
                     @click="payment(subscription.id)"
-                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs"
-                    title="View Payments"
+                    class="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
-                    <i class="fas fa-list-ul"></i>
+                    View Payments
                   </button>
                   <button
                     v-if="is_super_user != 'true'"
                     @click="openUpgradeModal(subscription)"
-                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-orange-50 text-orange-500 hover:bg-orange-500 hover:text-white transition text-xs"
-                    title="Upgrade Plan"
+                    class="px-2.5 py-1.5 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
-                    <i class="fas fa-arrow-up"></i>
+                    Upgrade Plan
                   </button>
                   <button
                     @click="askDeactivateConfirmation(subscription)"
-                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-xs"
-                    title="Deactivate"
+                    class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
-                    <i class="fas fa-power-off"></i>
+                    Deactivate
                   </button>
                 </div>
               </td>
@@ -222,15 +218,15 @@
         <div class="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
           <button v-if="is_super_user != 'true' && subscription.status === 'pending'" @click="pay(subscription)"
             class="flex-1 px-3 py-1.5 bg-green-50 text-green-600 border border-green-100 rounded-lg text-xs font-semibold">
-            <i class="fas fa-credit-card"></i> Pay
+            Pay Now
           </button>
           <button @click="payment(subscription.id)"
             class="flex-1 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-xs font-semibold">
-            <i class="fas fa-list-ul"></i> Logs
+            View Payments
           </button>
           <button v-if="is_super_user != 'true'" @click="openUpgradeModal(subscription)"
             class="flex-1 px-3 py-1.5 bg-orange-50 text-orange-500 border border-orange-100 rounded-lg text-xs font-semibold">
-            <i class="fas fa-arrow-up"></i> Upgrade
+            Upgrade Plan
           </button>
         </div>
       </div>
