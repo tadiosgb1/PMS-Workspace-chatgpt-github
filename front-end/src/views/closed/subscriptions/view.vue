@@ -163,10 +163,18 @@
                     Upgrade Plan
                   </button>
                   <button
-                    @click="askDeactivateConfirmation(subscription)"
+                    v-if="isSubscriptionAdmin && subscription.status === 'active'"
+                    @click="askSubscriptionConfirmation(subscription, 'terminated')"
                     class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
                     Deactivate
+                  </button>
+                  <button
+                    v-if="isSubscriptionAdmin && (subscription.status === 'terminated' || subscription.status === 'expired')"
+                    @click="askSubscriptionConfirmation(subscription, 'active')"
+                    class="px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 hover:bg-green-600 hover:text-white transition text-xs font-semibold whitespace-nowrap"
+                  >
+                    Activate
                   </button>
                 </div>
               </td>
@@ -228,6 +236,14 @@
             class="flex-1 px-3 py-1.5 bg-orange-50 text-orange-500 border border-orange-100 rounded-lg text-xs font-semibold">
             Upgrade Plan
           </button>
+          <button v-if="isSubscriptionAdmin && subscription.status === 'active'" @click="askSubscriptionConfirmation(subscription, 'terminated')"
+            class="flex-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-semibold">
+            Deactivate
+          </button>
+          <button v-if="isSubscriptionAdmin && (subscription.status === 'terminated' || subscription.status === 'expired')" @click="askSubscriptionConfirmation(subscription, 'active')"
+            class="flex-1 px-3 py-1.5 bg-green-50 text-green-700 border border-green-100 rounded-lg text-xs font-semibold">
+            Activate
+          </button>
         </div>
       </div>
       <div v-if="!filteredSubscriptions.length" class="bg-white rounded-lg border border-gray-100 p-10 text-center text-sm text-gray-400 italic">
@@ -261,7 +277,14 @@
     <!-- Modals -->
     <PaymentModal v-if="paymentVisible" :visible="paymentVisible" :payload="paymentPayload" @close="paymentVisible = false" @paid="handlePaymentSuccess" />
     <UpgradeSubscriptionModal v-if="showUpgradeModal" :visible="showUpgradeModal" :subscriptionId="selectedSubscriptionId" @close="showUpgradeModal = false" @plan-upgraded="fetchSubscriptions" />
-    <ConfirmModal v-if="confirmVisible" :visible="confirmVisible" title="Confirm Deactivate" message="Are you sure you want to deactivate this subscription?" @confirm="Deactivate" @cancel="confirmVisible = false" />
+    <ConfirmModal
+      v-if="confirmVisible"
+      :visible="confirmVisible"
+      :title="subscriptionAction === 'active' ? 'Confirm Activate' : 'Confirm Deactivate'"
+      :message="subscriptionAction === 'active' ? 'Are you sure you want to activate this subscription?' : 'Are you sure you want to deactivate this subscription?'"
+      @confirm="updateSubscriptionStatus"
+      @cancel="confirmVisible = false"
+    />
   </div>
 </template>
 
@@ -297,9 +320,32 @@ export default {
       status: "",
       loading: false,
       subscriptionToAD: null,
+      subscriptionAction: null,
     };
   },
   computed: {
+    isSubscriptionAdmin() {
+      if (this.is_super_user === "true") return true;
+
+      const role = String(localStorage.getItem("role") || "").trim().toLowerCase();
+      let groups = [];
+      try {
+        groups = JSON.parse(localStorage.getItem("groups") || "[]");
+      } catch {
+        groups = [];
+      }
+
+      const normalizedGroups = Array.isArray(groups)
+        ? groups.map((group) => {
+            if (typeof group === "string") return group;
+            return group?.name || group?.group || group?.role || "";
+          }).map((group) => String(group).trim().toLowerCase())
+        : [];
+
+      return ["admin", "superuser", "super_staff"].some(
+        (adminRole) => role === adminRole || normalizedGroups.includes(adminRole)
+      );
+    },
     filteredSubscriptions() {
       const term = this.searchTerm.toLowerCase();
       return this.subscriptions.filter((sub) =>
@@ -440,19 +486,42 @@ export default {
       if (subscriptionId) this.$router.push({ name: "subscriptionsPayment_view", params: { id: subscriptionId } });
     },
 
-    askDeactivateConfirmation(subscription) {
+    askSubscriptionConfirmation(subscription, status) {
+      if (!this.isSubscriptionAdmin) return;
       this.subscriptionToAD = subscription;
+      this.subscriptionAction = status;
       this.confirmVisible = true;
     },
 
-    async Deactivate() {
+    async updateSubscriptionStatus() {
+      if (!this.isSubscriptionAdmin || !this.subscriptionToAD?.id || !this.subscriptionAction) {
+        this.confirmVisible = false;
+        return;
+      }
+
+      const subscriptionId = this.subscriptionToAD.id;
+      const nextStatus = this.subscriptionAction;
+
       this.confirmVisible = false;
+
       try {
-        await this.$apiPatch("/update_subscription", { status: "terminated" }, this.subscriptionToAD.id);
-        this.$root.$refs.toast.showToast("Subscription deactivated successfully", "success");
+        await this.$apiPatch("/update_subscription", subscriptionId, { status: nextStatus });
+        this.$root.$refs.toast.showToast(
+          nextStatus === "active"
+            ? "Subscription activated successfully"
+            : "Subscription deactivated successfully",
+          "success"
+        );
+        this.subscriptionToAD = null;
+        this.subscriptionAction = null;
         this.fetchSubscriptions();
       } catch (e) {
-        this.$root.$refs.toast.showToast("Failed to deactivate subscription", "error");
+        this.$root.$refs.toast.showToast(
+          nextStatus === "active"
+            ? "Failed to activate subscription"
+            : "Failed to deactivate subscription",
+          "error"
+        );
       }
     },
 
