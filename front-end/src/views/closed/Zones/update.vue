@@ -98,7 +98,6 @@
         </div>
       </div>
     </div>
-    </div>
 
     <div v-if="updateModalVisible" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" @click.self="updateModalVisible = false">
       <div class="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl border border-gray-100 animate-in zoom-in-95 duration-150">
