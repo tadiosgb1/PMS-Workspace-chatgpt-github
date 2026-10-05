@@ -163,14 +163,14 @@
                     Upgrade Plan
                   </button>
                   <button
-                    v-if="isSubscriptionAdmin && subscription.status === 'active'"
+                    v-if="isSubscriptionAdmin && String(subscription.status || '').trim().toLowerCase() === 'active'"
                     @click="askSubscriptionConfirmation(subscription, 'terminated')"
                     class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
                     Deactivate
                   </button>
                   <button
-                    v-if="isSubscriptionAdmin && (subscription.status === 'terminated' || subscription.status === 'expired')"
+                    v-if="isSubscriptionAdmin && (['terminated', 'expired'].includes(String(subscription.status || '').trim().toLowerCase()))"
                     @click="askSubscriptionConfirmation(subscription, 'active')"
                     class="px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 hover:bg-green-600 hover:text-white transition text-xs font-semibold whitespace-nowrap"
                   >
@@ -236,11 +236,11 @@
             class="flex-1 px-3 py-1.5 bg-orange-50 text-orange-500 border border-orange-100 rounded-lg text-xs font-semibold">
             Upgrade Plan
           </button>
-          <button v-if="isSubscriptionAdmin && subscription.status === 'active'" @click="askSubscriptionConfirmation(subscription, 'terminated')"
+          <button v-if="isSubscriptionAdmin && String(subscription.status || '').trim().toLowerCase() === 'active'" @click="askSubscriptionConfirmation(subscription, 'terminated')"
             class="flex-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-semibold">
             Deactivate
           </button>
-          <button v-if="isSubscriptionAdmin && (subscription.status === 'terminated' || subscription.status === 'expired')" @click="askSubscriptionConfirmation(subscription, 'active')"
+          <button v-if="isSubscriptionAdmin && (['terminated', 'expired'].includes(String(subscription.status || '').trim().toLowerCase()))" @click="askSubscriptionConfirmation(subscription, 'active')"
             class="flex-1 px-3 py-1.5 bg-green-50 text-green-700 border border-green-100 rounded-lg text-xs font-semibold">
             Activate
           </button>
@@ -325,7 +325,10 @@ export default {
   },
   computed: {
     isSubscriptionAdmin() {
-      if (this.is_super_user === "true") return true;
+      const storedSuperuser = String(
+        localStorage.getItem("is_superuser") ?? localStorage.getItem("is_super_user") ?? ""
+      ).trim().toLowerCase();
+      if (this.is_super_user === "true" || ["true", "1"].includes(storedSuperuser)) return true;
 
       const role = String(localStorage.getItem("role") || "").trim().toLowerCase();
       let groups = [];
@@ -354,7 +357,9 @@ export default {
     },
   },
   mounted() {
-    this.is_super_user = localStorage.getItem("is_superuser");
+    this.is_super_user = String(
+      localStorage.getItem("is_superuser") ?? localStorage.getItem("is_super_user") ?? ""
+    ).trim().toLowerCase();
     this.fetchPlans();
     this.fetchSubscriptions();
   },
