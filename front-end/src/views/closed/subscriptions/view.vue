@@ -325,35 +325,10 @@ export default {
   },
   computed: {
     isSubscriptionAdmin() {
-      const storedSuperuser = String(
-        localStorage.getItem("is_superuser") ?? localStorage.getItem("is_super_user") ?? ""
-      ).trim().toLowerCase();
-      if (this.is_super_user === "true" || ["true", "1"].includes(storedSuperuser)) return true;
+      const role = this.$getRole ? this.$getRole() : "";
+      const normalizedRole = String(role || "").trim().toLowerCase().replace(/[-\s]+/g, "_");
 
-      const role = String(localStorage.getItem("role") || "").trim().toLowerCase();
-      let groups = [];
-      try {
-        groups = JSON.parse(localStorage.getItem("groups") || "[]");
-      } catch {
-        groups = [];
-      }
-
-      const normalizedGroups = Array.isArray(groups)
-        ? groups.map((group) => {
-            if (typeof group === "string") return group;
-            return group?.name || group?.group || group?.role || "";
-          }).map((group) => String(group).trim().toLowerCase())
-        : [];
-
-      const normalizedRoleValues = [role, ...normalizedGroups].map((value) =>
-        String(value).replace(/[-\s]+/g, "_").trim().toLowerCase()
-      );
-
-      return normalizedRoleValues.some((value) =>
-        ["admin", "superuser", "super_staff"].includes(value) ||
-        value.includes("superuser") ||
-        value.includes("super_staff")
-      );
+      return ["admin", "superuser", "super_staff"].includes(normalizedRole);
     },
     filteredSubscriptions() {
       const term = this.searchTerm.toLowerCase();
