@@ -243,6 +243,13 @@ export default {
           icon: "fas fa-gear",
           explicitRoles: ["superuser", "admin"],
           children: [
+            {
+              id: "plans",
+              name: "Plans",
+              route: "plans_view",
+              icon: "fas fa-list-check",
+              explicitRoles: ["superuser", "admin"],
+            },
             { name: "Roles", route: "groups", permission: "auth.view_group", explicitRoles: ["superuser"] },
             { name: "Permissions", route: "permissions_view", permission: "auth.view_permission", explicitRoles: ["superuser"] },
             {
@@ -257,13 +264,6 @@ export default {
               name: "Brands",
               route: "Brands-view",
               icon: "fas fa-palette",
-              explicitRoles: ["superuser", "admin"],
-            },
-            {
-              id: "plans",
-              name: "Plans",
-              route: "plans_view",
-              icon: "fas fa-list-check",
               explicitRoles: ["superuser", "admin"],
             },
           ],
