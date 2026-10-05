@@ -345,8 +345,14 @@ export default {
           }).map((group) => String(group).trim().toLowerCase())
         : [];
 
-      return ["admin", "superuser", "super_staff"].some(
-        (adminRole) => role === adminRole || normalizedGroups.includes(adminRole)
+      const normalizedRoleValues = [role, ...normalizedGroups].map((value) =>
+        String(value).replace(/[-\s]+/g, "_").trim().toLowerCase()
+      );
+
+      return normalizedRoleValues.some((value) =>
+        ["admin", "superuser", "super_staff"].includes(value) ||
+        value.includes("superuser") ||
+        value.includes("super_staff")
       );
     },
     filteredSubscriptions() {
