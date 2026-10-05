@@ -6,9 +6,8 @@ import {
   apiPatch, apiDelete, isStrongPassword, validateField,
   gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
   processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
-  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getOffplanApplications, getOffplanProperties, getOffplanPayments, getOffplanPaymentPlans, getOffplanMilestones, getOffplanBankFinancings
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments, getRole, getOffplanApplications, getOffplanProperties, getOffplanPayments, getOffplanPaymentPlans, getOffplanMilestones, getOffplanBankFinancings
 } from "../utils/utils";
-import { getRole } from "../utils/authRole";
 export default {
 
   install(app) {
