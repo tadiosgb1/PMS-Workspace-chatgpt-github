@@ -259,6 +259,13 @@ export default {
               icon: "fas fa-palette",
               explicitRoles: ["superuser", "admin"],
             },
+            {
+              id: "plans",
+              name: "Plans",
+              route: "plans_view",
+              icon: "fas fa-list-check",
+              explicitRoles: ["superuser", "admin"],
+            },
           ],
         },
       ],
