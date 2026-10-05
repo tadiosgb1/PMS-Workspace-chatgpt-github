@@ -172,7 +172,7 @@ export default {
       }
 
       this.loading = true;
-      this.errorMessage = "";
+      this.errorMessages = [];
 
       try {
         const payload = {
@@ -193,7 +193,6 @@ export default {
         this.$emit("success", response);
         this.close();
       } catch (error) {
-        const msg = this.getApiErrorMessage(error);
         this.errorMessages = this.getApiErrorMessages(error);
       } finally {
         this.loading = false;
