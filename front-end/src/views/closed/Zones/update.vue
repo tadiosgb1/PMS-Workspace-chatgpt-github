@@ -80,7 +80,16 @@
           </form>
         </div>
 
-        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+          <div v-if="errorMessages.length" class="mb-4 text-red-700 text-sm bg-red-50 border border-red-200 p-4 rounded-lg">
+            <ul class="space-y-1">
+              <li v-for="(message, index) in errorMessages" :key="index" class="flex items-start gap-2">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></span>
+                <span>{{ message }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="flex justify-end gap-3">
           <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
           <button v-if="$hasPermission('pms.change_propertyzone')" form="editZoneForm" type="submit" class="btn-primary flex items-center gap-2">
             <i class="fas fa-save text-xs"></i> Update Zone
@@ -113,6 +122,7 @@ export default {
     return {
       form: { id: null, name: "", address: "", city: "", state: "", owner_id: null, manager_id: null, latitude: "", longitude: "", description: "" },
       amenities: [{ amenity: "", value: "" }],
+      errorMessages: [],
       updateModalVisible: false,
     };
   },
@@ -127,18 +137,36 @@ export default {
       } else { this.amenities = [{ amenity: "", value: "" }]; }
     },
     buildDescription() { return this.amenities.filter(a => a.amenity && a.value).map(a => `${a.amenity}:${a.value}`).join(","); },
+    getApiErrorMessages(error) {
+      const data = error?.response?.data;
+      const source = data ?? (error?.message && typeof error.message === "object" ? error.message : null);
+      const flatten = (value) => {
+        if (typeof value === "string" && value.trim()) return [value.trim()];
+        if (Array.isArray(value)) return value.flatMap((item) => flatten(item));
+        if (value && typeof value === "object") return Object.values(value).flatMap((item) => flatten(item));
+        return [];
+      };
+      const candidates = [source?.error, source?.message, source, error?.message];
+      for (const candidate of candidates) {
+        const messages = flatten(candidate);
+        if (messages.length) return messages;
+      }
+      return ["Failed to update zone"];
+    },
+
     async submitForm() {
       if (!this.$hasPermission("pms.change_propertyzone")) {
         this.$root.$refs.toast.showToast("You do not have permission to edit zones.", "error");
         return;
       }
       this.updateModalVisible = false;
+      this.errorMessages = [];
       this.form.description = this.buildDescription();
       try {
         const response = await this.$apiPut("/update_property_zone", this.form.id, this.form);
-        if (response?.error) { this.$root.$refs.toast.showToast(response.error, "error"); }
+        if (response?.error) { this.errorMessages = this.getApiErrorMessages(response); }
         else { this.$root.$refs.toast.showToast("Zone updated successfully", "success"); this.$emit("refresh"); this.$emit("close"); }
-      } catch (err) { console.error(err); this.$root.$refs.toast.showToast("Failed to update zone", "error"); }
+      } catch (err) { console.error(err); this.errorMessages = this.getApiErrorMessages(err); }
     },
   },
 };
