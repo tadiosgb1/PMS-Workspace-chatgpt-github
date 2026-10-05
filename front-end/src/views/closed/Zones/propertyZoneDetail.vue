@@ -283,7 +283,12 @@
 
         <!-- Stakeholders -->
         <div class="bg-white border border-gray-100 rounded-lg p-5">
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Stakeholders</p>
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Stakeholders</p>
+            <button v-if="$hasPermission('pms.add_manager')" @click="addManagerVisible = true" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-[10px] font-semibold transition">
+              <i class="fas fa-user-plus"></i> Add Manager
+            </button>
+          </div>
           <div class="space-y-4">
             <div>
               <p class="text-[10px] text-gray-400 uppercase font-semibold mb-0.5">Manager ID</p>
@@ -332,6 +337,8 @@
       <p class="text-sm font-semibold">Zone not found.</p>
     </div>
 
+    <AddManager v-if="addManagerVisible" :visible="addManagerVisible" :zone-id="$route.params.id" @close="addManagerVisible = false" @success="handleManagerAdded" />
+
     <AddPropertyZonePicture v-if="addPictureVisible" :visible="addPictureVisible" :zoneId="$route.params.id" @close="addPictureVisible = false" @refresh="fetchZone" />
     <UpdatePropertyZonePicture v-if="updatePictureVisible" :visible="updatePictureVisible" :picture="pictureToUpdate" :zoneId="$route.params.id" @close="updatePictureVisible = false" @refresh="fetchZone" />
     <ConfirmModal v-if="confirmDeleteVisible" :visible="confirmDeleteVisible" title="Delete Image" message="Are you sure you want to permanently remove this image?" @confirm="confirmDeletePicture" @cancel="confirmDeleteVisible = false" />
@@ -349,19 +356,21 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddPropertyZonePicture from "./addPropertyZonePicture.vue";
+import AddManager from "@/views/closed/managers/add.vue";
 import UpdatePropertyZonePicture from "./updatePropertyZonePicture.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Loading from "@/components/Loading.vue";
 
 export default {
   name: "ZoneDetail",
-  components: { Toast, AddPropertyZonePicture, UpdatePropertyZonePicture, ConfirmModal, Loading },
+  components: { Toast, AddPropertyZonePicture, UpdatePropertyZonePicture, ConfirmModal, Loading, AddManager },
   data() {
     return {
       zone: null, 
       recentProperties: [],
       recentCoworkingSpaces: [],
-      addPictureVisible: false, 
+      addPictureVisible: false,
+      addManagerVisible: false, 
       updatePictureVisible: false, 
       confirmDeleteVisible: false,
       updateZoneStatusVisible: false,
@@ -403,6 +412,11 @@ export default {
     }
   },
   methods: {
+    handleManagerAdded() {
+      this.addManagerVisible = false;
+      this.fetchZone();
+    },
+
     async fetchZone() {
       this.loading = true;
       try {
