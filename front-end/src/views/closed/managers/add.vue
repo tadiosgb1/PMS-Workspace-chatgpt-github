@@ -41,7 +41,7 @@
               </div>
               <div>
                 <label class="form-label">Property Zone <span class="text-red-400">*</span></label>
-                <select v-model="form.property_zone" required class="form-input">
+                <select v-model="form.property_zone" required :disabled="!!zoneId" class="form-input disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed">
                   <option disabled value="">Select zone</option>
                   <option v-for="z in zones" :key="z.id" :value="z.id">{{ z.name }}</option>
                 </select>
@@ -69,7 +69,10 @@
 <script>
 export default {
   name: "AddManagerModal",
-  props: { visible: Boolean },
+  props: {
+    visible: Boolean,
+    zoneId: { type: [String, Number], default: null },
+  },
   data() {
     return {
       zones: [],
@@ -81,10 +84,31 @@ export default {
     };
   },
   async mounted() {
-    const result = await this.$getZones();
-    this.zones = result.zones || [];
+    await this.loadZones();
+  },
+  watch: {
+    visible(val) {
+      if (val) this.applyZoneId();
+    },
+    zoneId() {
+      this.applyZoneId();
+    },
   },
   methods: {
+    async loadZones() {
+      try {
+        const result = await this.$getZones();
+        this.zones = result.zones || [];
+        this.applyZoneId();
+      } catch (e) {
+        console.error("Failed to load zones", e);
+      }
+    },
+    applyZoneId() {
+      if (this.zoneId !== null && this.zoneId !== undefined && this.zoneId !== "") {
+        this.form.property_zone = this.zoneId;
+      }
+    },
     async submitForm() {
       try {
         await this.$apiPost("/create_manager", { ...this.form });
