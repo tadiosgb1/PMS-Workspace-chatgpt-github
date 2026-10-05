@@ -325,10 +325,8 @@ export default {
   },
   computed: {
     isSubscriptionAdmin() {
-      const role = this.$getRole ? this.$getRole() : "";
-      const normalizedRole = String(role || "").trim().toLowerCase().replace(/[-\s]+/g, "_");
-
-      return ["admin", "superuser", "super_staff"].includes(normalizedRole);
+      const role = String(this.$getRole ? this.$getRole() : "").trim().toLowerCase();
+      return ["admin", "superuser", "super_staff"].includes(role);
     },
     filteredSubscriptions() {
       const term = this.searchTerm.toLowerCase();
