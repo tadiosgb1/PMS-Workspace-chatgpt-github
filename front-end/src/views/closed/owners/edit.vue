@@ -198,21 +198,30 @@ export default {
 
     getApiErrorMessage(error) {
       const data = error?.response?.data;
+      const source = data ?? (error?.message && typeof error.message === "object" ? error.message : null);
 
-      if (typeof data === "string" && data.trim()) return data;
+      const format = (value) => {
+        if (typeof value === "string" && value.trim()) return value;
+        if (Array.isArray(value)) return value.filter(Boolean).map(String).join(" ");
+        if (value && typeof value === "object") {
+          return Object.entries(value)
+            .flatMap(([field, messages]) => {
+              const items = Array.isArray(messages) ? messages : [messages];
+              return items.filter(Boolean).map((message) => {
+                const text = typeof message === "string" ? message : message?.message;
+                return text ? (field === "non_field_errors" ? text : field.replace(/_/g, " ") + ": " + text) : "";
+              });
+            })
+            .filter(Boolean)
+            .join(" ");
+        }
+        return "";
+      };
 
-      if (data?.error) {
-        if (typeof data.error === "string") return data.error;
-        if (data.error?.message) return data.error.message;
+      for (const candidate of [source?.error, source?.message, source, error?.message]) {
+        const message = format(candidate);
+        if (message) return message;
       }
-
-      if (data?.message) return data.message;
-      if (error?.message && typeof error.message === "object") {
-        if (typeof error.message.error === "string") return error.message.error;
-        if (typeof error.message.message === "string") return error.message.message;
-      }
-      if (typeof error?.message === "string") return error.message;
-
       return "Failed to update owner";
     },
   },
