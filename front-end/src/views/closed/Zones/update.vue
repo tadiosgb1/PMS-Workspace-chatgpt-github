@@ -3,19 +3,19 @@
     <Toast ref="toast" />
 
     <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white w-full max-w-xl md:max-w-3xl lg:max-w-5xl rounded-xl shadow-xl flex flex-col max-h-[92vh] overflow-hidden">
+      <div class="bg-white w-full max-w-2xl rounded-xl shadow-xl flex flex-col max-h-[90vh] overflow-hidden">
 
         <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 shrink-0">
           <h2 class="text-base font-bold text-gray-800 tracking-tight">Edit Property Zone</h2>
           <button @click="$emit('close')" class="h-7 w-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 transition text-lg font-bold leading-none">&times;</button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
-          <form id="editZoneForm" @submit.prevent="updateModalVisible = true" class="space-y-6">
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+          <form id="editZoneForm" @submit.prevent="updateModalVisible = true" class="space-y-5">
 
-            <section class="space-y-3">
+            <section class="space-y-2.5">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Core Identity</p>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="form-label">Zone Name <span class="text-red-500">*</span></label>
                   <input v-model="form.name" class="form-input" required />
@@ -27,7 +27,7 @@
               </div>
             </section>
 
-            <section class="bg-gray-50 rounded-xl p-5 border border-gray-100 space-y-4">
+            <section class="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-100 space-y-4">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200/60 pb-1">Location Details</p>
               <div>
                 <label class="form-label">Street Address</label>
@@ -80,7 +80,7 @@
           </form>
         </div>
 
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div class="px-6 py-3.5 border-t border-gray-100 bg-gray-50 shrink-0">
           <div v-if="errorMessages.length" class="mb-4 text-red-700 text-sm bg-red-50 border border-red-200 p-4 rounded-lg">
             <ul class="space-y-1">
               <li v-for="(message, index) in errorMessages" :key="index" class="flex items-start gap-2">
