@@ -109,7 +109,7 @@ export default {
       this.saving = true;
       this.error = "";
       try {
-        await this.$apiPost("/api/post_offplan_product", this.payload());
+        await this.$apiPost("/post_offplan_product", this.payload());
         this.$emit("saved");
         this.close();
       } catch (e) { this.error = e?.message || "Unable to update payment plan."; }
