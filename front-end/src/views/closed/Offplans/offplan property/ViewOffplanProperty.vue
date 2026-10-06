@@ -140,6 +140,16 @@
           </div>
         </div>
         <div class="border-b border-slate-200 p-4">
+          <div class="flex items-center justify-between"><h3 class="text-xs font-semibold text-slate-900">Payment plans</h3><span v-if="plansLoading" class="text-[10px] text-slate-500">Loading…</span></div>
+          <div v-if="plansError" class="mt-2 border border-red-200 bg-red-50 px-2 py-1.5 text-[10px] text-red-700">{{ plansError }}</div>
+          <div v-else-if="!plansLoading && !plans.length" class="mt-2 text-[10px] text-slate-500">No payment plans for this property.</div>
+          <div v-else class="mt-2 overflow-x-auto">
+            <table class="min-w-full text-left text-[10px]">
+              <thead class="border-b border-slate-200 bg-slate-50"><tr><th class="px-2 py-1.5">Plan</th><th class="px-2 py-1.5">Type</th><th class="px-2 py-1.5">Total</th><th class="px-2 py-1.5">Down payment</th><th class="px-2 py-1.5">Installments</th><th class="px-2 py-1.5">Active</th></tr></thead>
+              <tbody><tr v-for="plan in plans" :key="plan.id" class="border-t border-slate-100"><td class="px-2 py-1.5 font-semibold">{{plan.name || "—"}}</td><td class="px-2 py-1.5">{{plan.plan_type || "—"}}</td><td class="px-2 py-1.5">{{plan.total_price || "—"}}</td><td class="px-2 py-1.5">{{plan.down_payment_percentage ?? "—"}}%</td><td class="px-2 py-1.5">{{plan.number_of_installments ?? "—"}} × / {{plan.installment_interval_months ?? "—"}} mo</td><td class="px-2 py-1.5">{{plan.is_active ? "Yes" : "No"}}</td></tr></tbody>
+            </table>
+          </div>
+        </div>\n        <div class="border-b border-slate-200 p-4">
           <h3 class="text-xs font-semibold text-slate-900">Features</h3>
           <div class="mt-2 grid gap-1.5 sm:grid-cols-2">
             <div v-for="feature in activeFeatures(selectedProperty)" :key="feature" class="border border-slate-200 px-2.5 py-1.5 text-xs text-slate-700">{{ feature }}</div>
@@ -171,7 +181,10 @@ export default {
       editOpen: false,
       detailOpen: false,
       selectedId: null,
-      selectedProperty: null
+      selectedProperty: null,
+      plans: [],
+      plansLoading: false,
+      plansError: ""
     };
   },
   computed: {
@@ -218,9 +231,23 @@ export default {
       this.editOpen = false;
       this.selectedId = null;
     },
-    openDetail(item) {
+    async openDetail(item) {
       this.selectedProperty = item;
       this.detailOpen = true;
+      await this.loadPlansForProperty(item?.id);
+    },
+    async loadPlansForProperty(propertyId) {
+      this.plans = [];
+      this.plansError = "";
+      if (!propertyId) return;
+      this.plansLoading = true;
+      try {
+        this.plans = await this.$getOffplanProducts({ property: propertyId });
+      } catch (e) {
+        this.plansError = e?.message || "Unable to load payment plans.";
+      } finally {
+        this.plansLoading = false;
+      }
     },
     display(v) {
       if (v === null || v === undefined || v === "") return "—";
