@@ -716,7 +716,7 @@ export function getOffplanProperties(params = {}) {
 }
 
 export function getOffplanProducts(params = {}) {
-  return getOffplanCollection("/api/get_offplan_products", ["products"], params);
+  return getOffplanCollection("/get_offplan_products", ["products"], params);
 }
 
 export function getOffplanPayments(params = {}) {
