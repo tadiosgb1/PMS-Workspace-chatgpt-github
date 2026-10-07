@@ -131,8 +131,8 @@
       </section>
     </div>
 
-    <AddOffplanPaymentPlan :open="addOpen" @close="addOpen=false" @saved="load" />
-    <EditOffplanPaymentPlan :open="editOpen" :id="selectedId" @close="editOpen=false" @saved="load" />
+    <AddOffplanPaymentPlan :open="addOpen" @close="addOpen=false" @saved="handleSaved" />
+    <EditOffplanPaymentPlan :open="editOpen" :id="selectedId" @close="editOpen=false" @saved="handleSaved" />
 
 
   </div>
