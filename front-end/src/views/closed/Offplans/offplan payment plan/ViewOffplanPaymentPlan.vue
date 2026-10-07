@@ -195,6 +195,7 @@ export default {
     this.load();
   },
   methods: {
+    async handleSaved() { this.addOpen = false; this.editOpen = false; await this.load(); },
     async loadBaseData() {
       try {
         const rows = await this.$getOffplanProperties();
