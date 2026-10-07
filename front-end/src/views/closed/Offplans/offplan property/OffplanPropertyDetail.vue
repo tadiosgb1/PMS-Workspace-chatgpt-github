@@ -19,7 +19,7 @@
             <p class="mt-1 text-sm text-slate-500">{{form.developer || 'Developer not specified'}} · {{form.property_type || 'Property'}}</p>
           </div>
           <div class="flex gap-2">
-            <router-link :to="{name:'OffplanProperty-edit',params:{id}}" class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700"><i class="fas fa-pen mr-2"></i>Edit</router-link>
+            <button type="button" @click="editOpen=true" class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700"><i class="fas fa-pen mr-2"></i>Edit</button>
             <router-link :to="{name:'OffplanProperty-view'}" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700">Back</router-link>
           </div>
         </div>
@@ -83,8 +83,8 @@
               <div class="space-y-4">
                 <Info label="Property zone" :value="zoneName(form.property_zone)" />
                 <Info label="Address" :value="zoneAddress(form.property_zone)" />
-                <Info label="City" :value="form.property_zone?.city || '—'" />
-                <Info label="State" :value="form.property_zone?.state || '—'" />
+                <Info label="City" :value="form.property_zone?.city || form.city || '—'" />
+                <Info label="State" :value="form.property_zone?.state || form.state || '—'" />
                 <Info label="Zone status" :value="display(form.property_zone?.zone_status)" />
                 <Info label="Owner" :value="personName(form.owner)" />
                 <Info label="Manager" :value="personName(form.manager)" />
@@ -123,15 +123,17 @@
 <script>
 import OffplanInfo from "./OffplanInfo.vue";
 import OffplanStat from "./OffplanStat.vue";
+import EditOffplanProperty from "./EditOffplanProperty.vue";
 
 export default {
   name: "OffplanPropertyDetail",
   props: { id: [String, Number] },
-  components: { Info: OffplanInfo, Stat: OffplanStat },
+  components: { Info: OffplanInfo, Stat: OffplanStat, EditOffplanProperty },
   data() {
     return {
       form: {}, loading: true, error: "",
       pictures: [], picturesLoading: false, picturesError: "",
+      editOpen: false,
       imageModalOpen: false, editingImage: null, imageSaving: false, imageError: "",
       imageForm: { id: null, description: "", file: null, preview: "", currentUrl: "" },
       amenityOptions: [
