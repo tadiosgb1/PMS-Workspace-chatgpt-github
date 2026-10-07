@@ -19,16 +19,16 @@
             <p class="mt-1 text-sm text-slate-500">{{form.developer || 'Developer not specified'}} · {{form.property_type || 'Property'}}</p>
           </div>
           <div class="flex gap-2">
-            <button type="button" @click="editOpen=true" class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700"><i class="fas fa-pen mr-2"></i>Edit</button>
-            <router-link :to="{name:'OffplanProperty-view'}" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700">Back</router-link>
+            <button type="button" @click="editOpen=true" class="bg-primary px-5 py-2.5 text-sm font-bold text-white hover:opacity-90"><i class="fas fa-pen mr-2"></i>Edit</button>
+            <router-link :to="{name:'OffplanProperty-view'}" class="border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700">Back</router-link>
           </div>
         </div>
 
-        <div v-if="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{error}}</div>
+        <div v-if="error" class="mb-6  border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{error}}</div>
 
         <div class="grid gap-6 lg:grid-cols-3">
           <div class="space-y-6 lg:col-span-2">
-            <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <section class="border border-slate-200 bg-white shadow-sm">
               <div class="border-b border-slate-100 px-6 py-5"><h2 class="font-bold text-slate-900">Property overview</h2></div>
               <div class="grid grid-cols-2 gap-px bg-slate-100 sm:grid-cols-4">
                 <Stat label="Price" :value="form.price || '—'" /><Stat label="Bedrooms" :value="form.bedrooms || '—'" />
@@ -69,7 +69,7 @@
             <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div class="border-b border-slate-100 px-6 py-5"><h2 class="font-bold text-slate-900">Amenities & features</h2></div>
               <div class="grid gap-3 p-6 sm:grid-cols-2">
-                <div v-for="item in amenityOptions" :key="item.key" class="flex items-center gap-3 rounded-xl border border-slate-100 p-3">
+                <div v-for="item in amenityOptions" :key="item.key" class="flex items-center gap-3 border border-slate-100 p-3">
                   <span class="flex h-8 w-8 items-center justify-center rounded-lg" :class="form[item.key] ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'"><i :class="form[item.key] ? 'fas fa-check' : 'fas fa-minus'"></i></span>
                   <span class="text-sm font-medium text-slate-700">{{item.label}}</span>
                 </div>
@@ -96,169 +96,16 @@
       </template>
     </div>
 
-    <div v-if="imageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @keydown.esc="closeImageModal">
-      <div class="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <div><h2 class="font-bold text-slate-900">{{editingImage ? 'Edit property image' : 'Add property image'}}</h2><p class="mt-1 text-xs text-slate-500">{{editingImage ? 'Replace the selected image and update its description.' : 'Upload an image for this property.'}}</p></div>
-          <button type="button" @click="closeImageModal" class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"><i class="fas fa-times"></i></button>
-        </div>
-        <form @submit.prevent="saveImage" class="space-y-5 p-6">
-          <div v-if="imageForm.preview || imageForm.currentUrl" class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-            <img :src="imageForm.preview || imageForm.currentUrl" alt="Image preview" class="max-h-72 w-full object-contain" />
-          </div>
-          <label class="block">
-            <span class="mb-2 block text-sm font-semibold text-slate-700">{{editingImage ? 'New image' : 'Image'}} <span class="text-red-500">*</span></span>
-            <input ref="imageInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" @change="onImageChange" class="block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" :required="!editingImage" />
-            <span class="mt-1 block text-xs text-slate-400">JPG, PNG, GIF or WEBP, maximum 10MB.</span>
-          </label>
-          <label class="block"><span class="mb-2 block text-sm font-semibold text-slate-700">Description</span><textarea v-model="imageForm.description" maxlength="200" class="min-h-24 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Describe this image…"></textarea></label>
-          <div v-if="imageError" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{imageError}}</div>
-          <div class="flex justify-end gap-3 border-t border-slate-100 pt-4"><button type="button" @click="closeImageModal" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700">Cancel</button><button type="submit" :disabled="imageSaving" class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60"><i v-if="imageSaving" class="fas fa-spinner fa-spin mr-2"></i>{{imageSaving ? 'Saving…' : editingImage ? 'Update image' : 'Add image'}}</button></div>
-        </form>
-      </div>
-    </div>
-
-    <EditOffplanProperty :open="editOpen" :id="id" @close="editOpen=false" @saved="loadProperty" />
-  </div>
-</template>
-
-<script>
-import OffplanInfo from "./OffplanInfo.vue";
-import OffplanStat from "./OffplanStat.vue";
-import EditOffplanProperty from "./EditOffplanProperty.vue";
-
-export default {
-  name: "OffplanPropertyDetail",
-  props: { id: [String, Number] },
-  components: { Info: OffplanInfo, Stat: OffplanStat, EditOffplanProperty },
-  data() {
-    return {
-      form: {}, loading: true, error: "",
-      pictures: [], picturesLoading: false, picturesError: "",
-      editOpen: false,
-      imageModalOpen: false, editingImage: null, imageSaving: false, imageError: "",
-      imageForm: { id: null, description: "", file: null, preview: "", currentUrl: "" },
-      amenityOptions: [
-        {key:"is_furnished",label:"Furnished"},{key:"has_maids_room",label:"Maid’s room"},{key:"has_study",label:"Study"},
-        {key:"has_central_or_ac_and_heating",label:"Central A/C & heating"},{key:"has_balcony",label:"Balcony"},{key:"has_private_garden",label:"Private garden"},
-        {key:"has_private_pool",label:"Private pool"},{key:"has_private_gym",label:"Private gym"},{key:"has_private_jacuzzi",label:"Private jacuzzi"},
-        {key:"has_shared_pool",label:"Shared pool"},{key:"has_shared_spa",label:"Shared spa"}
-      ]
-    };
-  },
-  async mounted() {
-    try {
-      await this.loadProperty();
-    } catch (e) {
-      this.error = e?.message || "Unable to load property.";
-    } finally { this.loading = false; }
-  },
-  methods: {
-    normalizeProperty(res) {
-      let body = res;
-      if (body?.data?.data) body = body.data.data;
-      else if (body?.data) body = body.data;
-      else if (body?.property) body = body.property;
-      if (Array.isArray(body)) body = body[0] || {};
-      return body && typeof body === "object" ? body : {};
-    },
-    async loadProperty() {
-      if (!this.id) return;
-      const res = await this.$apiGetById("/get_offplan_property", this.id);
-      this.form = this.normalizeProperty(res);
-      await this.loadPictures();
-    },
-    display(v) { if (v === null || v === undefined || v === "") return "—"; return String(v).replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase()); },
-    booleanText(v) { return v === true ? "Yes" : v === false ? "No" : "—"; },
-    formatDate(v) { if (!v) return "—"; const d = new Date(v); return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString(); },
-    personName(person) {
-      if (!person || typeof person !== "object") return "—";
-      return person.name || person.full_name || [person.first_name, person.middle_name, person.last_name].filter(Boolean).join(" ") || person.username || person.email || "—";
-    },
-    zoneName(zone) {
-      if (!zone || typeof zone !== "object") return "—";
-      return zone.name || "—";
-    },
-    zoneAddress(zone) {
-      if (!zone || typeof zone !== "object") return "—";
-      return [zone.address, zone.city, zone.state].filter(Boolean).join(", ") || "—";
-    },
-    normalizePictures(res) {
-      const raw = res?.data ?? res;
-      if (Array.isArray(raw)) return raw;
-      for (const key of ["pictures","images","results","data"]) if (Array.isArray(raw?.[key])) return raw[key];
-      return [];
-    },
-    imageUrl(picture) { return picture?.offplan_property_image || picture?.image || picture?.picture || picture?.url || picture?.file || ""; },
-    async loadPictures() {
-      if (!this.id) return;
-      this.picturesLoading = true; this.picturesError = "";
-      try {
-        const res = await this.$apiGet("/get_offplan_property_pictures", { offplan_property_id: this.id, property_id: this.id });
-        this.pictures = this.normalizePictures(res);
-      } catch (e) { this.picturesError = e?.message || "Unable to load property images."; }
-      finally { this.picturesLoading = false; }
-    },
-    openAddImage() {
-      this.editingImage = null; this.imageError = "";
-      this.imageForm = {id:null,description:"",file:null,preview:"",currentUrl:""};
+    <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />\n    openAddImage() {
+      this.editingImage = null;
       this.imageModalOpen = true;
     },
-    async openEditImage(picture) {
-      this.imageError = ""; this.editingImage = {...picture};
-      this.imageForm = {id:picture.id,description:picture.description || "",file:null,preview:"",currentUrl:this.imageUrl(picture)};
+    openEditImage(picture) {
+      this.editingImage = { ...picture };
       this.imageModalOpen = true;
-      if (picture.id) {
-        try {
-          const res = await this.$apiGetById("/get_offplan_property_picture", picture.id);
-          const item = res?.data?.data || res?.data || res?.picture || res;
-          this.editingImage = {...picture,...item};
-          this.imageForm.description = item?.description ?? this.imageForm.description;
-          this.imageForm.currentUrl = this.imageUrl(item) || this.imageForm.currentUrl;
-        } catch (e) { /* The list record is sufficient to continue editing. */ }
-      }
-    },
-    onImageChange(e) {
-      const file = e.target.files?.[0]; if (!file) return;
-      const allowed = ["image/jpeg","image/png","image/gif","image/webp"];
-      if (!allowed.includes(file.type)) { this.imageError = "Only JPG, PNG, GIF and WEBP images are allowed."; e.target.value=""; return; }
-      if (file.size > 10 * 1024 * 1024) { this.imageError = "Image size must not exceed 10MB."; e.target.value=""; return; }
-      this.imageError = ""; this.imageForm.file = file;
-      if (this.imageForm.preview) URL.revokeObjectURL(this.imageForm.preview);
-      this.imageForm.preview = URL.createObjectURL(file);
     },
     closeImageModal() {
-      if (this.imageSaving) return;
-      if (this.imageForm.preview) URL.revokeObjectURL(this.imageForm.preview);
-      this.imageModalOpen = false; this.editingImage = null;
+      this.imageModalOpen = false;
+      this.editingImage = null;
     },
-    async saveImage() {
-      this.imageError = "";
-      if (!this.editingImage && !this.imageForm.file) { this.imageError = "Please select an image."; return; }
-      this.imageSaving = true;
-      try {
-        const fd = new FormData();
-        fd.append("description", this.imageForm.description || "");
-        fd.append("offplan_property_id", this.id);
-        fd.append("property_id", this.id);
-        if (this.imageForm.file) fd.append("offplan_property_image", this.imageForm.file);
-        if (this.imageForm.file) fd.append("property_image", this.imageForm.file);
-        if (this.editingImage) {
-          await this.$apiPut("/update_offplan_property_picture", this.imageForm.id, fd, {"Content-Type":"multipart/form-data"});
-        } else {
-          await this.$apiPost("/post_offplan_property_picture", fd, {"Content-Type":"multipart/form-data"});
-        }
-        await this.loadPictures(); this.closeImageModal();
-      } catch (e) { this.imageError = e?.message || "Unable to save the property image."; }
-      finally { this.imageSaving = false; }
-    },
-    async deleteImage(picture) {
-      if (!picture?.id || !window.confirm("Delete this property image?")) return;
-      try {
-        await this.$apiDelete("/delete_offplan_property_picture", picture.id);
-        await this.loadPictures();
-      } catch (e) { this.picturesError = e?.message || "Unable to delete the property image."; }
-    }
-  }
-};
-</script>
+
