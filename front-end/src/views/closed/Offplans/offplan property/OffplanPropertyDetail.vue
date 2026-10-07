@@ -38,6 +38,8 @@
                 <Info label="Completion status" :value="display(form.completion_status)" /><Info label="Sale type" :value="display(form.sale_type)" />
                 <Info label="Project completion" :value="display(form.project_completion)" /><Info label="Pre-handover payment" :value="display(form.pre_handover_payment)" />
                 <Info label="Project status" :value="display(form.project_status)" /><Info label="Developer" :value="form.developer || '—'" />
+                <Info label="Furnished" :value="booleanText(form.is_furnished)" /><Info label="Created" :value="formatDate(form.created_at)" />
+                <Info label="Updated" :value="formatDate(form.updated_at)" />
               </div>
             </section>
 
@@ -58,7 +60,7 @@
                       <button type="button" @click="deleteImage(picture)" class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-red-600 shadow hover:bg-white" title="Delete image"><i class="fas fa-trash text-xs"></i></button>
                     </div>
                   </div>
-                  <div class="p-4"><p class="text-sm font-medium text-slate-700">{{picture.description || 'No description'}}</p><p class="mt-1 text-xs text-slate-400">Image #{{picture.id}}</p></div>
+                  <div class="p-4"><p class="text-sm font-medium text-slate-700">{{picture.description || 'No description'}}</p></div>
                 </article>
               </div>
               <div v-else class="p-10 text-center text-sm text-slate-500"><i class="fas fa-images mb-2 block text-2xl text-slate-300"></i>No images have been added yet.</div>
@@ -76,7 +78,18 @@
           </div>
 
           <aside class="space-y-6">
-            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 class="mb-4 font-bold text-slate-900">Relationships</h2><div class="space-y-4"><Info label="Property zone" :value="form.property_zone ?? '—'" /><Info label="Owner" :value="form.owner ?? '—'" /><Info label="Manager" :value="form.manager ?? '—'" /></div></section>
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 class="mb-4 font-bold text-slate-900">Location & relationships</h2>
+              <div class="space-y-4">
+                <Info label="Property zone" :value="zoneName(form.property_zone)" />
+                <Info label="Address" :value="zoneAddress(form.property_zone)" />
+                <Info label="City" :value="form.property_zone?.city || '—'" />
+                <Info label="State" :value="form.property_zone?.state || '—'" />
+                <Info label="Zone status" :value="display(form.property_zone?.zone_status)" />
+                <Info label="Owner" :value="personName(form.owner)" />
+                <Info label="Manager" :value="personName(form.manager)" />
+              </div>
+            </section>
             <section class="rounded-2xl border border-blue-100 bg-blue-50/60 p-6"><div class="flex items-start gap-3"><i class="fas fa-circle-info mt-0.5 text-blue-600"></i><p class="text-sm leading-6 text-blue-900">This record is connected to the authenticated property-management workspace and uses the offplan property API endpoints.</p></div></section>
           </aside>
         </div>
@@ -140,6 +153,20 @@ export default {
   },
   methods: {
     display(v) { if (v === null || v === undefined || v === "") return "—"; return String(v).replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase()); },
+    booleanText(v) { return v === true ? "Yes" : v === false ? "No" : "—"; },
+    formatDate(v) { if (!v) return "—"; const d = new Date(v); return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString(); },
+    personName(person) {
+      if (!person || typeof person !== "object") return "—";
+      return person.name || person.full_name || [person.first_name, person.middle_name, person.last_name].filter(Boolean).join(" ") || person.username || person.email || "—";
+    },
+    zoneName(zone) {
+      if (!zone || typeof zone !== "object") return "—";
+      return zone.name || "—";
+    },
+    zoneAddress(zone) {
+      if (!zone || typeof zone !== "object") return "—";
+      return [zone.address, zone.city, zone.state].filter(Boolean).join(", ") || "—";
+    },
     normalizePictures(res) {
       const raw = res?.data ?? res;
       if (Array.isArray(raw)) return raw;
