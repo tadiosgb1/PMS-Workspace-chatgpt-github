@@ -96,7 +96,11 @@
       </template>
     </div>
 
-    <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />\n    openAddImage() {
+        <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />
+  </div>
+</template>
+
+    openAddImage() {
       this.editingImage = null;
       this.imageModalOpen = true;
     },
