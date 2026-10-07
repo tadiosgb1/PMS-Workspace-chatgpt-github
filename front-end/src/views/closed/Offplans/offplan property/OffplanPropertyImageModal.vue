@@ -125,8 +125,9 @@ export default {
           await this.$apiPost("/post_offplan_property_picture", fd, { "Content-Type": "multipart/form-data" });
         }
 
-        this.$emit("saved");
+        this.saving = false;
         this.$emit("close");
+        this.$emit("saved");
       } catch (e) {
         this.error = e?.response?.data?.offplan_property?.[0] || e?.message || "Unable to save the property image.";
       } finally {
