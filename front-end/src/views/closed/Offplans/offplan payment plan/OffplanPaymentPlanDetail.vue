@@ -3,29 +3,15 @@
     <div class="mx-auto max-w-7xl">
       <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <button @click="$router.back()" class="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold text-slate-600 hover:text-primary">
-            <i class="fas fa-arrow-left"></i> Back to payment plans
-          </button>
+          <button @click="$router.back()" class="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold text-slate-600 hover:text-primary"><i class="fas fa-arrow-left"></i> Back to payment plans</button>
           <p class="text-[10px] font-semibold uppercase tracking-wide text-primary">Offplan payment plan</p>
           <h1 class="text-xl font-semibold text-slate-900">{{ item.name || "Payment plan" }}</h1>
           <p class="mt-0.5 text-xs text-slate-500">Plan #{{ item.id || id || "—" }}</p>
         </div>
-        <button v-if="item.id" @click="editOpen=true" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90">
-          <i class="fas fa-pen mr-1"></i> Edit
-        </button>
+        <button v-if="item.id" @click="editOpen=true" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90"><i class="fas fa-pen mr-1"></i> Edit</button>
       </div>
-
-      <section v-if="error" class="mb-4 border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-        <div class="flex items-center justify-between gap-3">
-          <span>{{ error }}</span>
-          <button @click="load" class="border border-red-300 bg-white px-2.5 py-1.5 text-[10px] font-semibold">Retry</button>
-        </div>
-      </section>
-
-      <div v-if="loading" class="border border-slate-200 bg-white p-12 text-center text-xs text-slate-500">
-        <i class="fas fa-spinner fa-spin mr-2"></i>Loading payment plan…
-      </div>
-
+      <section v-if="error" class="mb-4 border border-red-200 bg-red-50 p-3 text-xs text-red-700"><div class="flex items-center justify-between gap-3"><span>{{ error }}</span><button @click="load" class="border border-red-300 bg-white px-2.5 py-1.5 text-[10px] font-semibold">Retry</button></div></section>
+      <div v-if="loading" class="border border-slate-200 bg-white p-12 text-center text-xs text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Loading payment plan…</div>
       <template v-else>
         <section class="border border-slate-200 bg-white">
           <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Payment plan</h2></div>
@@ -34,109 +20,102 @@
             <Info label="Total price" :value="formatNumber(item.total_price)" />
             <Info label="Down payment" :value="formatNumber(item.down_payment_amount) + ' · ' + (item.down_payment_percentage ?? '—') + '%'" />
             <Info label="Installment amount" :value="formatNumber(item.installment_amount)" />
-            <Info label="Installments" :value="(item.number_of_installments ?? '—') + ' × every ' + (item.installment_interval_months ?? '—') + ' month(s)'" />
-            <Info label="Penalty rate / day" :value="item.penalty_rate_per_day ?? '0.0000'" />
+            <Info label="Installments" :value="installmentText" />
+            <Info label="Penalty rate / day" :value="item.penalty_rate_per_day ?? '—'" />
             <Info label="Grace period" :value="(item.grace_period_days ?? 0) + ' days'" />
             <Info label="Status" :value="item.is_active ? 'Active' : 'Inactive'" />
-            <Info label="Sale type" :value="display(property?.sale_type)" />
-            <Info label="Pre-handover payment" :value="display(property?.pre_handover_payment)" />
+            <Info label="Sale type" :value="display(property && property.sale_type)" />
+            <Info label="Pre-handover payment" :value="display(property && property.pre_handover_payment)" />
             <Info label="Created" :value="formatDate(item.created_at)" />
             <Info label="Updated" :value="formatDate(item.updated_at)" />
           </div>
-          <div v-if="item.description" class="border-t border-slate-200 px-4 py-3">
-            <h3 class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Description</h3>
-            <p class="mt-1 text-xs leading-5 text-slate-600">{{ item.description }}</p>
-          </div>
+          <div v-if="item.description" class="border-t border-slate-200 px-4 py-3"><h3 class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Description</h3><p class="mt-1 text-xs leading-5 text-slate-600">{{ item.description }}</p></div>
         </section>
-
         <section class="mt-4 border border-slate-200 bg-white">
           <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Offplan property</h2></div>
           <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Info label="Property ID" :value="property?.id ? '#' + property.id : '—'" />
-            <Info label="Developer" :value="property?.developer" />
-            <Info label="Property type" :value="display(property?.property_type)" />
-            <Info label="Property price" :value="formatNumber(property?.price)" />
-            <Info label="Beds / baths" :value="(property?.bedrooms ?? '—') + ' / ' + (property?.bathrooms ?? '—')" />
-            <Info label="Area / size" :value="property?.area_or_size" />
-            <Info label="Completion" :value="display(property?.completion_status)" />
-            <Info label="Project status" :value="display(property?.project_status)" />
-            <Info label="Project completion" :value="display(property?.project_completion)" />
-            <Info label="Sale type" :value="display(property?.sale_type)" />
-            <Info label="Pre-handover payment" :value="display(property?.pre_handover_payment)" />
-            <Info label="Zone" :value="property?.property_zone?.name" />
-            <Info label="Zone address" :value="zoneAddress(property?.property_zone)" />
+            <Info label="Property ID" :value="property && property.id ? '#' + property.id : '—'" />
+            <Info label="Developer" :value="property && property.developer" />
+            <Info label="Property type" :value="display(property && property.property_type)" />
+            <Info label="Property price" :value="formatNumber(property && property.price)" />
+            <Info label="Beds / baths" :value="bedsBaths" />
+            <Info label="Area / size" :value="property && property.area_or_size" />
+            <Info label="Completion" :value="display(property && property.completion_status)" />
+            <Info label="Project status" :value="display(property && property.project_status)" />
+            <Info label="Project completion" :value="display(property && property.project_completion)" />
+            <Info label="Sale type" :value="display(property && property.sale_type)" />
+            <Info label="Pre-handover payment" :value="display(property && property.pre_handover_payment)" />
+            <Info label="Zone" :value="property && property.property_zone && property.property_zone.name" />
+            <Info label="Zone address" :value="zoneAddress(property && property.property_zone)" />
           </div>
         </section>
-
         <section class="mt-4 border border-slate-200 bg-white">
           <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Ownership & management</h2></div>
           <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <Info label="Owner" :value="personName(owner)" />
-            <Info label="Owner ID" :value="owner?.id ? '#' + owner.id : '—'" />
-            <Info label="Owner email" :value="owner?.email" />
-            <Info label="Owner phone" :value="owner?.phone_number" />
+            <Info label="Owner ID" :value="owner && owner.id ? '#' + owner.id : '—'" />
+            <Info label="Owner email" :value="owner && owner.email" />
+            <Info label="Owner phone" :value="owner && owner.phone_number" />
             <Info label="Manager" :value="personName(manager)" />
-            <Info label="Manager ID" :value="manager?.id ? '#' + manager.id : '—'" />
-            <Info label="Manager email" :value="manager?.email" />
-            <Info label="Manager phone" :value="manager?.phone_number" />
+            <Info label="Manager ID" :value="manager && manager.id ? '#' + manager.id : '—'" />
+            <Info label="Manager email" :value="manager && manager.email" />
+            <Info label="Manager phone" :value="manager && manager.phone_number" />
           </div>
         </section>
       </template>
     </div>
-
     <EditOffplanPaymentPlan :open="editOpen" :id="id" @close="editOpen=false" @saved="load" />
   </div>
 </template>
 
 <script>
 import EditOffplanPaymentPlan from "./EditOffplanPaymentPlan.vue";
-
-const Info = {
-  props: { label: String, value: [String, Number] },
-  template: '<div class="border border-slate-200 p-2.5"><p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{{ label }}</p><p class="mt-1 text-xs font-medium text-slate-900">{{ value || "—" }}</p></div>'
-};
+import OffplanInfo from "../offplan property/OffplanInfo.vue";
 
 export default {
   name: "OffplanPaymentPlanDetail",
-  components: { EditOffplanPaymentPlan, Info },
+  components: { EditOffplanPaymentPlan, Info: OffplanInfo },
   props: { id: [String, Number] },
-  data() {
-    return { item: {}, loading: false, error: "", editOpen: false };
-  },
+  data() { return { item: {}, loading: false, error: "", editOpen: false }; },
   computed: {
     property() {
-      return this.item?.offplan_property && typeof this.item.offplan_property === "object"
-        ? this.item.offplan_property
-        : null;
+      const p = this.item && this.item.offplan_property;
+      return p && typeof p === "object" ? p : null;
     },
     owner() {
-      return this.item?.owner || this.property?.owner || this.property?.property_zone?.owner || null;
+      return (this.item && this.item.owner) || (this.property && this.property.owner) || (this.property && this.property.property_zone && this.property.property_zone.owner) || null;
     },
     manager() {
-      return this.item?.manager || this.property?.manager || this.property?.property_zone?.manager || null;
+      return (this.item && this.item.manager) || (this.property && this.property.manager) || (this.property && this.property.property_zone && this.property.property_zone.manager) || null;
+    },
+    installmentText() {
+      const count = this.item && this.item.number_of_installments != null ? this.item.number_of_installments : "—";
+      const interval = this.item && this.item.installment_interval_months != null ? this.item.installment_interval_months : "—";
+      return count + " × every " + interval + " month(s)";
+    },
+    bedsBaths() {
+      const beds = this.property && this.property.bedrooms != null ? this.property.bedrooms : "—";
+      const baths = this.property && this.property.bathrooms != null ? this.property.bathrooms : "—";
+      return beds + " / " + baths;
     }
   },
-  mounted() {
-    this.load();
-  },
+  mounted() { this.load(); },
   methods: {
     async load() {
       this.loading = true;
       this.error = "";
       try {
         const res = await this.$apiGetById("/get_offplan_product", this.id);
-
-        // Match the existing OffplanPropertyDetail.vue pattern.
-        // $apiGetById can return an axios-style wrapper, so unwrap the
-        // actual resource body before binding it to the detail view.
-        this.item = res?.data?.data || res?.data || res?.payment_plan || res?.offplan_payment_plan || res || {};
-
-        if (Array.isArray(this.item)) {
-          this.item = this.item[0] || {};
-        }
+        let body = res;
+        if (body && body.data && body.data.data) body = body.data.data;
+        else if (body && body.data) body = body.data;
+        else if (body && body.payment_plan) body = body.payment_plan;
+        else if (body && body.offplan_payment_plan) body = body.offplan_payment_plan;
+        if (Array.isArray(body)) body = body[0] || {};
+        this.item = body && typeof body === "object" ? body : {};
       } catch (e) {
         this.item = {};
-        this.error = e?.message || "Unable to load this payment plan.";
+        this.error = e && e.message ? e.message : "Unable to load this payment plan.";
       } finally {
         this.loading = false;
       }
