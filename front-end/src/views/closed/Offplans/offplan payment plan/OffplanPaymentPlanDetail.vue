@@ -84,18 +84,15 @@ export default {
     owner() {
       return (this.item && this.item.owner) || (this.property && this.property.owner) || (this.property && this.property.property_zone && this.property.property_zone.owner) || null;
     },
-    manager() {
-      return (this.item && this.item.manager) || (this.property && this.property.manager) || (this.property && this.property.property_zone && this.property.property_zone.manager) || null;
-    },
     installmentText() {
       const count = this.item && this.item.number_of_installments != null ? this.item.number_of_installments : "—";
       const interval = this.item && this.item.installment_interval_months != null ? this.item.installment_interval_months : "—";
       return count + " × every " + interval + " month(s)";
     },
-    bedsBaths() {
-      const beds = this.property && this.property.bedrooms != null ? this.property.bedrooms : "—";
-      const baths = this.property && this.property.bathrooms != null ? this.property.bathrooms : "—";
-      return beds + " / " + baths;
+    propertyName() {
+      const p = this.property;
+      if (!p) return "Not assigned";
+      return p.name || p.title || (p.developer ? p.developer + " · " + this.display(p.property_type) : "Offplan Property #" + p.id);
     }
   },
   mounted() { this.load(); },
