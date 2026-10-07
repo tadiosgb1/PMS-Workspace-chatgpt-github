@@ -19,7 +19,7 @@
             <p class="mt-0.5 text-xs text-slate-500">{{form.developer || 'Developer not specified'}} · {{form.property_type || 'Property'}}</p>
           </div>
           <div class="flex gap-2">
-            <button type="button" @click="editOpen = true" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90"><i class="fas fa-pen mr-2"></i>Edit</button>
+            <button type="button" @click="openEdit" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90"><i class="fas fa-pen mr-2"></i>Edit</button>
             <router-link :to="{name:'OffplanProperty-view'}" class="border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:border-primary hover:text-primary">Back</router-link>
           </div>
         </div>
@@ -96,7 +96,7 @@
       </template>
     </div>
 
-    <EditOffplanProperty :open="editOpen" :id="id" @close="editOpen=false" @saved="loadProperty" />
+    <EditOffplanProperty :open="editOpen" :id="selectedId" @close="closeEdit" @saved="handleEditSaved" />
     <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />
   </div>
 </template>
@@ -115,7 +115,7 @@ export default {
     return {
       form: {}, loading: true, error: "",
       pictures: [], picturesLoading: false, picturesError: "",
-      editOpen: false,
+      editOpen: false, selectedId: null,
       imageModalOpen: false, editingImage: null,
       amenityOptions: [
         {key:"is_furnished",label:"Furnished"},{key:"has_maids_room",label:"Maid’s room"},{key:"has_study",label:"Study"},
@@ -177,6 +177,17 @@ export default {
         this.pictures = this.normalizePictures(res);
       } catch (e) { this.picturesError = e?.message || "Unable to load property images."; }
       finally { this.picturesLoading = false; }
+    },
+    openEdit() {
+      this.selectedId = this.id;
+      this.editOpen = true;
+    },
+    closeEdit() {
+      this.editOpen = false;
+      this.selectedId = null;
+    },
+    async handleEditSaved() {
+      await this.loadProperty();
     },
     openAddImage() {
       this.editingImage = null;
