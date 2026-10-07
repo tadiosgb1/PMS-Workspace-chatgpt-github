@@ -32,34 +32,33 @@
           <div v-if="item.description" class="border-t border-slate-200 px-4 py-3"><h3 class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Description</h3><p class="mt-1 text-xs leading-5 text-slate-600">{{ item.description }}</p></div>
         </section>
         <section class="mt-4 border border-slate-200 bg-white">
-          <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Offplan property</h2></div>
-          <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Info label="Property ID" :value="property && property.id ? '#' + property.id : '—'" />
-            <Info label="Developer" :value="property && property.developer" />
-            <Info label="Property type" :value="display(property && property.property_type)" />
-            <Info label="Property price" :value="formatNumber(property && property.price)" />
-            <Info label="Beds / baths" :value="bedsBaths" />
-            <Info label="Area / size" :value="property && property.area_or_size" />
-            <Info label="Completion" :value="display(property && property.completion_status)" />
-            <Info label="Project status" :value="display(property && property.project_status)" />
-            <Info label="Project completion" :value="display(property && property.project_completion)" />
-            <Info label="Sale type" :value="display(property && property.sale_type)" />
-            <Info label="Pre-handover payment" :value="display(property && property.pre_handover_payment)" />
-            <Info label="Zone" :value="property && property.property_zone && property.property_zone.name" />
-            <Info label="Zone address" :value="zoneAddress(property && property.property_zone)" />
-          </div>
-        </section>
-        <section class="mt-4 border border-slate-200 bg-white">
-          <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Ownership & management</h2></div>
-          <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Info label="Owner" :value="personName(owner)" />
-            <Info label="Owner ID" :value="owner && owner.id ? '#' + owner.id : '—'" />
-            <Info label="Owner email" :value="owner && owner.email" />
-            <Info label="Owner phone" :value="owner && owner.phone_number" />
-            <Info label="Manager" :value="personName(manager)" />
-            <Info label="Manager ID" :value="manager && manager.id ? '#' + manager.id : '—'" />
-            <Info label="Manager email" :value="manager && manager.email" />
-            <Info label="Manager phone" :value="manager && manager.phone_number" />
+          <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Related records</h2></div>
+          <div class="grid gap-3 p-4 sm:grid-cols-2">
+            <div class="border border-slate-100 p-3">
+              <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Offplan property</p>
+              <router-link
+                v-if="property && property.id"
+                :to="{ name: 'OffplanProperty-detail', params: { id: property.id } }"
+                class="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                {{ propertyName }}
+                <i class="fas fa-arrow-up-right-from-square text-[9px]"></i>
+              </router-link>
+              <p v-else class="mt-1 text-sm text-slate-500">Not assigned</p>
+            </div>
+
+            <div class="border border-slate-100 p-3">
+              <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Owner</p>
+              <router-link
+                v-if="owner && owner.id"
+                :to="{ name: 'owner-detail', params: { id: owner.id } }"
+                class="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                {{ personName(owner) }}
+                <i class="fas fa-arrow-up-right-from-square text-[9px]"></i>
+              </router-link>
+              <p v-else class="mt-1 text-sm text-slate-500">Not assigned</p>
+            </div>
           </div>
         </section>
       </template>
