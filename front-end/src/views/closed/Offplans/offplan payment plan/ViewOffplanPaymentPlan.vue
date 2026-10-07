@@ -283,9 +283,10 @@ export default {
       }
     },
     propertyFromPlan(plan) {
-      return plan?.offplan_property && typeof plan.offplan_property === "object"
-        ? plan.offplan_property
-        : (plan?.offplan_property || plan?.property && typeof plan.property === "object" ? plan.property : null);
+      if (plan?.offplan_property && typeof plan.offplan_property === "object") return plan.offplan_property;
+      if (plan?.property && typeof plan.property === "object") return plan.property;
+      const id = plan?.offplan_property ?? plan?.property;
+      return this.properties.find(item => String(item.id) === String(id)) || null;
     },
     ownerFromPlan(plan) {
       const p = this.propertyFromPlan(plan);
