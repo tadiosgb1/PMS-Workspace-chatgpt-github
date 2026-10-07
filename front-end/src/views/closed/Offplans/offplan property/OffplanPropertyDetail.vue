@@ -97,7 +97,7 @@
     </div>
 
     <EditOffplanProperty :open="editOpen" :id="selectedId" @close="closeEdit" @saved="handleEditSaved" />
-    <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />
+    <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="handleImageSaved" />
   </div>
 </template>
 
@@ -197,6 +197,7 @@ export default {
       this.editingImage = { ...picture };
       this.imageModalOpen = true;
     },
+    async handleImageSaved() { this.closeImageModal(); await this.loadPictures(); },
     closeImageModal() {
       this.imageModalOpen = false;
       this.editingImage = null;
