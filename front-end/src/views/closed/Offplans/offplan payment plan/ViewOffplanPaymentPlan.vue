@@ -71,55 +71,58 @@
           <h2 class="text-xs font-semibold text-slate-900">No payment plans found</h2>
           <p class="mt-1 text-xs text-slate-500">Create a plan or adjust the filters.</p>
         </div>
-        <div v-else class="overflow-x-auto">
-          <table class="min-w-[1850px] w-full border-collapse text-left">
+        <div v-else class="w-full overflow-hidden">
+          <table class="w-full table-fixed border-collapse text-left">
+            <colgroup>
+              <col class="w-[16%]" /><col class="w-[19%]" /><col class="w-[17%]" /><col class="w-[20%]" /><col class="w-[11%]" /><col class="w-[9%]" /><col class="w-[8%]" />
+            </colgroup>
             <thead class="bg-slate-50">
               <tr class="border-b border-slate-200">
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Plan</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Offplan property</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Owner</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Plan terms</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Penalty / grace</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                <th class="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Plan</th>
+                <th class="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Offplan property</th>
+                <th class="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Owner</th>
+                <th class="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Plan terms</th>
+                <th class="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Penalty / grace</th>
+                <th class="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Status</th>
                 <th class="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="x in filtered" :key="x.id" class="border-b border-slate-100 align-top hover:bg-slate-50">
-                <td class="px-3 py-2.5">
-                  <div class="font-semibold text-xs text-slate-900">{{ x.name || "Unnamed plan" }}</div>
+                <td class="min-w-0 px-2.5 py-2.5">
+                  <div class="truncate font-semibold text-xs text-slate-900" :title="x.name || 'Unnamed plan'">{{ x.name || "Unnamed plan" }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-500">#{{ x.id }} · {{ display(x.plan_type) }}</div>
-                  <div v-if="x.description" class="mt-1 max-w-[190px] text-[10px] text-slate-500">{{ x.description }}</div>
+                  <div v-if="x.description" class="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-500">{{ x.description }}</div>
                 </td>
-                <td class="px-3 py-2.5">
-                  <div class="font-medium text-xs text-slate-900">{{ propertyLabel(propertyFromPlan(x)) }}</div>
+                <td class="min-w-0 px-2.5 py-2.5">
+                  <div class="line-clamp-2 font-medium text-xs leading-4 text-slate-900" :title="propertyLabel(propertyFromPlan(x))">{{ propertyLabel(propertyFromPlan(x)) }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-500">ID {{ propertyFromPlan(x)?.id || "—" }}</div>
                   <div class="mt-1 text-[10px] text-slate-600">{{ display(propertyFromPlan(x)?.developer) || "Developer not set" }}</div>
                 </td>
-                <td class="px-3 py-2.5">
-                  <div class="font-medium text-xs text-slate-900">{{ personName(ownerFromPlan(x)) }}</div>
+                <td class="min-w-0 px-2.5 py-2.5">
+                  <div class="truncate font-medium text-xs text-slate-900" :title="personName(ownerFromPlan(x))">{{ personName(ownerFromPlan(x)) }}</div>
                   <div v-if="ownerFromPlan(x)?.email" class="mt-0.5 text-[10px] text-slate-500">{{ ownerFromPlan(x).email }}</div>
                   <div v-if="ownerFromPlan(x)?.phone_number" class="text-[10px] text-slate-500">{{ ownerFromPlan(x).phone_number }}</div>
                   <div v-if="ownerFromPlan(x)?.id" class="mt-0.5 text-[10px] text-slate-400">Owner #{{ ownerFromPlan(x).id }}</div>
                 </td>
-                <td class="px-3 py-2.5">
+                <td class="min-w-0 px-2.5 py-2.5">
                   <div class="font-semibold text-xs text-slate-900">Total {{ formatNumber(x.total_price) }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-600">Down: {{ formatNumber(x.down_payment_amount) }} ({{ x.down_payment_percentage ?? "—" }}%)</div>
                   <div class="mt-0.5 text-[10px] text-slate-600">Installment: {{ formatNumber(x.installment_amount) }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-600">{{ x.number_of_installments ?? "—" }} payments · every {{ x.installment_interval_months ?? "—" }} month(s)</div>
                 </td>
-                <td class="px-3 py-2.5">
+                <td class="min-w-0 px-2.5 py-2.5">
                   <div class="text-xs text-slate-700">{{ x.penalty_rate_per_day ?? "0.0000" }} / day</div>
                   <div class="mt-0.5 text-[10px] text-slate-500">{{ x.grace_period_days ?? 0 }} day grace period</div>
                 </td>
-                <td class="px-3 py-2.5">
+                <td class="min-w-0 px-2.5 py-2.5">
                   <span :class="x.is_active ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-600'" class="inline-flex border px-2 py-0.5 text-[10px] font-medium">{{ x.is_active ? "Active" : "Inactive" }}</span>
                   <div class="mt-1 text-[10px] text-slate-500">Sale: {{ display(propertyFromPlan(x)?.sale_type) }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-500">Pre-handover: {{ display(propertyFromPlan(x)?.pre_handover_payment) }}</div>
                 </td>
-                <td class="px-3 py-2.5 text-right whitespace-nowrap">
-                  <button @click="$router.push({ name: 'OffplanPaymentPlan-detail', params: { id: x.id } })" class="mr-1 border border-slate-300 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</button>
-                  <button @click="edit(x.id)" class="border border-primary bg-primary px-2 py-1.5 text-[10px] font-semibold text-white hover:opacity-90">Edit</button>
+                <td class="px-2 py-2.5 text-right">
+                  <button @click="$router.push({ name: 'OffplanPaymentPlan-detail', params: { id: x.id } })" class="mb-1 w-full border border-slate-300 bg-white px-1.5 py-1.5 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</button>
+                  <button @click="edit(x.id)" class="w-full border border-primary bg-primary px-1.5 py-1.5 text-[10px] font-semibold text-white hover:opacity-90">Edit</button>
                 </td>
               </tr>
             </tbody>
