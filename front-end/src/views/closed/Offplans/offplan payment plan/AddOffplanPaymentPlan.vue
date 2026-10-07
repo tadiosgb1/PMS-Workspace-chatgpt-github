@@ -152,8 +152,9 @@ export default {
       this.error = "";
       try {
         await this.$apiPost("/post_offplan_product", this.payload());
+        this.loading = false;
+        this.$emit("close");
         this.$emit("saved");
-        this.close();
       } catch (e) {
         this.error = e?.message || "Unable to create payment plan.";
       } finally {
