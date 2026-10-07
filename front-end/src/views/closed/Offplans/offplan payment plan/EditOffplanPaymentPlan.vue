@@ -174,8 +174,9 @@ export default {
       this.error = "";
       try {
         await this.$apiPatch("/update_offplan_product", this.id, this.payload());
+        this.saving = false;
+        this.$emit("close");
         this.$emit("saved");
-        this.close();
       } catch (e) {
         this.error = e?.message || "Unable to update payment plan.";
       } finally {
