@@ -78,12 +78,9 @@
                 <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Plan</th>
                 <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Offplan property</th>
                 <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Owner</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Zone / manager</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Property details</th>
                 <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Plan terms</th>
                 <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Penalty / grace</th>
                 <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Status</th>
-                <th class="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Updated</th>
                 <th class="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">Actions</th>
               </tr>
             </thead>
@@ -106,17 +103,6 @@
                   <div v-if="ownerFromPlan(x)?.id" class="mt-0.5 text-[10px] text-slate-400">Owner #{{ ownerFromPlan(x).id }}</div>
                 </td>
                 <td class="px-3 py-2.5">
-                  <div class="font-medium text-xs text-slate-900">{{ zoneFromPlan(x)?.name || "—" }}</div>
-                  <div class="mt-0.5 text-[10px] text-slate-500">{{ zoneAddress(zoneFromPlan(x)) }}</div>
-                  <div class="mt-1 text-[10px] text-slate-600">Manager: {{ personName(managerFromPlan(x)) }}</div>
-                </td>
-                <td class="px-3 py-2.5">
-                  <div class="text-xs text-slate-700">{{ display(propertyFromPlan(x)?.property_type) }}</div>
-                  <div class="mt-0.5 text-[10px] text-slate-500">{{ propertyFromPlan(x)?.bedrooms ?? "—" }} beds · {{ propertyFromPlan(x)?.bathrooms ?? "—" }} baths · {{ propertyFromPlan(x)?.area_or_size || "—" }} area</div>
-                  <div class="mt-1 text-[10px] text-slate-500">Price: {{ formatNumber(propertyFromPlan(x)?.price) }}</div>
-                  <div class="mt-0.5 text-[10px] text-slate-500">{{ display(propertyFromPlan(x)?.completion_status) }} · {{ display(propertyFromPlan(x)?.project_status) }}</div>
-                </td>
-                <td class="px-3 py-2.5">
                   <div class="font-semibold text-xs text-slate-900">Total {{ formatNumber(x.total_price) }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-600">Down: {{ formatNumber(x.down_payment_amount) }} ({{ x.down_payment_percentage ?? "—" }}%)</div>
                   <div class="mt-0.5 text-[10px] text-slate-600">Installment: {{ formatNumber(x.installment_amount) }}</div>
@@ -131,12 +117,8 @@
                   <div class="mt-1 text-[10px] text-slate-500">Sale: {{ display(propertyFromPlan(x)?.sale_type) }}</div>
                   <div class="mt-0.5 text-[10px] text-slate-500">Pre-handover: {{ display(propertyFromPlan(x)?.pre_handover_payment) }}</div>
                 </td>
-                <td class="px-3 py-2.5 text-[10px] text-slate-500">
-                  <div>{{ formatDate(x.updated_at) }}</div>
-                  <div class="mt-0.5 text-slate-400">Created {{ formatDate(x.created_at) }}</div>
-                </td>
                 <td class="px-3 py-2.5 text-right whitespace-nowrap">
-                  <button @click="viewDetails(x)" class="mr-1 border border-slate-300 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</button>
+                  <button @click="$router.push({ name: 'OffplanPaymentPlan-detail', params: { id: x.id } })" class="mr-1 border border-slate-300 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</button>
                   <button @click="edit(x.id)" class="border border-primary bg-primary px-2 py-1.5 text-[10px] font-semibold text-white hover:opacity-90">Edit</button>
                 </td>
               </tr>
@@ -149,48 +131,7 @@
     <AddOffplanPaymentPlan :open="addOpen" @close="addOpen=false" @saved="load" />
     <EditOffplanPaymentPlan :open="editOpen" :id="selectedId" @close="editOpen=false" @saved="load" />
 
-    <div v-if="detailOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-3" @click.self="detailOpen=false">
-      <div class="w-full max-w-5xl max-h-[92vh] overflow-y-auto border border-slate-200 bg-white shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <div>
-            <p class="text-[10px] font-semibold uppercase tracking-wide text-primary">Offplan payment plan</p>
-            <h2 class="text-base font-semibold text-slate-900">{{ detailItem?.name || "Payment plan" }}</h2>
-          </div>
-          <button @click="detailOpen=false" class="flex h-8 w-8 items-center justify-center border border-slate-200 text-xs text-slate-500"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Info label="Plan type" :value="display(detailItem?.plan_type)" />
-          <Info label="Total price" :value="formatNumber(detailItem?.total_price)" />
-          <Info label="Down payment" :value="formatNumber(detailItem?.down_payment_amount) + ' (' + (detailItem?.down_payment_percentage ?? '—') + '%)'" />
-          <Info label="Installment amount" :value="formatNumber(detailItem?.installment_amount)" />
-          <Info label="Installments" :value="(detailItem?.number_of_installments ?? '—') + ' × every ' + (detailItem?.installment_interval_months ?? '—') + ' month(s)'" />
-          <Info label="Penalty / grace" :value="(detailItem?.penalty_rate_per_day ?? '0.0000') + ' / day · ' + (detailItem?.grace_period_days ?? 0) + ' days'" />
-          <Info label="Offplan property" :value="propertyLabel(propertyFromPlan(detailItem))" />
-          <Info label="Property owner" :value="personName(ownerFromPlan(detailItem))" />
-          <Info label="Zone" :value="zoneFromPlan(detailItem)?.name || '—'" />
-          <Info label="Manager" :value="personName(managerFromPlan(detailItem))" />
-          <Info label="Created" :value="formatDate(detailItem?.created_at)" />
-          <Info label="Last updated" :value="formatDate(detailItem?.updated_at)" />
-        </div>
-        <div class="border-t border-slate-200 p-4">
-          <h3 class="text-xs font-semibold text-slate-900">Property context</h3>
-          <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <Info label="Developer" :value="display(propertyFromPlan(detailItem)?.developer)" />
-            <Info label="Property type" :value="display(propertyFromPlan(detailItem)?.property_type)" />
-            <Info label="Price" :value="formatNumber(propertyFromPlan(detailItem)?.price)" />
-            <Info label="Beds / baths" :value="(propertyFromPlan(detailItem)?.bedrooms ?? '—') + ' / ' + (propertyFromPlan(detailItem)?.bathrooms ?? '—')" />
-            <Info label="Area / size" :value="display(propertyFromPlan(detailItem)?.area_or_size)" />
-            <Info label="Completion" :value="display(propertyFromPlan(detailItem)?.completion_status)" />
-            <Info label="Project status" :value="display(propertyFromPlan(detailItem)?.project_status)" />
-            <Info label="Sale type" :value="display(propertyFromPlan(detailItem)?.sale_type)" />
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3">
-          <button @click="detailOpen=false" class="border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700">Close</button>
-          <button @click="edit(detailItem.id); detailOpen=false" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white">Edit plan</button>
-        </div>
-      </div>
-    </div>
+
   </div>
 </template>
 
@@ -198,14 +139,9 @@
 import AddOffplanPaymentPlan from "./AddOffplanPaymentPlan.vue";
 import EditOffplanPaymentPlan from "./EditOffplanPaymentPlan.vue";
 
-const Info = {
-  props: { label: String, value: String },
-  template: '<div class="border border-slate-200 p-2.5"><p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{{ label }}</p><p class="mt-1 text-xs font-medium text-slate-900">{{ value || "—" }}</p></div>'
-};
-
 export default {
   name: "ViewOffplanPaymentPlan",
-  components: { AddOffplanPaymentPlan, EditOffplanPaymentPlan, Info },
+  components: { AddOffplanPaymentPlan, EditOffplanPaymentPlan },
   data() {
     return {
       items: [],
@@ -214,8 +150,6 @@ export default {
       error: "",
       addOpen: false,
       editOpen: false,
-      detailOpen: false,
-      detailItem: null,
       selectedId: null,
       filters: { search: "", offplan_property: "", plan_type: "", is_active: "" }
     };
@@ -335,10 +269,6 @@ export default {
       this.selectedId = id;
       this.editOpen = true;
     },
-    viewDetails(item) {
-      this.detailItem = item;
-      this.detailOpen = true;
-    }
   }
 };
 </script>
