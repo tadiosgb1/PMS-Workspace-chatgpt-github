@@ -28,9 +28,7 @@
 
       <template v-else>
         <section class="border border-slate-200 bg-white">
-          <div class="border-b border-slate-200 px-4 py-3">
-            <h2 class="text-xs font-semibold text-slate-900">Payment plan</h2>
-          </div>
+          <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Payment plan</h2></div>
           <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <Info label="Plan type" :value="display(item.plan_type)" />
             <Info label="Total price" :value="formatNumber(item.total_price)" />
@@ -52,9 +50,7 @@
         </section>
 
         <section class="mt-4 border border-slate-200 bg-white">
-          <div class="border-b border-slate-200 px-4 py-3">
-            <h2 class="text-xs font-semibold text-slate-900">Offplan property</h2>
-          </div>
+          <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Offplan property</h2></div>
           <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <Info label="Property ID" :value="property?.id ? '#' + property.id : '—'" />
             <Info label="Developer" :value="property?.developer" />
@@ -73,9 +69,7 @@
         </section>
 
         <section class="mt-4 border border-slate-200 bg-white">
-          <div class="border-b border-slate-200 px-4 py-3">
-            <h2 class="text-xs font-semibold text-slate-900">Ownership & management</h2>
-          </div>
+          <div class="border-b border-slate-200 px-4 py-3"><h2 class="text-xs font-semibold text-slate-900">Ownership & management</h2></div>
           <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <Info label="Owner" :value="personName(owner)" />
             <Info label="Owner ID" :value="owner?.id ? '#' + owner.id : '—'" />
@@ -130,10 +124,16 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        // $apiGetById already returns the extracted response body.
-        // The API response is the payment-plan object itself, so do not unwrap .data.
-        const response = await this.$apiGetById("/get_offplan_product", this.id);
-        this.item = Array.isArray(response) ? (response[0] || {}) : (response || {});
+        const res = await this.$apiGetById("/get_offplan_product", this.id);
+
+        // Match the existing OffplanPropertyDetail.vue pattern.
+        // $apiGetById can return an axios-style wrapper, so unwrap the
+        // actual resource body before binding it to the detail view.
+        this.item = res?.data?.data || res?.data || res?.payment_plan || res?.offplan_payment_plan || res || {};
+
+        if (Array.isArray(this.item)) {
+          this.item = this.item[0] || {};
+        }
       } catch (e) {
         this.item = {};
         this.error = e?.message || "Unable to load this payment plan.";
