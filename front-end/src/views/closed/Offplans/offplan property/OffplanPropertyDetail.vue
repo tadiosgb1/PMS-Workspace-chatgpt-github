@@ -20,11 +20,11 @@
           </div>
           <div class="flex gap-2">
             <button type="button" @click="editOpen=true" class="bg-primary px-5 py-2.5 text-sm font-bold text-white hover:opacity-90"><i class="fas fa-pen mr-2"></i>Edit</button>
-            <router-link :to="{name:'OffplanProperty-view'}" class="border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700">Back</router-link>
+            <router-link :to="{name:'OffplanProperty-view'}" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700">Back</router-link>
           </div>
         </div>
 
-        <div v-if="error" class="mb-6  border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{error}}</div>
+        <div v-if="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{error}}</div>
 
         <div class="grid gap-6 lg:grid-cols-3">
           <div class="space-y-6 lg:col-span-2">
@@ -69,7 +69,7 @@
             <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div class="border-b border-slate-100 px-6 py-5"><h2 class="font-bold text-slate-900">Amenities & features</h2></div>
               <div class="grid gap-3 p-6 sm:grid-cols-2">
-                <div v-for="item in amenityOptions" :key="item.key" class="flex items-center gap-3 border border-slate-100 p-3">
+                <div v-for="item in amenityOptions" :key="item.key" class="flex items-center gap-3 rounded-xl border border-slate-100 p-3">
                   <span class="flex h-8 w-8 items-center justify-center rounded-lg" :class="form[item.key] ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'"><i :class="form[item.key] ? 'fas fa-check' : 'fas fa-minus'"></i></span>
                   <span class="text-sm font-medium text-slate-700">{{item.label}}</span>
                 </div>
@@ -78,7 +78,7 @@
           </div>
 
           <aside class="space-y-6">
-            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section class="border border-slate-200 bg-white p-6 shadow-sm">
               <h2 class="mb-4 font-bold text-slate-900">Location & relationships</h2>
               <div class="space-y-4">
                 <Info label="Property zone" :value="zoneName(form.property_zone)" />
@@ -90,16 +90,93 @@
                 <Info label="Manager" :value="personName(form.manager)" />
               </div>
             </section>
-            <section class="rounded-2xl border border-blue-100 bg-blue-50/60 p-6"><div class="flex items-start gap-3"><i class="fas fa-circle-info mt-0.5 text-blue-600"></i><p class="text-sm leading-6 text-blue-900">This record is connected to the authenticated property-management workspace and uses the offplan property API endpoints.</p></div></section>
+            <section class="border border-blue-100 bg-blue-50/60 p-6"><div class="flex items-start gap-3"><i class="fas fa-circle-info mt-0.5 text-blue-600"></i><p class="text-sm leading-6 text-blue-900">This record is connected to the authenticated property-management workspace and uses the offplan property API endpoints.</p></div></section>
           </aside>
         </div>
       </template>
     </div>
 
-        <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />
+    <OffplanPropertyImageModal :open="imageModalOpen" :property-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />
   </div>
 </template>
 
+<script>
+import OffplanInfo from "./OffplanInfo.vue";
+import OffplanStat from "./OffplanStat.vue";
+import EditOffplanProperty from "./EditOffplanProperty.vue";
+import OffplanPropertyImageModal from "./OffplanPropertyImageModal.vue";
+
+export default {
+  name: "OffplanPropertyDetail",
+  props: { id: [String, Number] },
+  components: { Info: OffplanInfo, Stat: OffplanStat, EditOffplanProperty, OffplanPropertyImageModal },
+  data() {
+    return {
+      form: {}, loading: true, error: "",
+      pictures: [], picturesLoading: false, picturesError: "",
+      editOpen: false,
+      imageModalOpen: false, editingImage: null,
+      amenityOptions: [
+        {key:"is_furnished",label:"Furnished"},{key:"has_maids_room",label:"Maid’s room"},{key:"has_study",label:"Study"},
+        {key:"has_central_or_ac_and_heating",label:"Central A/C & heating"},{key:"has_balcony",label:"Balcony"},{key:"has_private_garden",label:"Private garden"},
+        {key:"has_private_pool",label:"Private pool"},{key:"has_private_gym",label:"Private gym"},{key:"has_private_jacuzzi",label:"Private jacuzzi"},
+        {key:"has_shared_pool",label:"Shared pool"},{key:"has_shared_spa",label:"Shared spa"}
+      ]
+    };
+  },
+  async mounted() {
+    try {
+      await this.loadProperty();
+    } catch (e) {
+      this.error = e?.message || "Unable to load property.";
+    } finally { this.loading = false; }
+  },
+  methods: {
+    normalizeProperty(res) {
+      let body = res;
+      if (body?.data?.data) body = body.data.data;
+      else if (body?.data) body = body.data;
+      else if (body?.property) body = body.property;
+      if (Array.isArray(body)) body = body[0] || {};
+      return body && typeof body === "object" ? body : {};
+    },
+    async loadProperty() {
+      if (!this.id) return;
+      const res = await this.$apiGetById("/get_offplan_property", this.id);
+      this.form = this.normalizeProperty(res);
+      await this.loadPictures();
+    },
+    display(v) { if (v === null || v === undefined || v === "") return "—"; return String(v).replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase()); },
+    booleanText(v) { return v === true ? "Yes" : v === false ? "No" : "—"; },
+    formatDate(v) { if (!v) return "—"; const d = new Date(v); return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString(); },
+    personName(person) {
+      if (!person || typeof person !== "object") return "—";
+      return person.name || person.full_name || [person.first_name, person.middle_name, person.last_name].filter(Boolean).join(" ") || person.username || person.email || "—";
+    },
+    zoneName(zone) {
+      if (!zone || typeof zone !== "object") return "—";
+      return zone.name || "—";
+    },
+    zoneAddress(zone) {
+      if (!zone || typeof zone !== "object") return "—";
+      return [zone.address, zone.city, zone.state].filter(Boolean).join(", ") || "—";
+    },
+    normalizePictures(res) {
+      const raw = res?.data ?? res;
+      if (Array.isArray(raw)) return raw;
+      for (const key of ["pictures","images","results","data"]) if (Array.isArray(raw?.[key])) return raw[key];
+      return [];
+    },
+    imageUrl(picture) { return picture?.offplan_property_image || picture?.image || picture?.picture || picture?.url || picture?.file || ""; },
+    async loadPictures() {
+      if (!this.id) return;
+      this.picturesLoading = true; this.picturesError = "";
+      try {
+        const res = await this.$apiGet("/get_offplan_property_pictures", { offplan_property_id: this.id, property_id: this.id });
+        this.pictures = this.normalizePictures(res);
+      } catch (e) { this.picturesError = e?.message || "Unable to load property images."; }
+      finally { this.picturesLoading = false; }
+    },
     openAddImage() {
       this.editingImage = null;
       this.imageModalOpen = true;
@@ -112,4 +189,15 @@
       this.imageModalOpen = false;
       this.editingImage = null;
     },
-
+    async deleteImage(picture) {
+      if (!picture?.id || !window.confirm("Delete this property image?")) return;
+      try {
+        await this.$apiDelete("/delete_offplan_property_picture", picture.id);
+        await this.loadPictures();
+      } catch (e) {
+        this.picturesError = e?.message || "Unable to delete the property image.";
+      }
+    }
+  }
+};
+</script>
