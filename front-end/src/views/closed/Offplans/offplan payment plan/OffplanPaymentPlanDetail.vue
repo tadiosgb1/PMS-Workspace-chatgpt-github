@@ -116,10 +116,10 @@ export default {
       return null;
     },
     owner() {
-      return this.property?.owner || this.property?.property_zone?.owner || null;
+      return this.item?.owner || this.property?.owner || this.property?.property_zone?.owner || null;
     },
     manager() {
-      return this.property?.manager || this.property?.property_zone?.manager || null;
+      return this.item?.manager || this.property?.manager || this.property?.property_zone?.manager || null;
     }
   },
   mounted() {
@@ -131,7 +131,9 @@ export default {
       this.error = "";
       try {
         const response = await this.$apiGetById("/get_offplan_product", this.id);
-        this.item = response?.data?.data || response?.data || response?.offplan_product || response?.product || response || {};
+        const payload = response?.data ?? response;
+        const body = payload?.data ?? payload?.offplan_product ?? payload?.product ?? payload;
+        this.item = Array.isArray(body) ? (body[0] || {}) : (body || {});
       } catch (e) {
         this.item = {};
         this.error = e?.message || "Unable to load this payment plan.";
