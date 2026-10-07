@@ -40,7 +40,7 @@
       </template>
     </div>
 
-    <EditOffplanMilestone :open="editOpen" :id="id" @close="editOpen=false" @saved="load"/>
+    <EditOffplanMilestone :open="editOpen" :id="id" @close="editOpen=false" @saved="handleEditSaved"/>
     <OffplanMilestoneImageModal :open="imageModalOpen" :milestone-id="id" :image="editingImage" @close="closeImageModal" @saved="handleImageSaved" />
   </div>
 </template>
