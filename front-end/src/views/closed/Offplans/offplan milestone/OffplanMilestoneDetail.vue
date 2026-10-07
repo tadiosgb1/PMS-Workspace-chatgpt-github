@@ -41,7 +41,7 @@
     </div>
 
     <EditOffplanMilestone :open="editOpen" :id="id" @close="editOpen=false" @saved="load"/>
-    <OffplanMilestoneImageModal :open="imageModalOpen" :milestone-id="id" :image="editingImage" @close="closeImageModal" @saved="loadPictures" />
+    <OffplanMilestoneImageModal :open="imageModalOpen" :milestone-id="id" :image="editingImage" @close="closeImageModal" @saved="handleImageSaved" />
   </div>
 </template>
 
@@ -91,6 +91,8 @@ export default {
     },
     openAddImage(){this.editingImage=null;this.imageModalOpen=true},
     openEditImage(picture){this.editingImage={...picture};this.imageModalOpen=true},
+    async handleImageSaved(){this.closeImageModal();await this.loadPictures()},
+    handleEditSaved(){this.editOpen=false;return this.load()},
     closeImageModal(){this.imageModalOpen=false;this.editingImage=null},
     async deleteImage(picture){
       if(!picture?.id||!window.confirm("Delete this milestone image?"))return;
