@@ -111,9 +111,9 @@ export default {
   },
   computed: {
     property() {
-      if (this.item?.offplan_property && typeof this.item.offplan_property === "object") return this.item.offplan_property;
-      if (this.item?.property && typeof this.item.property === "object") return this.item.property;
-      return null;
+      return this.item?.offplan_property && typeof this.item.offplan_property === "object"
+        ? this.item.offplan_property
+        : null;
     },
     owner() {
       return this.item?.owner || this.property?.owner || this.property?.property_zone?.owner || null;
@@ -130,10 +130,10 @@ export default {
       this.loading = true;
       this.error = "";
       try {
+        // $apiGetById already returns the extracted response body.
+        // The API response is the payment-plan object itself, so do not unwrap .data.
         const response = await this.$apiGetById("/get_offplan_product", this.id);
-        const payload = response?.data ?? response;
-        const body = payload?.data ?? payload?.offplan_product ?? payload?.product ?? payload;
-        this.item = Array.isArray(body) ? (body[0] || {}) : (body || {});
+        this.item = Array.isArray(response) ? (response[0] || {}) : (response || {});
       } catch (e) {
         this.item = {};
         this.error = e?.message || "Unable to load this payment plan.";
