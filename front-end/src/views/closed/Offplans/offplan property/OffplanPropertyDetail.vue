@@ -117,6 +117,8 @@
         </form>
       </div>
     </div>
+
+    <EditOffplanProperty :open="editOpen" :id="id" @close="editOpen=false" @saved="loadProperty" />
   </div>
 </template>
 
@@ -146,14 +148,26 @@ export default {
   },
   async mounted() {
     try {
-      const res = await this.$apiGetById("/get_offplan_property", this.id);
-      this.form = res?.data?.data || res?.data || res?.property || res || {};
-      await this.loadPictures();
+      await this.loadProperty();
     } catch (e) {
       this.error = e?.message || "Unable to load property.";
     } finally { this.loading = false; }
   },
   methods: {
+    normalizeProperty(res) {
+      let body = res;
+      if (body?.data?.data) body = body.data.data;
+      else if (body?.data) body = body.data;
+      else if (body?.property) body = body.property;
+      if (Array.isArray(body)) body = body[0] || {};
+      return body && typeof body === "object" ? body : {};
+    },
+    async loadProperty() {
+      if (!this.id) return;
+      const res = await this.$apiGetById("/get_offplan_property", this.id);
+      this.form = this.normalizeProperty(res);
+      await this.loadPictures();
+    },
     display(v) { if (v === null || v === undefined || v === "") return "—"; return String(v).replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase()); },
     booleanText(v) { return v === true ? "Yes" : v === false ? "No" : "—"; },
     formatDate(v) { if (!v) return "—"; const d = new Date(v); return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString(); },
