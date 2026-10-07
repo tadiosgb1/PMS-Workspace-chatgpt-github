@@ -131,8 +131,8 @@ export default {
       this.error = "";
       try {
         const response = await this.$apiGetById("/get_offplan_product", this.id);
-        const payload = response?.data ?? response;
-        const body = payload?.data ?? payload?.offplan_product ?? payload?.product ?? payload;
+        const payload =  response;
+        const body = payload;
         this.item = Array.isArray(body) ? (body[0] || {}) : (body || {});
       } catch (e) {
         this.item = {};

@@ -38,7 +38,7 @@ export default {
     this.$store.dispatch('fetchBanks');
     this.bankRefreshInterval = setInterval(() => {
       this.$store.dispatch('fetchBanks');
-    }, 600000); // Fetch every 60 seconds
+    }, 60000); // Fetch every 60 seconds
   },
   mounted() {
     // If the browser/tab was closed, the previous pagehide handler leaves a
@@ -96,7 +96,7 @@ export default {
 
       this.inactivityTimeout = setTimeout(() => {
         this.handleInactivity();
-      }, 60 * 1000); // 1 minute
+      }, 600 * 1000); // 10 minute
     },
 
     checkLastActivity() {
