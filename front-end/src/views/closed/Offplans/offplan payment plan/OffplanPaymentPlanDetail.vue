@@ -133,13 +133,7 @@ export default {
         // $apiGetById already returns the extracted response body.
         // The API response is the payment-plan object itself, so do not unwrap .data.
         const response = await this.$apiGetById("/get_offplan_product", this.id);
-<<<<<<< HEAD
-        const payload =  response;
-        const body = payload;
-        this.item = Array.isArray(body) ? (body[0] || {}) : (body || {});
-=======
         this.item = Array.isArray(response) ? (response[0] || {}) : (response || {});
->>>>>>> 410b3e6b75bdfbba58f9f307ee1d8a4a4c8db9e0
       } catch (e) {
         this.item = {};
         this.error = e?.message || "Unable to load this payment plan.";
