@@ -117,7 +117,7 @@ export default {
         const fd = new FormData();
         fd.append("offplan_property", String(this.propertyId));
         fd.append("description", this.description || "");
-        if (this.file) fd.append("offplan_property_image", this.file);
+        if (this.file) fd.append("image", this.file);
 
         if (this.editing) {
           await this.$apiPut("/update_offplan_property_picture", this.image.id, fd, { "Content-Type": "multipart/form-data" });
