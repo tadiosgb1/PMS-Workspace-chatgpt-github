@@ -470,7 +470,7 @@ export default {
     async confirmAction() {
       if (!this.selectedPayment) return;
 
-      const newStatus = this.selectedAction === "approve" ? "paid" : "canceled";
+      const newStatus = this.selectedAction === "approve" ? "complete" : "canceled";
 
       try {
         await this.$apiPatch("/update_subscription_payment", this.selectedPayment.id, {
