@@ -62,12 +62,20 @@
                 <td class="px-5 py-4">
                   <div class="flex justify-end gap-2">
                     <router-link :to="{ name: 'OffplanApplication-detail', params: { id: item.id } }" class="border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</router-link>
-                    <select :value="normalizedStatus(item.application_status)" @change="changeStatus(item, $event.target.value)" class="border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 outline-none focus:border-primary" :disabled="statusSavingId === item.id">
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approve</option>
-                      <option value="rejected">Reject</option>
-                      <option value="cancelled">Cancel</option>
-                    </select>
+                    <button
+                      v-if="normalizedStatus(item.application_status) === 'pending'"
+                      type="button"
+                      @click="openAction(item, 'approve')"
+                      class="border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-60"
+                      :disabled="statusSavingId === item.id"
+                    >Approve</button>
+                    <button
+                      v-if="normalizedStatus(item.application_status) === 'pending'"
+                      type="button"
+                      @click="openAction(item, 'reject')"
+                      class="border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
+                      :disabled="statusSavingId === item.id"
+                    >Reject</button>
                   </div>
                 </td>
               </tr>
@@ -77,6 +85,41 @@
       </div>
     </div>
 
+    <div v-if="actionItem" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+      <div class="w-full max-w-md border border-slate-200 bg-white p-5 shadow-xl">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-slate-900">{{ actionType === 'approve' ? 'Approve application' : 'Reject application' }}</h2>
+          <button type="button" @click="closeAction" class="text-slate-400 hover:text-slate-700" :disabled="statusSavingId === actionItem.id">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <p class="mb-4 text-xs text-slate-500">Application #{{ actionItem.id }}</p>
+
+        <div v-if="actionType === 'approve'">
+          <label class="mb-1 block text-xs font-medium text-slate-700">Start date</label>
+          <input v-model="actionStartDate" type="date" class="w-full border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" />
+        </div>
+
+        <div v-else>
+          <label class="mb-1 block text-xs font-medium text-slate-700">Notes</label>
+          <textarea v-model="actionNotes" rows="4" class="w-full resize-none border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Enter the reason for rejection"></textarea>
+        </div>
+
+        <div class="mt-5 flex justify-end gap-2">
+          <button type="button" @click="closeAction" class="border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50" :disabled="statusSavingId === actionItem.id">Cancel</button>
+          <button
+            type="button"
+            @click="submitAction"
+            class="px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
+            :class="actionType === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'"
+            :disabled="statusSavingId === actionItem.id || (actionType === 'approve' ? !actionStartDate : !actionNotes.trim())"
+          >
+            {{ statusSavingId === actionItem.id ? 'Saving…' : (actionType === 'approve' ? 'Approve application' : 'Reject application') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -89,7 +132,11 @@ export default {
       loading: false,
       error: "",
       search: "",
-      statusSavingId: null
+      statusSavingId: null,
+      actionItem: null,
+      actionType: null,
+      actionStartDate: "",
+      actionNotes: ""
     };
   },
   computed: {
@@ -128,7 +175,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        this.applications = await this.$getOffplanApplications();
+        this.applications = await this.$getOffplanProductApplications();
       } catch (e) {
         this.error = this.shortError(e, "Unable to load offplan applications.");
       } finally {
@@ -143,16 +190,53 @@ export default {
     normalizedStatus(value) {
       return value ? String(value).toLowerCase() : "pending";
     },
-    async changeStatus(item, status) {
-      const previous = this.normalizedStatus(item.application_status);
-      if (status === previous) return;
+    openAction(item, type) {
+      this.actionItem = item;
+      this.actionType = type;
+      this.actionStartDate = "";
+      this.actionNotes = "";
+      this.error = "";
+    },
+    closeAction() {
+      if (this.statusSavingId) return;
+      this.actionItem = null;
+      this.actionType = null;
+      this.actionStartDate = "";
+      this.actionNotes = "";
+    },
+    async submitAction() {
+      if (!this.actionItem) return;
+
+      const item = this.actionItem;
+      const type = this.actionType;
       this.statusSavingId = item.id;
       this.error = "";
+
       try {
-        await this.$apiPatch("/update_offplan_application_status", item.id, { application_status: status });
-        item.application_status = status;
+        if (type === "approve") {
+          if (!this.actionStartDate) return;
+          await this.$apiPost("/approve_offplan_product_application", {
+            application_id: item.id,
+            start_date: this.actionStartDate
+          });
+        } else {
+          const notes = this.actionNotes.trim();
+          if (!notes) return;
+          await this.$apiPost("/reject_offplan_product_application", {
+            application_id: item.id,
+            notes
+          });
+        }
+
+        this.actionItem = null;
+        this.actionType = null;
+        this.actionStartDate = "";
+        this.actionNotes = "";
+        await this.load();
       } catch (e) {
-        this.error = this.shortError(e, "Unable to update the application status.");
+        this.error = this.shortError(e, type === "approve"
+          ? "Unable to approve the application."
+          : "Unable to reject the application.");
       } finally {
         this.statusSavingId = null;
       }
