@@ -711,6 +711,10 @@ export function getOffplanApplications(params = {}) {
   return getOffplanCollection("/get_offplan_applications", ["applications"], params);
 }
 
+export function getOffplanProductApplications(params = {}) {
+  return getOffplanCollection("/get_offplan_product_applications", ["applications", "product_applications"], params);
+}
+
 export function getOffplanProperties(params = {}) {
   return getOffplanCollection("/get_offplan_properties", ["properties"], params);
 }
