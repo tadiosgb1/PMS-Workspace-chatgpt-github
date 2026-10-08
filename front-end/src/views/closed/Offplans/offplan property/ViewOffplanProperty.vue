@@ -90,7 +90,7 @@
                 </td>
                 <td class="px-2 py-1.5">
                   <div class="flex justify-end gap-1">
-                    <button @click="openDetail(item)" class="border border-slate-300 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</button>
+                    <router-link :to="{ name: 'OffplanProperty-detail', params: { id: item.id } }" class="border border-slate-300 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 hover:border-primary hover:text-primary">View</router-link>
                     <button @click="openEdit(item)" class="border border-primary bg-primary px-2 py-1 text-[10px] font-semibold text-white hover:opacity-90">Edit</button>
                   </div>
                 </td>
@@ -104,53 +104,7 @@
     <AddOffplanProperty :open="addOpen" @close="addOpen=false" @saved="loadProperties" />
     <EditOffplanProperty :open="editOpen" :id="selectedId" @close="closeEdit" @saved="loadProperties" />
 
-    <div v-if="detailOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-3" @click.self="detailOpen=false">
-      <div class="w-full max-w-none max-h-[92vh] overflow-y-auto border border-slate-200 bg-white shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <div>
-            <h2 class="text-base font-semibold text-slate-900">Offplan property details</h2>
-            <p class="mt-0.5 text-[10px] text-slate-500">Reference {{ selectedProperty?.id || "—" }}</p>
-          </div>
-          <button @click="detailOpen=false" class="flex h-8 w-8 items-center justify-center border border-slate-200 text-xs text-slate-500 hover:bg-slate-50"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="grid gap-0 md:grid-cols-2">
-          <div class="border-b border-slate-200 p-4 md:border-r">
-            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Developer</p>
-            <p class="mt-1 text-sm font-semibold text-slate-900">{{ selectedProperty?.developer || "—" }}</p>
-          </div>
-          <div class="border-b border-slate-200 p-4">
-            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Property type</p>
-            <p class="mt-1 text-sm font-medium text-slate-900">{{ display(selectedProperty?.property_type) }}</p>
-          </div>
-          <div class="border-b border-slate-200 p-4 md:border-r">
-            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Price</p>
-            <p class="mt-1 text-sm font-semibold text-slate-900">{{ selectedProperty?.price || "—" }}</p>
-          </div>
-          <div class="border-b border-slate-200 p-4">
-            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Bedrooms / Bathrooms</p>
-            <p class="mt-1 text-sm font-medium text-slate-900">{{ selectedProperty?.bedrooms || "—" }} / {{ selectedProperty?.bathrooms || "—" }}</p>
-          </div>
-          <div class="border-b border-slate-200 p-4 md:border-r">
-            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Area</p>
-            <p class="mt-1 text-sm font-medium text-slate-900">{{ selectedProperty?.area_or_size || "—" }}</p>
-          </div>
-          <div class="border-b border-slate-200 p-4">
-            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Project status</p>
-            <p class="mt-1 text-sm font-medium text-slate-900">{{ display(selectedProperty?.project_status) }}</p>
-          </div>
-        </div>
-        <div class="border-b border-slate-200 p-4">
-          <h3 class="text-xs font-semibold text-slate-900">Features</h3>
-          <div class="mt-2 grid gap-1.5 sm:grid-cols-2">
-            <div v-for="feature in activeFeatures(selectedProperty)" :key="feature" class="border border-slate-200 px-2.5 py-1.5 text-xs text-slate-700">{{ feature }}</div>
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 bg-slate-50 px-4 py-3">
-          <button @click="detailOpen=false" class="border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Close</button>
-          <button @click="openEdit(selectedProperty); detailOpen=false" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90">Edit property</button>
-        </div>
-      </div>
-    </div>
+
   </div>
 </template>
 
@@ -169,9 +123,7 @@ export default {
       error: "",
       addOpen: false,
       editOpen: false,
-      detailOpen: false,
-      selectedId: null,
-      selectedProperty: null
+      selectedId: null
     };
   },
   computed: {
@@ -217,10 +169,6 @@ export default {
     closeEdit() {
       this.editOpen = false;
       this.selectedId = null;
-    },
-    openDetail(item) {
-      this.selectedProperty = item;
-      this.detailOpen = true;
     },
     display(v) {
       if (v === null || v === undefined || v === "") return "—";

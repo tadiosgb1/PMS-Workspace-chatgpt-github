@@ -164,7 +164,7 @@ export default {
     },
     ownerDisplayName() {
       const owner = this.owners.find(item => Number(item.id) === Number(this.form.owner));
-      return owner?.name || (this.form.owner ? "Owner #" + this.form.owner : "Assigned owner");
+      return owner?.name || (this.form.owner ? "Assigned owner" : "Assigned owner");
     }
   },
   methods: {
@@ -176,12 +176,12 @@ export default {
     },
     normalizePerson(item) {
       const id = item?.id ?? item?.user_id ?? item?.owner_id ?? item?.manager_id;
-      const name = item?.name || item?.full_name || [item?.first_name, item?.middle_name, item?.last_name].filter(Boolean).join(" ") || item?.username || item?.email || ("#" + id);
+      const name = item?.name || item?.full_name || [item?.first_name, item?.middle_name, item?.last_name].filter(Boolean).join(" ") || item?.username || item?.email || "Unnamed person";
       return { id: Number(id), name: String(name).trim() };
     },
     normalizeZone(item) {
       const id = item?.id ?? item?.property_zone_id ?? item?.zone_id;
-      const name = item?.name || item?.zone_name || item?.title || ("Zone #" + id);
+      const name = item?.name || item?.zone_name || item?.title || "Unnamed zone";
       return { id: Number(id), name: String(name).trim() };
     },
     getLoggedInUserId() {

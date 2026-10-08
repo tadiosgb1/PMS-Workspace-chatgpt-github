@@ -32,7 +32,7 @@
                   <button type="button" @click="deleteImage(picture)" class="flex h-8 w-8 items-center justify-center bg-white/90 text-red-600 shadow" title="Delete image"><i class="fas fa-trash text-xs"></i></button>
                 </div>
               </div>
-              <div class="p-4"><p class="text-sm font-medium text-slate-700">{{picture.description || 'No description'}}</p><p class="mt-1 text-xs text-slate-400">Image #{{picture.id}}</p></div>
+              <div class="p-4"><p class="text-sm font-medium text-slate-700">{{picture.description || 'No description'}}</p></div>
             </article>
           </div>
           <div v-else class="p-10 text-center text-sm text-slate-500"><i class="fas fa-images mb-2 block text-2xl text-slate-300"></i>No images have been added yet.</div>
@@ -40,28 +40,18 @@
       </template>
     </div>
 
-    <EditOffplanMilestone :open="editOpen" :id="id" @close="editOpen=false" @saved="load"/>
-    <div v-if="imageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @keydown.esc="closeImageModal">
-      <div class="w-full max-w-lg overflow-hidden bg-white shadow-2xl" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4"><div><h2 class="font-bold text-slate-900">{{editingImage ? 'Edit milestone image' : 'Add milestone image'}}</h2><p class="mt-1 text-xs text-slate-500">{{editingImage ? 'Replace the selected image and update its description.' : 'Upload a progress image for this milestone.'}}</p></div><button type="button" @click="closeImageModal" class="flex h-9 w-9 items-center justify-center text-slate-400 hover:bg-slate-100"><i class="fas fa-times"></i></button></div>
-        <form @submit.prevent="saveImage" class="space-y-5 p-6">
-          <div v-if="imageForm.preview || imageForm.currentUrl" class="overflow-hidden border border-slate-200 bg-slate-50"><img :src="imageForm.preview || imageForm.currentUrl" alt="Image preview" class="max-h-72 w-full object-contain" /></div>
-          <label class="block"><span class="mb-2 block text-sm font-semibold text-slate-700">{{editingImage ? 'New image' : 'Image'}} <span class="text-red-500">*</span></span><input type="file" accept="image/jpeg,image/png,image/gif,image/webp" @change="onImageChange" class="block w-full border border-slate-300 px-3 py-2 text-sm" :required="!editingImage" /><span class="mt-1 block text-xs text-slate-400">JPG, PNG, GIF or WEBP, maximum 10MB.</span></label>
-          <label class="block"><span class="mb-2 block text-sm font-semibold text-slate-700">Description</span><textarea v-model="imageForm.description" maxlength="200" class="min-h-24 w-full border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary" placeholder="Describe this image…"></textarea></label>
-          <div v-if="imageError" class="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{imageError}}</div>
-          <div class="flex justify-end gap-3 border-t border-slate-100 pt-4"><button type="button" @click="closeImageModal" class="border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700">Cancel</button><button type="submit" :disabled="imageSaving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60"><i v-if="imageSaving" class="fas fa-spinner fa-spin mr-2"></i>{{imageSaving ? 'Saving…' : editingImage ? 'Update image' : 'Add image'}}</button></div>
-        </form>
-      </div>
-    </div>
+    <EditOffplanMilestone :open="editOpen" :id="id" @close="editOpen=false" @saved="handleEditSaved"/>
+    <OffplanMilestoneImageModal :open="imageModalOpen" :milestone-id="id" :image="editingImage" @close="closeImageModal" @saved="handleImageSaved" />
   </div>
 </template>
 
 <script>
 import EditOffplanMilestone from "./EditOffplanMilestone.vue";
+import OffplanMilestoneImageModal from "./OffplanMilestoneImageModal.vue";
 
 export default {
   name:"OffplanMilestoneDetail",
-  components:{EditOffplanMilestone},
+  components:{EditOffplanMilestone,OffplanMilestoneImageModal},
   props:{id:{type:[String,Number],default:null}},
   data(){return{
     form:{},loading:false,error:"",editOpen:false,
@@ -99,57 +89,16 @@ export default {
       }catch(e){this.picturesError=e?.message||"Unable to load milestone images."}
       finally{this.picturesLoading=false}
     },
-    openAddImage(){this.editingImage=null;this.imageError="";this.imageForm={id:null,description:"",file:null,preview:"",currentUrl:""};this.imageModalOpen=true},
-    async openEditImage(picture){
-      this.imageError="";this.editingImage={...picture};
-      this.imageForm={id:picture.id,description:picture.description||"",file:null,preview:"",currentUrl:this.imageUrl(picture)};
-      this.imageModalOpen=true;
-      if(picture.id){
-        try{
-          const res=await this.$apiGetById("/get_offplan_milestone_picture",picture.id);
-          const item=res?.data?.data||res?.data||res?.picture||res;
-          this.editingImage={...picture,...item};
-          this.imageForm.description=item?.description??this.imageForm.description;
-          this.imageForm.currentUrl=this.imageUrl(item)||this.imageForm.currentUrl;
-        }catch(e){}
-      }
-    },
-    onImageChange(e){
-      const file=e.target.files?.[0];if(!file)return;
-      const allowed=["image/jpeg","image/png","image/gif","image/webp"];
-      if(!allowed.includes(file.type)){this.imageError="Only JPG, PNG, GIF and WEBP images are allowed.";e.target.value="";return}
-      if(file.size>10*1024*1024){this.imageError="Image size must not exceed 10MB.";e.target.value="";return}
-      this.imageError="";this.imageForm.file=file;
-      if(this.imageForm.preview)URL.revokeObjectURL(this.imageForm.preview);
-      this.imageForm.preview=URL.createObjectURL(file);
-    },
-    closeImageModal(){
-      if(this.imageSaving)return;
-      if(this.imageForm.preview)URL.revokeObjectURL(this.imageForm.preview);
-      this.imageModalOpen=false;this.editingImage=null;
-    },
-    async saveImage(){
-      this.imageError="";
-      if(!this.editingImage&&!this.imageForm.file){this.imageError="Please select an image.";return}
-      this.imageSaving=true;
-      try{
-        const fd=new FormData();
-        fd.append("description",this.imageForm.description||"");
-        fd.append("offplan_milestone_id",this.id);
-        fd.append("milestone_id",this.id);
-        if(this.imageForm.file)fd.append("offplan_milestone_image",this.imageForm.file);
-        if(this.imageForm.file)fd.append("milestone_image",this.imageForm.file);
-        if(this.editingImage)await this.$apiPut("/update_offplan_milestone_picture",this.imageForm.id,fd,{"Content-Type":"multipart/form-data"});
-        else await this.$apiPost("/post_offplan_milestone_picture",fd,{"Content-Type":"multipart/form-data"});
-        await this.loadPictures();this.closeImageModal();
-      }catch(e){this.imageError=e?.message||"Unable to save the milestone image."}
-      finally{this.imageSaving=false}
-    },
+    openAddImage(){this.editingImage=null;this.imageModalOpen=true},
+    openEditImage(picture){this.editingImage={...picture};this.imageModalOpen=true},
+    async handleImageSaved(){this.closeImageModal();await this.loadPictures()},
+    handleEditSaved(){this.editOpen=false;return this.load()},
+    closeImageModal(){this.imageModalOpen=false;this.editingImage=null},
     async deleteImage(picture){
       if(!picture?.id||!window.confirm("Delete this milestone image?"))return;
       try{await this.$apiDelete("/delete_offplan_milestone_picture",picture.id);await this.loadPictures()}
       catch(e){this.picturesError=e?.message||"Unable to delete the milestone image."}
-    }
+    },
   }
 };
 </script>
