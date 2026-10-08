@@ -175,7 +175,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        this.applications = await this.$getOffplanApplications();
+        this.applications = await this.$getOffplanProductApplications();
       } catch (e) {
         this.error = this.shortError(e, "Unable to load offplan applications.");
       } finally {
