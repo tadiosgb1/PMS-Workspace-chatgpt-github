@@ -51,10 +51,7 @@
                 <p v-if="item.transaction_id" class="mt-1 break-all text-[11px] text-slate-500">Ref: {{ item.transaction_id }}</p>
               </td>
               <td class="px-3 py-3">
-                <a v-if="slipUrl(item)" :href="slipUrl(item)" target="_blank" rel="noopener noreferrer" class="inline-flex flex-col items-start gap-1">
-                  <img :src="slipUrl(item)" alt="Payment slip" class="h-20 w-28 border border-slate-200 object-cover" @error="markSlipUnavailable(item.id)" />
-                  <span class="text-[10px] font-semibold text-primary">View full slip ↗</span>
-                </a>
+                <a v-if="slipUrl(item)" :href="slipUrl(item)" target="_blank" rel="noopener noreferrer" class="text-[11px] font-semibold text-primary underline underline-offset-2 hover:text-primary/80">View payment slip ↗</a>
                 <span v-else class="text-[11px] text-slate-400">No slip uploaded</span>
               </td>
               <td class="px-3 py-3">
