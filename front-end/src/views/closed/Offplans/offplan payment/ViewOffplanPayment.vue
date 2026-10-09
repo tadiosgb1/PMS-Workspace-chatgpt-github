@@ -61,11 +61,14 @@
                 <span class="inline-block border px-2 py-1 text-[10px] font-semibold" :class="statusClass(item.payment_status)">{{ display(item.payment_status || 'pending') }}</span>
               </td>
               <td class="px-3 py-3 text-right">
-                <div v-if="isPending(item)" class="flex justify-end gap-1.5">
-                  <button @click="confirmAction(item, 'approve')" :disabled="savingId === item.id" class="border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-50">Approve</button>
-                  <button @click="confirmAction(item, 'reject')" :disabled="savingId === item.id" class="border border-red-200 bg-red-50 px-2 py-1.5 text-[10px] font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50">Reject</button>
+                <div class="flex flex-wrap justify-end gap-1.5">
+                  <button @click="viewDetails(item)" class="border border-primary/30 bg-primary/5 px-2 py-1.5 text-[10px] font-semibold text-primary hover:bg-primary/10">Details</button>
+                  <template v-if="isPending(item)">
+                    <button @click="confirmAction(item, 'approve')" :disabled="savingId === item.id" class="border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-50">Approve</button>
+                    <button @click="confirmAction(item, 'reject')" :disabled="savingId === item.id" class="border border-red-200 bg-red-50 px-2 py-1.5 text-[10px] font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50">Reject</button>
+                  </template>
+                  <span v-else class="self-center text-[10px] text-slate-400">Reviewed</span>
                 </div>
-                <span v-else class="text-[10px] text-slate-400">Reviewed</span>
               </td>
             </tr>
           </tbody>
@@ -185,6 +188,12 @@ export default {
       const raw = String(error?.response?.data?.detail || error?.response?.data?.message || error?.message || fallback);
       const cleaned = raw.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
       return cleaned.length > 180 ? cleaned.slice(0, 177) + "..." : cleaned;
+    },
+    viewDetails(item) {
+      this.$router.push({
+        name: "OffplanPayment-detail",
+        params: { id: item.id }
+      });
     },
     confirmAction(item, type) {
       this.actionItem = item;
