@@ -54,8 +54,8 @@
             <tbody class="divide-y divide-slate-100">
               <tr v-for="item in filteredApplications" :key="item.id" class="hover:bg-slate-50">
                 <td class="px-2 py-1.5"><span class="font-bold text-slate-900">#{{ item.id }}</span><p class="mt-0.5 text-xs text-slate-500">{{ formatDate(item.created_at) }}</p></td>
-                <td class="px-5 py-4 text-xs font-medium text-slate-700">{{ relationLabel(item.customer) }}</td>
-                <td class="px-5 py-4 text-xs text-slate-700">{{ relationLabel(item.offplan_property) }}</td>
+                <td class="px-5 py-4 text-xs font-medium text-slate-700">{{ customerLabel(item) }}</td>
+                <td class="px-5 py-4 text-xs text-slate-700">{{ propertyLabel(item) }}</td>
                 <td class="px-5 py-4 text-xs font-bold text-slate-900">{{ item.agreed_price || "—" }}</td>
                 <td class="px-5 py-4 text-xs text-slate-600">{{ item.preferred_payment_method || "—" }}</td>
                 <td class="px-5 py-4"><span class="border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">{{ display(item.application_status) }}</span></td>
@@ -150,8 +150,8 @@ export default {
           item.application_status,
           item.preferred_payment_method,
           item.notes,
-          this.relationLabel(item.customer),
-          this.relationLabel(item.offplan_property)
+          this.customerLabel(item),
+          this.propertyLabel(item)
         ].join(" ").toLowerCase();
         return haystack.includes(query);
       });
@@ -249,6 +249,26 @@ export default {
         return value.name || value.full_name || value.title || value.display_name || value.id || "—";
       }
       return value ?? "—";
+    },
+    customerLabel(item) {
+      const customer = item?.customer;
+      if (customer && typeof customer === "object") {
+        const fullName = [customer.first_name, customer.last_name]
+          .filter(part => part != null && String(part).trim())
+          .map(part => String(part).trim())
+          .join(" ");
+        return fullName || customer.full_name || customer.name || customer.display_name || customer.phone || customer.phone_number || customer.id || "—";
+      }
+      return this.relationLabel(customer);
+    },
+    propertyLabel(item) {
+      const property = item?.payment_product?.offplan_property
+        || (item?.offplan_property && typeof item.offplan_property === "object" ? item.offplan_property : null);
+      if (property && typeof property === "object") {
+        const zoneName = property.property_zone?.name || property.propertyZone?.name;
+        return zoneName || property.name || property.title || property.display_name || property.developer || property.id || "—";
+      }
+      return this.relationLabel(item?.offplan_property);
     },
     formatDate(value) {
       if (!value) return "—";
