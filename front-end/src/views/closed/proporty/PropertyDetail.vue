@@ -254,9 +254,47 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div v-if="activeDetailTab === 'overview'" class="grid grid-cols-1 gap-5">
+        <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div class="border-b border-gray-100 bg-white px-5 py-4">
+            <h2 class="text-sm font-semibold text-gray-900">Property at a glance</h2>
+            <p class="mt-1 text-xs text-gray-500">Key information and location for this property.</p>
+          </div>
+          <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="flex items-start gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"><i class="fas fa-map-marker-alt"></i></span>
+              <div class="min-w-0"><p class="text-xs text-gray-500">Location</p><p class="mt-1 break-words text-sm font-semibold text-gray-800">{{ locationLabel || 'Not specified' }}</p></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"><i class="fas fa-building"></i></span>
+              <div><p class="text-xs text-gray-500">Property type</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.property_type?.name || property.property_type_name || '—' }}</p></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"><i class="fas fa-ruler-combined"></i></span>
+              <div><p class="text-xs text-gray-500">Area</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.area ? property.area + ' sqft' : '—' }}</p></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600"><i class="fas fa-bed"></i></span>
+              <div><p class="text-xs text-gray-500">Bedrooms</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.bed_rooms ?? '—' }}</p></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600"><i class="fas fa-bath"></i></span>
+              <div><p class="text-xs text-gray-500">Bathrooms</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.bath_rooms ?? '—' }}</p></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600"><i class="fas fa-layer-group"></i></span>
+              <div><p class="text-xs text-gray-500">Property zone</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.property_zone?.name || property.property_zone_name || '—' }}</p></div>
+            </div>
+          </div>
+        </section>
+        <section v-if="property.content || property.description" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="mb-3 flex items-center gap-2"><i class="fas fa-align-left text-indigo-500"></i><h2 class="text-sm font-semibold text-gray-900">About this property</h2></div>
+          <p class="whitespace-pre-line text-sm leading-6 text-gray-600">{{ property.content || property.description }}</p>
+          <button type="button" @click="activeDetailTab = 'description'" class="mt-4 text-sm font-semibold text-indigo-600 hover:text-indigo-800">View full description <i class="fas fa-arrow-right ml-1 text-xs"></i></button>
+        </section>
+      </div>
 
-        <!-- Left: Details + Amenities + Maintenance -->
+      <!-- Left: Details + Amenities + Maintenance -->
         <div class="lg:col-span-3 space-y-5">
 
           <!-- Specifications -->
@@ -304,6 +342,22 @@
               <div class="flex justify-between border-b border-gray-50 pb-2">
                 <span class="text-xs text-gray-400">Updated</span>
                 <span class="text-xs font-semibold text-gray-700">{{ property.updated_at || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div v-if="activeDetailTab === 'description'" class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+            <div class="border-b border-gray-100 bg-gray-50 px-5 py-4">
+              <h2 class="text-sm font-semibold text-gray-800">Property Description</h2>
+              <p class="mt-1 text-xs text-gray-500">Full description and additional notes.</p>
+            </div>
+            <div class="p-5">
+              <p v-if="property.content || property.description" class="whitespace-pre-line text-sm leading-7 text-gray-600">{{ property.content || property.description }}</p>
+              <div v-else class="py-8 text-center text-sm text-gray-400"><i class="fas fa-align-left mb-2 block text-2xl"></i>No description has been provided for this property.</div>
+              <div class="mt-5 grid grid-cols-1 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-2">
+                <div><p class="text-xs text-gray-500">Property name</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.name || '—' }}</p></div>
+                <div><p class="text-xs text-gray-500">Property ID</p><p class="mt-1 text-sm font-semibold text-gray-800">{{ property.id || '—' }}</p></div>
               </div>
             </div>
           </div>
@@ -409,7 +463,7 @@
             <div v-for="pic in visiblePictures" :key="pic.id"
               class="group rounded-xl overflow-hidden border border-gray-100 bg-white shadow-sm">
               <div class="aspect-video overflow-hidden relative">
-                <img :src="pic.property_image" :alt="pic.description"
+                <img :src="pictureUrl(pic.property_image)" :alt="pic.description || property.name"
                   class="object-cover w-full h-full cursor-pointer transition-transform duration-300 group-hover:scale-105"
                   @click="previewImage(pic.property_image)" />
                 <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
@@ -496,7 +550,7 @@ export default {
       showAllPictures: false, imagePreviewVisible: false, imageToPreview: null,
       updateVisible: false, propertyToEdit: null,
       activeDetailTab: 'overview',
-      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],\n      activeWorkflow: 'rent', // Default to rental workflow
+      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'description', label: 'Description', icon: 'fas fa-align-left' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],\n      activeWorkflow: 'rent', // Default to rental workflow
       statusSteps: [
         { status: 'available', label: 'Available', icon: 'fas fa-home' },
         { status: 'for_rent', label: 'For Rent', icon: 'fas fa-list' },
@@ -510,6 +564,11 @@ export default {
     };
   },
   computed: {
+    locationLabel() {
+      return [this.property?.address, this.property?.city, this.property?.state, this.property?.zip_code]
+        .filter(value => value !== null && value !== undefined && String(value).trim() !== '')
+        .join(', ');
+    },
     amenities() {
       if (!this.property?.description) return [];
       return this.property.description.split(",").map(pair => {
@@ -564,7 +623,12 @@ export default {
       } catch (e) { this.$root.$refs.toast.showToast("Failed to delete", "error"); }
       this.pictureToDelete = null;
     },
-    previewImage(url) { this.imageToPreview = url; this.imagePreviewVisible = true; },
+    pictureUrl(path) {
+      if (!path) return '';
+      if (/^https?:\\/\\//i.test(path)) return path;
+      return `https://alphapms.sunriseworld.org${path.startsWith('/') ? '' : '/'}${path}`;
+    },
+    previewImage(url) { this.imageToPreview = this.pictureUrl(url); this.imagePreviewVisible = true; },
     
     // Status Management Methods
     getStatusLabel(status) {
