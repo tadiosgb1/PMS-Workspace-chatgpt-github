@@ -17,6 +17,7 @@ import AccessDenied from "../views/opened/auth/accessDenied.vue";
 import first_dash from '../views/closed/first_dash.vue'
 import dashboard from '../views/closed/dashboard.vue'
 import Properties from '../views/closed/proporty/view.vue';
+import PropertyForRent from '../views/closed/proporty/propertyForRent.vue';
 import PropertyDetail from '../views/closed/proporty/PropertyDetail.vue'
 import rentPay from '../views/closed/rent/view.vue'
 import PropertyZoneDetail from '../views/closed/Zones/propertyZoneDetail.vue';
@@ -350,6 +351,7 @@ const routes = [
         component: workSpaceRentalDetail
       },
       { path: '/properties', name: 'properties', component: Properties, meta: { permission: 'pms.view_property' } },
+      { path: '/properties-for-rent', name: 'propertyForRent', component: PropertyForRent, meta: { permission: 'pms.view_property' } },
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true, meta: { permission: 'pms.view_property' } },
       { path: '/zones/:id', name: 'zoneDetail', component: PropertyZoneDetail, props: true, meta: { permission: 'pms.view_propertyzone' } },
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },
