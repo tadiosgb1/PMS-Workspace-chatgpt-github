@@ -1,17 +1,27 @@
 <template>
   <Teleport to="body">
-    <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
-      <div class="bg-white w-full max-w-xl md:max-w-3xl lg:max-w-5xl rounded-xl shadow-xl flex flex-col max-h-[92vh]">
+    <div v-if="visible" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-0 sm:p-4">
+      <div class="bg-white w-full max-w-5xl rounded-none shadow-xl flex flex-col h-screen max-h-screen min-h-0 sm:h-auto sm:max-h-[calc(100vh-2rem)]">
 
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <h2 class="text-base font-bold text-gray-800">Add Property</h2>
           <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
         </div>
 
-        <div class="overflow-y-auto p-5 space-y-6">
+        <div class="px-5 pt-3 shrink-0 border-b border-gray-100">
+          <div class="flex items-center justify-between gap-3 text-xs text-gray-500">
+            <span>Step {{ currentStep + 1 }} of 5</span>
+            <span class="font-semibold text-gray-700">{{ ['Basic Info', 'Location', 'Specs & Pricing', 'Amenities', 'Description'][currentStep] }}</span>
+          </div>
+          <div class="mt-2 mb-3 h-1 w-full bg-gray-100">
+            <div class="h-1 bg-blue-600 transition-all duration-200" :style="{ width: ((currentStep + 1) / 5 * 100) + '%' }"></div>
+          </div>
+        </div>
+
+        <div id="addPropertyFormScroll" class="flex-1 min-h-0 overflow-y-auto p-5 space-y-6>
           <form id="addPropertyForm" @submit.prevent="submitForm">
 
-            <section class="space-y-3 mb-6">
+            <section class="space-y-3 mb-6" v-if="currentStep === 0">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Basic Info</p>
               <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <div class="sm:col-span-3 lg:col-span-2">
@@ -71,7 +81,7 @@
             </section>
 
             <!-- Location -->
-            <section class="space-y-3 mb-6">
+            <section class="space-y-3 mb-6" v-if="currentStep === 1">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Location</p>
               <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <div class="col-span-2 sm:col-span-3 lg:col-span-4">
@@ -108,7 +118,7 @@
             </section>
 
             <!-- Specs & Pricing -->
-            <section class="space-y-3 mb-6">
+            <section class="space-y-3 mb-6" v-if="currentStep === 2">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Specs & Pricing</p>
               <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div>
@@ -164,7 +174,7 @@
             </section>
 
             <!-- Amenities -->
-            <section class="space-y-3 mb-6">
+            <section class="space-y-3 mb-6" v-if="currentStep === 3">
               <div class="flex items-center justify-between border-b border-gray-100 pb-1">
                 <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Amenities</p>
                 <button type="button" @click="addAmenity"
@@ -183,7 +193,7 @@
             </section>
 
             <!-- Description -->
-            <section class="space-y-2">
+            <section class="space-y-2" v-if="currentStep === 4">
               <p class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-1">Description</p>
               <textarea v-model="form.content" rows="3" placeholder="Describe the property..."
                 class="form-input resize-none"></textarea>
@@ -192,9 +202,15 @@
           </form>
         </div>
 
-        <div class="flex justify-end gap-3 px-5 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl shrink-0">
-          <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
-          <button form="addPropertyForm" type="submit" class="btn-primary">Save Property</button>
+        <div class="flex items-center justify-between gap-3 px-5 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+          <div class="flex gap-2">
+            <button type="button" @click="$emit('close')" class="btn-cancel">Cancel</button>
+            <button v-if="currentStep > 0" type="button" @click="goToPreviousStep" class="btn-cancel">Previous</button>
+          </div>
+          <button v-if="currentStep < 4" type="button" @click="goToNextStep" class="btn-primary">Next</button>
+          <button v-else form="addPropertyForm" type="submit" class="btn-primary">
+            Save Property
+          </button>
         </div>
 
       </div>
@@ -211,6 +227,7 @@ export default {
   props: { visible: Boolean },
   data() {
     return {
+      currentStep: 0,
       managers: [],
       zones: [],
       propertyTypes: [],
@@ -268,6 +285,36 @@ export default {
     await this.fetchZones("");
   },
   methods: {
+
+    goToNextStep() {
+      const form = document.getElementById("addPropertyForm");
+      if (!form) return;
+      const fields = form.querySelectorAll("section input[required], section select[required], section textarea[required]");
+      for (const field of fields) {
+        if (!field.checkValidity()) {
+          field.reportValidity();
+          return;
+        }
+      }
+      if (this.currentStep < 4) {
+        this.currentStep += 1;
+        this.$nextTick(() => {
+          const scrollArea = document.getElementById("addPropertyFormScroll");
+          if (scrollArea) scrollArea.scrollTop = 0;
+        });
+      }
+    },
+
+    goToPreviousStep() {
+      if (this.currentStep > 0) {
+        this.currentStep -= 1;
+        this.$nextTick(() => {
+          const scrollArea = document.getElementById("addPropertyFormScroll");
+          if (scrollArea) scrollArea.scrollTop = 0;
+        });
+      }
+    },
+
     onTypeSelected() {
       this.selectedType = this.propertyTypes.find(t => t.id == this.selectedTypeId);
       this.form.property_type = this.selectedTypeId;
