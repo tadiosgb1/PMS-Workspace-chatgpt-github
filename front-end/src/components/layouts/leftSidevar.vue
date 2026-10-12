@@ -199,6 +199,7 @@ export default {
           minRole: "manager",
           children: [
             { id: "rent_property", name: "Property Rentals",  route: "rents" },
+            { id: "rent_available_properties", name: "Properties for Rent", route: "propertyForRent" },
             { id: "rent_workspace", name: "Workspace Rentals", route: "coworking-space-rentals" },
           ],
         },
