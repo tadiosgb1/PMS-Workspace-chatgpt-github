@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <div id="addPropertyFormScroll" class="flex-1 min-h-0 overflow-y-auto p-5 space-y-6>
+        <div id="addPropertyFormScroll" class="flex-1 min-h-0 overflow-y-auto p-5 space-y-6">
           <form id="addPropertyForm" @submit.prevent="submitForm">
 
             <section class="space-y-3 mb-6" v-if="currentStep === 0">
