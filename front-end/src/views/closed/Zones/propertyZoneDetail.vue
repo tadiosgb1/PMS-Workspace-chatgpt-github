@@ -78,6 +78,29 @@
         </div>
       </div>
 
+      <!-- Detail navigation tabs -->
+      <div class="border-b border-gray-200 bg-white rounded-xl shadow-sm overflow-x-auto">
+        <div class="flex min-w-max px-2 sm:px-4" role="tablist" aria-label="Zone details">
+          <button
+            v-for="tab in zoneTabs"
+            :key="tab.id"
+            type="button"
+            role="tab"
+            :aria-selected="activeTab === tab.id"
+            @click="activeTab = tab.id"
+            class="relative inline-flex items-center gap-2 px-4 py-4 text-sm font-semibold transition-colors focus:outline-none"
+            :class="activeTab === tab.id ? 'text-blue-700' : 'text-gray-500 hover:text-gray-800'"
+          >
+            <i :class="tab.icon" class="text-sm"></i>
+            <span>{{ tab.label }}</span>
+            <span v-if="tab.id === 'properties'" class="rounded-full px-2 py-0.5 text-xs" :class="activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'">{{ recentProperties.length }}</span>
+            <span v-if="tab.id === 'spaces'" class="rounded-full px-2 py-0.5 text-xs" :class="activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'">{{ recentCoworkingSpaces.length }}</span>
+            <span v-if="activeTab === tab.id" class="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-blue-600"></span>
+          </button>
+        </div>
+      </div>
+
+      <section v-show="activeTab === 'properties'" class="space-y-5">
       <!-- Zone Properties Section -->
       <div class="bg-white border border-gray-100 rounded-lg overflow-hidden">
         <div class="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
@@ -166,6 +189,9 @@
         </div>
       </div>
 
+      </section>
+
+      <section v-show="activeTab === 'spaces'" class="space-y-5">
       <!-- Zone Coworking Spaces Section -->
       <div class="bg-white border border-gray-100 rounded-lg overflow-hidden">
         <div class="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
@@ -260,6 +286,9 @@
         </div>
       </div>
 
+      </section>
+
+      <section v-show="activeTab === 'overview'" class="space-y-5">
       <!-- Info Cards -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <!-- Geographic -->
@@ -306,6 +335,9 @@
         {{ zone.description }}
       </div>
 
+      </section>
+
+      <section v-show="activeTab === 'gallery'" class="space-y-5">
       <!-- Gallery -->
       <div>
         <div class="flex items-center justify-between mb-3">
@@ -330,6 +362,7 @@
         </div>
         <div v-else class="bg-white border border-gray-100 rounded-lg p-10 text-center text-sm text-gray-400 italic">No images uploaded yet.</div>
       </div>
+      </section>
     </div>
 
     <!-- Not found -->
@@ -366,7 +399,14 @@ export default {
   components: { Toast, AddPropertyZonePicture, UpdatePropertyZonePicture, ConfirmModal, Loading, AddManager },
   data() {
     return {
-      zone: null, 
+      zone: null,
+      activeTab: "overview",
+      zoneTabs: [
+        { id: "overview", label: "Overview", icon: "fas fa-th-large" },
+        { id: "properties", label: "Properties", icon: "fas fa-building" },
+        { id: "spaces", label: "Coworking Spaces", icon: "fas fa-users" },
+        { id: "gallery", label: "Gallery", icon: "fas fa-images" },
+      ],
       recentProperties: [],
       recentCoworkingSpaces: [],
       addPictureVisible: false,
