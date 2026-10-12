@@ -74,7 +74,7 @@
       </div>
 
       <!-- Property Status Workflow Tracker -->
-      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div v-if="activeDetailTab === 'overview'" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
           <h2 class="text-sm font-semibold text-gray-700">Property Lifecycle & Actions</h2>
         </div>
@@ -235,7 +235,7 @@
       </div>
 
       <!-- Stat cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div v-if="activeDetailTab === 'overview'" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-white rounded-xl border border-gray-100 p-4">
           <p class="text-xs text-gray-400 font-medium mb-1">Monthly Rent</p>
           <p class="text-lg font-bold text-primary">{{ property.rent || '—' }}</p>
@@ -257,10 +257,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         <!-- Left: Details + Amenities + Maintenance -->
-        <div class="lg:col-span-2 space-y-5">
+        <div class="lg:col-span-3 space-y-5">
 
           <!-- Specifications -->
-          <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div v-if="activeDetailTab === 'details'" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
               <h2 class="text-sm font-semibold text-gray-700">Specifications</h2>
             </div>
@@ -309,7 +309,7 @@
           </div>
 
           <!-- Amenities -->
-          <div v-if="amenities.length" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div v-if="activeDetailTab === 'amenities'" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
               <h2 class="text-sm font-semibold text-gray-700">Amenities</h2>
             </div>
@@ -323,7 +323,7 @@
           </div>
 
           <!-- Maintenance -->
-          <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden maintenance-history">
+          <div v-if="activeDetailTab === 'maintenance'" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden maintenance-history">
             <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
               <h2 class="text-sm font-semibold text-gray-700">Maintenance History</h2>
             </div>
@@ -333,7 +333,7 @@
           </div>
 
           <!-- Property Rentals -->
-          <div v-if="property.status === 'rent' || propertyRentals.length > 0" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div v-if="activeDetailTab === 'rentals'" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
               <h2 class="text-sm font-semibold text-gray-700">Property Rentals</h2>
               <span class="text-xs text-gray-500">{{ propertyRentals.length }} rental(s)</span>
@@ -396,7 +396,7 @@
         </div>
 
         <!-- Right: Gallery -->
-        <div class="space-y-4">
+        <div v-if="activeDetailTab === 'photos'" class="space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-gray-700">Photos</h2>
             <button v-if="$hasPermission('pms.add_propertypicture')" @click="addPictureVisible = true"
@@ -495,7 +495,8 @@ export default {
       confirmDeleteVisible: false, pictureToDelete: null,
       showAllPictures: false, imagePreviewVisible: false, imageToPreview: null,
       updateVisible: false, propertyToEdit: null,
-      activeDetailTab: 'overview',\n      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],\n      activeWorkflow: 'rent', // Default to rental workflow
+      activeDetailTab: 'overview',
+      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],\n      activeWorkflow: 'rent', // Default to rental workflow
       statusSteps: [
         { status: 'available', label: 'Available', icon: 'fas fa-home' },
         { status: 'for_rent', label: 'For Rent', icon: 'fas fa-list' },
