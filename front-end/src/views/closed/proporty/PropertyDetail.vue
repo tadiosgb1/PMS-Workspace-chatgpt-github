@@ -625,7 +625,7 @@ export default {
     },
     pictureUrl(path) {
       if (!path) return '';
-      if (/^https?:\\/\\//i.test(path)) return path;
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
       return `https://alphapms.sunriseworld.org${path.startsWith('/') ? '' : '/'}${path}`;
     },
     previewImage(url) { this.imageToPreview = this.pictureUrl(url); this.imagePreviewVisible = true; },
