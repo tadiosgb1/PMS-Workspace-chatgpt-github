@@ -427,8 +427,12 @@ export default {
           this.$root.$refs.toast.showToast("You do not have permission to view this zone.", "error");
           return;
         }
+<<<<<<< HEAD
         
         const res = await this.$getPropertyZone();
+=======
+        const res = await this.$apiGetById("/get_property_zones", this.$route.params.id);
+>>>>>>> f2917837f1169db8a31bbdc764d36e971709de84
         this.zone = res.data || res;
         
         // Fetch zone-specific properties and coworking spaces
