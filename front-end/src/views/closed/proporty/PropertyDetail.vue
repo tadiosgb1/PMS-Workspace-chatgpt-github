@@ -551,7 +551,8 @@ export default {
       showAllPictures: false, imagePreviewVisible: false, imageToPreview: null,
       updateVisible: false, propertyToEdit: null,
       activeDetailTab: 'overview',
-      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'description', label: 'Description', icon: 'fas fa-align-left' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],\n      activeWorkflow: 'rent', // Default to rental workflow
+      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'description', label: 'Description', icon: 'fas fa-align-left' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],
+      activeWorkflow: 'rent', // Default to rental workflow
       statusSteps: [
         { status: 'available', label: 'Available', icon: 'fas fa-home' },
         { status: 'for_rent', label: 'For Rent', icon: 'fas fa-list' },
