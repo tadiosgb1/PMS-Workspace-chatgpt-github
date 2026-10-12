@@ -65,6 +65,14 @@
   </div>
 </div>
 
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-2">
+        <div class="flex gap-2 overflow-x-auto" role="tablist" aria-label="Property information">
+          <button v-for="tab in detailTabs" :key="tab.id" type="button" role="tab" :aria-selected="activeDetailTab === tab.id" @click="activeDetailTab = tab.id" class="inline-flex shrink-0 items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition" :class="activeDetailTab === tab.id ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'">
+            <i :class="tab.icon"></i>{{ tab.label }}
+          </button>
+        </div>
+      </div>
+
       <!-- Property Status Workflow Tracker -->
       <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
@@ -487,7 +495,7 @@ export default {
       confirmDeleteVisible: false, pictureToDelete: null,
       showAllPictures: false, imagePreviewVisible: false, imageToPreview: null,
       updateVisible: false, propertyToEdit: null,
-      activeWorkflow: 'rent', // Default to rental workflow
+      activeDetailTab: 'overview',\n      detailTabs: [{ id: 'overview', label: 'Overview', icon: 'fas fa-chart-pie' }, { id: 'details', label: 'Property Details', icon: 'fas fa-list-alt' }, { id: 'photos', label: 'Photos', icon: 'fas fa-images' }, { id: 'amenities', label: 'Amenities', icon: 'fas fa-star' }, { id: 'rentals', label: 'Rentals', icon: 'fas fa-file-contract' }, { id: 'maintenance', label: 'Maintenance', icon: 'fas fa-tools' }],\n      activeWorkflow: 'rent', // Default to rental workflow
       statusSteps: [
         { status: 'available', label: 'Available', icon: 'fas fa-home' },
         { status: 'for_rent', label: 'For Rent', icon: 'fas fa-list' },
