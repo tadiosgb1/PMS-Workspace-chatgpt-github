@@ -418,13 +418,17 @@ export default {
     },
 
     async fetchZone() {
+
+    //  alert("hy")
       this.loading = true;
       try {
         if (!this.$hasPermission("pms.view_propertyzone")) {
+          //alert("hi")
           this.$root.$refs.toast.showToast("You do not have permission to view this zone.", "error");
           return;
         }
-        const res = await this.$getPropertyZone(this.$route.params.id);
+        
+        const res = await this.$getPropertyZone();
         this.zone = res.data || res;
         
         // Fetch zone-specific properties and coworking spaces
