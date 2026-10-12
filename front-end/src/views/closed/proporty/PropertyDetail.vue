@@ -294,7 +294,8 @@
         </section>
       </div>
 
-      <!-- Left: Details + Amenities + Maintenance -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Left: Details + Amenities + Maintenance -->
         <div class="lg:col-span-3 space-y-5">
 
           <!-- Specifications -->
