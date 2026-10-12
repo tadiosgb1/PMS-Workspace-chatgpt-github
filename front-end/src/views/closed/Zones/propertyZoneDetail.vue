@@ -8,9 +8,6 @@
       <button @click="$router.back()" class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800 transition uppercase tracking-wider">
         <i class="fas fa-arrow-left text-[10px]"></i> Back
       </button>
-      <button v-if="$hasPermission('pms.add_propertyzonepicture')" @click="addPictureVisible = true" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
-        <i class="fas fa-camera text-xs"></i> Add Zone Picture
-      </button>
     </div>
 
     <div v-if="zone" class="max-w-5xl mx-auto px-4 pt-6 space-y-5">
@@ -134,7 +131,7 @@
           <div class="mb-6">
             <h4 class="text-sm font-semibold text-gray-700 mb-3">Recent Properties</h4>
             <div class="space-y-2 max-h-64 overflow-y-auto">
-              <div v-for="property in recentProperties" :key="property.id" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer" @click="goToPropertyDetail(property.id)">
+              <div v-for="property in visibleProperties" :key="property.id" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer" @click="goToPropertyDetail(property.id)">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-gray-200 text-gray-600 font-bold text-xs flex items-center justify-center uppercase shrink-0">
                     {{ (property.name||'').substring(0,2) }}
@@ -341,11 +338,19 @@
       <!-- Gallery -->
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-black text-gray-800">Zone Gallery</h3>
-          <span class="text-[10px] text-gray-400 font-semibold uppercase">{{ zone?.images?.length || 0 }} assets</span>
+          <div>
+            <h3 class="text-sm font-black text-gray-800">Zone Images</h3>
+            <p class="text-xs text-gray-400 mt-1">Manage photos for this zone</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] text-gray-400 font-semibold uppercase">{{ zone?.images?.length || 0 }} images</span>
+            <button v-if="$hasPermission('pms.add_propertyzonepicture')" @click="addPictureVisible = true" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
+              <i class="fas fa-camera text-xs"></i> Add Image
+            </button>
+          </div>
         </div>
 
-        <div v-if="zone?.images" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div v-if="zone?.images?.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <div v-for="pic in zone.images" :key="pic.id" class="group relative bg-white border border-gray-100 rounded-lg overflow-hidden">
             <div class="aspect-video bg-gray-100 overflow-hidden">
               <img :src="BASE_URL + pic.property_image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" @click="previewImage(pic.property_image)" />
@@ -360,7 +365,14 @@
             </div>
           </div>
         </div>
-        <div v-else class="bg-white border border-gray-100 rounded-lg p-10 text-center text-sm text-gray-400 italic">No images uploaded yet.</div>
+        <div v-else class="bg-white border border-dashed border-gray-200 rounded-lg p-10 text-center">
+          <i class="fas fa-images text-2xl text-gray-300 mb-3"></i>
+          <p class="text-sm font-semibold text-gray-600">No images yet</p>
+          <p class="text-xs text-gray-400 mt-1">Add an image to showcase this zone.</p>
+          <button v-if="$hasPermission('pms.add_propertyzonepicture')" @click="addPictureVisible = true" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition">
+            <i class="fas fa-camera"></i> Add Image
+          </button>
+        </div>
       </div>
       </section>
     </div>
@@ -405,7 +417,7 @@ export default {
         { id: "overview", label: "Overview", icon: "fas fa-th-large" },
         { id: "properties", label: "Properties", icon: "fas fa-building" },
         { id: "spaces", label: "Coworking Spaces", icon: "fas fa-users" },
-        { id: "gallery", label: "Gallery", icon: "fas fa-images" },
+        { id: "gallery", label: "Images", icon: "fas fa-images" },
       ],
       recentProperties: [],
       recentCoworkingSpaces: [],
@@ -449,6 +461,9 @@ export default {
     occupancyPercentage() {
       const stats = this.workspaceStats;
       return stats.totalCapacity > 0 ? Math.round((stats.rented / stats.totalCapacity) * 100) : 0;
+    },
+    visibleProperties() {
+      return (this.recentProperties || []).slice(0, 3);
     }
   },
   methods: {
@@ -557,7 +572,7 @@ export default {
 
     // Navigation Methods
     viewAllProperties() {
-      this.$router.push(`/properties?zone=${this.$route.params.id}`);
+      this.$router.push(`/properties?zone_id=${this.$route.params.id}`);
     },
 
     viewAllCoworkingSpaces() {
