@@ -747,47 +747,7 @@ export default {
         let listings = await loadListings();
         let listing = findListing(listings);
 
-        // If no listing exists yet, create one from the property's selling
-        // price so the sale modal can receive the required listing ID.
-        if (!listing) {
-          const price = Number(this.property.price ?? this.property.listing_price);
-          if (!Number.isFinite(price) || price <= 0) {
-            this.$root.$refs.toast.showToast("This property has no selling price. Edit the property and set a price first.", "error");
-            return;
-          }
-
-          const created = await this.$apiPost("/create_property_sale_listing", {
-            property_id: this.property.id,
-            listing_price: price,
-          });
-          if (created?.error) {
-            this.$root.$refs.toast.showToast(
-              typeof created.error === "string" ? created.error : "Could not create a sale listing for this property.",
-              "error"
-            );
-            return;
-          }
-
-          listings = await loadListings();
-          listing = findListing(listings);
-
-          // Some API responses include the newly-created listing directly.
-          const createdPayload = created?.data ?? created?.result ?? created;
-          if (!listing && createdPayload && typeof createdPayload === "object" && createdPayload.id) {
-            const createdProperty = createdPayload.property_id ?? createdPayload.property;
-            const createdPropertyId = createdProperty && typeof createdProperty === "object"
-              ? createdProperty.id
-              : createdProperty;
-            if (createdPropertyId === undefined || String(createdPropertyId) === propertyId) {
-              listing = {
-                ...createdPayload,
-                id: createdPayload.id,
-                property_id: createdPayload.property_id ?? this.property.id,
-                listing_price: createdPayload.listing_price ?? price,
-              };
-            }
-          }
-        }
+        // Listing creation is deferred to the sale modal submit handler.
 
         // Open the sale modal even if the listing endpoint did not return a
         // matching record. MakePropertySale will create the listing on submit.
