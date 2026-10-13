@@ -88,12 +88,7 @@
           <tbody class="divide-y divide-gray-100">
             <tr v-for="p in properties" :key="p.id" class="hover:bg-gray-50 transition-colors">
               <td class="px-4 py-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center uppercase shrink-0">
-                    {{ (p.name||'').substring(0,2) }}
-                  </div>
-                  <span class="font-semibold text-gray-800 whitespace-nowrap">{{ p.name }}</span>
-                </div>
+                <span class="font-semibold text-gray-800 whitespace-nowrap">{{ p.name }}</span>
               </td>
               <td class="px-4 py-3 text-xs text-gray-600">
                 <div class="font-semibold text-gray-700 cursor-pointer hover:underline transition" @click="goToUserDetail(p.owner_id)">
@@ -141,26 +136,26 @@
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button v-if="$hasPermission('pms.view_property')" @click="goToDetail(p.id)" class="btn-action btn-gray" title="View Details"><i class="fas fa-eye"></i></button>
-                  <button v-if="$hasPermission('pms.change_property')" @click="editProperty(p)" class="btn-action btn-blue" title="Edit Property"><i class="fas fa-edit"></i></button>
+                  <button v-if="$hasPermission('pms.view_property')" @click="goToDetail(p.id)" class="btn-action btn-gray" title="View details" aria-label="View details"><i class="fas fa-eye"></i></button>
+                  <button v-if="$hasPermission('pms.change_property')" @click="editProperty(p)" class="btn-action btn-blue" title="Edit property" aria-label="Edit property"><i class="fas fa-pen"></i></button>
                   
                   <!-- Property Status Actions -->
                   <div class="flex flex-wrap gap-1 justify-center">
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'available'" @click="markForRent(p)" class="status-btn bg-blue-50 text-blue-600 hover:bg-blue-600" title="List for Rent">
                       <i class="fas fa-home text-xs"></i>
                     </button>
-                    <button v-if="$hasPermission('pms.change_property') && p.status === 'available'" @click="markForSale(p)" class="status-btn bg-orange-50 text-orange-600 hover:bg-orange-600" title="List for Sale">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'available'" @click="openSaleModal(p.id)" class="status-btn bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white" title="List for sale" aria-label="List for sale">
                       <i class="fas fa-tag text-xs"></i>
                     </button>
                     
-                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_rent'" @click="markAsRented(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark as Rented">
-                      <i class="fas fa-check text-xs"></i>
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_rent'" @click="openRentModal(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" title="Mark as rented" aria-label="Mark as rented">
+                      <i class="fas fa-key text-xs"></i>
                     </button>
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'for_rent'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Rent">
                       <i class="fas fa-times text-xs"></i>
                     </button>
                     
-                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="markAsSold(p)" class="status-btn bg-purple-50 text-purple-600 hover:bg-purple-600" title="Mark as Sold">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="askMarkAsSold(p)" class="status-btn bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white" title="Mark as sold" aria-label="Mark as sold">
                       <i class="fas fa-handshake text-xs"></i>
                     </button>
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Sale">
@@ -188,9 +183,9 @@
                   <button v-if="p.status === 'sale'" @click="salesPay(p.id)" class="btn-action bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white" title="Sales Payments"><i class="fas fa-dollar-sign"></i></button>
                   
                   <!-- Listing Actions -->
-                  <button v-if="$hasPermission('pms.change_property') && (p.status === 'available' || p.status === 'for_sale')" @click="openSaleModal(p.id)" class="btn-action btn-orange" title="List for Sale"><i class="fas fa-tag"></i></button>
+                  <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="openSaleModal(p.id)" class="btn-action btn-orange" title="Edit sale listing" aria-label="Edit sale listing"><i class="fas fa-tag"></i></button>
                   
-                  <button v-if="$hasPermission('pms.delete_property')" @click="askDeleteConfirmation(p)" class="btn-action btn-red" title="Delete Property"><i class="fas fa-trash-alt"></i></button>
+                  <button v-if="$hasPermission('pms.delete_property')" @click="askDeleteConfirmation(p)" class="btn-action btn-red" title="Delete property" aria-label="Delete property"><i class="fas fa-trash-alt"></i></button>
                 </div>
               </td>
             </tr>
@@ -223,6 +218,10 @@
     <UpdateProperty v-if="updateVisible" :visible="updateVisible" :property="propertyToEdit" @close="updateVisible = false" @refresh="fetchProperties" />
     <ConfirmModal v-if="confirmVisible" :visible="confirmVisible" title="Delete Property"
       message="This is permanent. Remove this property?" @confirm="confirmDelete" @cancel="confirmVisible = false" />
+    <ConfirmModal v-if="soldConfirmVisible" :visible="soldConfirmVisible" title="Mark Property as Sold"
+      message="Confirm that this property has been sold?" @confirm="confirmMarkAsSold" @cancel="soldConfirmVisible = false" />
+    <AddRent v-if="rentModalVisible" :visible="rentModalVisible" :propertyId="rentPropertyId"
+      @close="rentModalVisible = false" @refresh="fetchProperties" />
     <SaleModal v-if="saleVisible" :visible="saleVisible" :propertyId="salePropertyId" sourceType="property"
       @close="saleVisible = false" @refresh="fetchProperties" />
   </div>
@@ -234,16 +233,19 @@ import UpdateProperty from "@/views/closed/proporty/update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import SaleModal from "../propertiesListForSale/add.vue";
+import AddRent from "@/views/closed/rent/add.vue";
 import Loading from "@/components/Loading.vue";
 
 export default {
   name: "PropertyView",
-  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, SaleModal, Loading },
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, SaleModal, AddRent, Loading },
   data() {
     return {
       zones: [], zone_id: "", zone_id_query_set: false,
       properties: [], visible: false, updateVisible: false, confirmVisible: false,
       propertyToEdit: null, propertyToDelete: null,
+      soldConfirmVisible: false, propertyToMarkSold: null,
+      rentModalVisible: false, rentPropertyId: null,
       searchTerm: "", currentPage: 1, totalPages: 1, next: null, previous: null,
       pageSize: 10, pageSizes: [10, 20, 50, 100, 1000],
       ordering: "-id", status: "",
@@ -397,12 +399,29 @@ export default {
       this.updatePropertyStatus(property, 'for_sale', 'Property listed for sale');
     },
 
-    markAsRented(property) {
-      this.updatePropertyStatus(property, 'rent', 'Property marked as rented');
+    openRentModal(property) {
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change property status.", "error");
+        return;
+      }
+      this.rentPropertyId = property.id;
+      this.rentModalVisible = true;
     },
 
-    markAsSold(property) {
-      this.updatePropertyStatus(property, 'sale', 'Property marked as sold');
+    askMarkAsSold(property) {
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to change property status.", "error");
+        return;
+      }
+      this.propertyToMarkSold = property;
+      this.soldConfirmVisible = true;
+    },
+
+    async confirmMarkAsSold() {
+      const property = this.propertyToMarkSold;
+      this.soldConfirmVisible = false;
+      this.propertyToMarkSold = null;
+      if (property) await this.updatePropertyStatus(property, "sale", "Property marked as sold");
     },
 
     markAvailable(property) {
@@ -491,12 +510,12 @@ export default {
 </script>
 
 <style scoped>
-.btn-action { @apply h-7 w-7 flex items-center justify-center rounded-lg text-xs transition-colors; }
+.btn-action { @apply h-6 w-6 flex items-center justify-center rounded-md text-[10px] transition-colors; }
 .btn-blue   { @apply bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white; }
 .btn-green  { @apply bg-green-50 text-green-600 hover:bg-green-600 hover:text-white; }
 .btn-orange { @apply bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white; }
 .btn-red    { @apply bg-red-50 text-red-600 hover:bg-red-600 hover:text-white; }
 .btn-gray   { @apply bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white; }
 .btn-page   { @apply flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all; }
-.status-btn { @apply h-6 w-6 flex items-center justify-center rounded text-xs transition-colors; }
+.status-btn { @apply h-5 w-5 flex items-center justify-center rounded text-[10px] transition-colors; }
 </style>
