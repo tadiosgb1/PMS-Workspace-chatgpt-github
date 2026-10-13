@@ -191,7 +191,7 @@ export default {
         fd.append("buyer_id", buyerId);
         fd.append("broker_id", brokerId);
         fd.append("selling_price", this.listing.listing_price);
-        fd.append("property_zone_sale_id", this.listing.property_zone_id?.id);
+        fd.append("property_zone_sale_id", this.listing.id ?? this.listing.property_zone_id?.id);
         fd.append("payment_method", this.payment_method);
         fd.append("transaction_id", this.transaction_id);
         fd.append("status", "pending");
