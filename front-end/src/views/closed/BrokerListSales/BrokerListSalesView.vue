@@ -71,9 +71,9 @@
               <!-- Pricing -->
               <td class="px-4 py-3">
                 <div class="space-y-1">
-                  <div class="text-xs text-gray-500">Listing: <span class="font-semibold text-gray-700">${{ parseFloat(item.listing_price || 0).toLocaleString() }}</span></div>
-                  <div class="text-xs text-gray-500">Selling: <span class="font-semibold text-green-600">${{ item.selling_price ? parseFloat(item.selling_price).toLocaleString() : '—' }}</span></div>
-                  <div class="text-xs text-gray-500">Fee: <span class="font-semibold text-orange-600">${{ parseFloat(item.posting_fee || 0).toLocaleString() }}</span></div>
+                  <div class="text-xs text-gray-500">Listing: <span class="font-semibold text-gray-700">ETB {{ parseFloat(item.listing_price || 0).toLocaleString() }}</span></div>
+                  <div class="text-xs text-gray-500">Selling: <span class="font-semibold text-green-600">ETB {{ item.selling_price ? parseFloat(item.selling_price).toLocaleString() : '—' }}</span></div>
+                  <div class="text-xs text-gray-500">Fee: <span class="font-semibold text-orange-600">ETB {{ parseFloat(item.posting_fee || 0).toLocaleString() }}</span></div>
                 </div>
               </td>
 
@@ -132,6 +132,9 @@
                   <button @click="viewDetails(item.id)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs" title="View Details">
                     <i class="fas fa-eye"></i>
                   </button>
+                  <button v-if="item.status !== 'completed' && item.status !== 'cancelled'" @click="openMakeSaleModal(item)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition text-xs" title="Mark as Sold" aria-label="Mark as Sold">
+                    <i class="fas fa-handshake"></i>
+                  </button>
                   <button @click="editItem(item)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white transition text-xs" title="Edit">
                     <i class="fas fa-edit"></i>
                   </button>
@@ -173,6 +176,8 @@
     <EditBrokerListSales v-if="showModal && editMode" :data="selectedItem" @close="showModal=false" @saved="fetchItems"/>
     <ConfirmModal v-if="deleteModalVisible" :visible="deleteModalVisible" title="Delete Broker Sale" 
                   message="Are you sure you want to delete this sale?" @confirm="confirmDelete" @cancel="deleteModalVisible=false"/>
+    <MakePropertySale v-if="makeSaleVisible" :visible="makeSaleVisible" :listing="saleExecutionListing"
+      @close="makeSaleVisible = false" @success="onPropertySaleSuccess" />
     
     <!-- Payment Slip Modal -->
     <div v-if="paymentSlipVisible" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[100]" @click="paymentSlipVisible = false">
@@ -197,9 +202,10 @@ import EditBrokerListSales from "./EditBrokerListSales.vue";
 import Loading from "@/components/Loading.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
+import MakePropertySale from "@/views/closed/propertiesListForSale/MakePropertySale.vue";
 
 export default {
-  components: { AddBrokerListSales, EditBrokerListSales, Loading, ConfirmModal, Toast },
+  components: { AddBrokerListSales, EditBrokerListSales, Loading, ConfirmModal, Toast, MakePropertySale },
   data() {
     return { 
       items: [], 
@@ -218,7 +224,9 @@ export default {
       deleteModalVisible: false, 
       deleteId: null,
       paymentSlipVisible: false,
-      currentPaymentSlip: null
+      currentPaymentSlip: null,
+      makeSaleVisible: false,
+      saleExecutionListing: null
     };
   },
   methods: {
@@ -277,6 +285,53 @@ export default {
       this.editMode = true; 
       this.selectedItem = item; 
       this.showModal = true; 
+    },
+
+    openMakeSaleModal(item) {
+      const property = item.property || {};
+      const existingListing = item.property_zone_sale
+        || item.property_zone_sale_listing
+        || item.property_sale_listing
+        || item.sale_listing
+        || item;
+
+      const rawZone = item.property_zone_id
+        ?? item.property_zone_sale_id
+        ?? existingListing.property_zone_id
+        ?? existingListing.property_zone_sale_id
+        ?? property.property_zone_id
+        ?? property.property_zone_sale_id;
+
+      const zoneId = rawZone && typeof rawZone === "object"
+        ? (rawZone.id ?? rawZone.property_zone_id ?? rawZone.property_zone_sale_id)
+        : rawZone;
+
+      this.saleExecutionListing = {
+        ...property,
+        ...item,
+        ...(existingListing && typeof existingListing === "object" ? existingListing : {}),
+        property: property,
+        listing_price: item.listing_price
+          ?? existingListing?.listing_price
+          ?? property.listing_price
+          ?? property.sale_price
+          ?? property.price,
+        property_zone_id: rawZone && typeof rawZone === "object"
+          ? { ...rawZone, id: zoneId }
+          : { id: zoneId },
+      };
+
+      if (!zoneId) {
+        this.$root.$refs.toast.showToast("This broker sale is missing the property zone listing required to complete the sale.", "error");
+        return;
+      }
+      this.makeSaleVisible = true;
+    },
+
+    async onPropertySaleSuccess() {
+      this.makeSaleVisible = false;
+      this.$root.$refs.toast.showToast("Property sale completed successfully", "success");
+      await this.fetchItems(this.currentPage);
     },
 
     viewDetails(id) { 
