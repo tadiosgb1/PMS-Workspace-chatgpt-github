@@ -81,8 +81,8 @@
               <th class="px-4 py-3 text-right whitespace-nowrap">Sale price</th>
               <th class="px-4 py-3 text-right whitespace-nowrap">Rent price</th>
               <th class="px-4 py-3 text-left">Type</th>
-              <th class="px-4 py-3 text-center">Status & Actions</th>
-              <th class="px-4 py-3 text-center">Quick Actions</th>
+              <th class="px-4 py-3 text-center">Status</th>
+              <th class="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -138,7 +138,15 @@
                     </span>
                   </div>
 
-                  <!-- Status Action Buttons -->
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-1">
+                  <button v-if="$hasPermission('pms.view_property')" @click="goToDetail(p.id)" class="btn-action btn-gray" title="View Details"><i class="fas fa-eye"></i></button>
+                  <button v-if="$hasPermission('pms.change_property')" @click="editProperty(p)" class="btn-action btn-blue" title="Edit Property"><i class="fas fa-edit"></i></button>
+                  
+                  <!-- Property Status Actions -->
                   <div class="flex flex-wrap gap-1 justify-center">
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'available'" @click="markForRent(p)" class="status-btn bg-blue-50 text-blue-600 hover:bg-blue-600" title="List for Rent">
                       <i class="fas fa-home text-xs"></i>
@@ -175,14 +183,7 @@
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'under_maintenance'" @click="markAvailable(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark Fixed">
                       <i class="fas fa-check-circle text-xs"></i>
                     </button>
-                  </div>
-                </div>
-              </td>
-              <td class="px-4 py-3">
-                <div class="flex items-center justify-center gap-1">
-                  <button v-if="$hasPermission('pms.view_property')" @click="goToDetail(p.id)" class="btn-action btn-gray" title="View Details"><i class="fas fa-eye"></i></button>
-                  <button v-if="$hasPermission('pms.change_property')" @click="editProperty(p)" class="btn-action btn-blue" title="Edit Property"><i class="fas fa-edit"></i></button>
-                  
+
                   <!-- Payment Related Actions -->
                   <button v-if="p.status === 'rent'" @click="rentPay(p.id)" class="btn-action bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" title="Rental Payments"><i class="fas fa-receipt"></i></button>
                   <button v-if="p.status === 'sale'" @click="salesPay(p.id)" class="btn-action bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white" title="Sales Payments"><i class="fas fa-dollar-sign"></i></button>
