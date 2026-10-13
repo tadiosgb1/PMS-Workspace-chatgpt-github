@@ -6,7 +6,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
       <div>
-        <h1 class="text-xl font-black text-gray-800 tracking-tight">Broker Property Sales</h1>
+        <h1 class="text-xl font-black text-gray-800 tracking-tight">Broker/Tenant Property Sales</h1>
         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">Review & Approve Sales</p>
       </div>
     </div>
