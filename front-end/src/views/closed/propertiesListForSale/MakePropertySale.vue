@@ -166,10 +166,26 @@ export default {
         this.$emit("success"); this.$emit("close");
       } catch (err) {
         const responseData = err?.response?.data;
-        this.saleError = responseData?.error
-          || responseData?.message
-          || err?.message
-          || "Unable to complete the sale. Please try again.";
+        let apiError = responseData?.error || responseData?.message;
+        // Some API clients return the response body as a JSON string.
+        if (typeof apiError === "string") {
+          apiError = apiError.trim();
+          try {
+            const parsedError = JSON.parse(apiError);
+            apiError = parsedError?.error || parsedError?.message || apiError;
+          } catch (_) {
+            // The API already returned a plain-text message.
+          }
+        }
+        if (!apiError && typeof responseData === "string") {
+          try {
+            const parsedResponse = JSON.parse(responseData);
+            apiError = parsedResponse?.error || parsedResponse?.message;
+          } catch (_) {
+            apiError = responseData;
+          }
+        }
+        this.saleError = apiError || err?.message || "Unable to complete the sale. Please try again.";
       } finally { this.loading = false; }
     },
   },
