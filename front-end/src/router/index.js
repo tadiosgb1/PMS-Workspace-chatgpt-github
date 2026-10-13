@@ -254,28 +254,6 @@ const routes = [
         props: true,
       },
       {
-        path: "tenantspropertsalerequests",
-        name: "TenantPropertySaleRequest-view",
-        component: () => import('../views/closed/TenantsPropertSaleRequests/TenantPropertySaleRequestView.vue'),
-      },
-      {
-        path: "tenantspropertsalerequests/add",
-        name: "TenantPropertySaleRequest-add",
-        component: () => import('../views/closed/TenantsPropertSaleRequests/AddTenantPropertySaleRequest.vue'),
-      },
-      {
-        path: "tenantspropertsalerequests/edit/:id",
-        name: "TenantPropertySaleRequest-edit",
-        component: () => import('../views/closed/TenantsPropertSaleRequests/EditTenantPropertySaleRequest.vue'),
-        props: true,
-      },
-      {
-        path: "tenantspropertsalerequests/detail/:id",
-        name: "TenantPropertySaleRequest-detail",
-        component: () => import('../views/closed/TenantsPropertSaleRequests/TenantPropertySaleRequestDetail.vue'),
-        props: true,
-      },
-      {
         path: "tenantproperty",
         name: "TenatProperty-view",
         component: () => import('../views/closed/TenantProperty/TenatPropertyView.vue'),
