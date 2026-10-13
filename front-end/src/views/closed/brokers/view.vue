@@ -40,6 +40,7 @@
               <th class="px-4 py-3 text-left">License</th>
               <th class="px-4 py-3 text-left">Commission</th>
               <th class="px-4 py-3 text-left">Wallet</th>
+              <th class="px-4 py-3 text-center">Status</th>
               <th class="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -61,16 +62,36 @@
                 <span class="px-2 py-0.5 bg-green-50 text-green-700 rounded border border-green-100 font-semibold">{{ broker.commission_rate }}%</span>
               </td>
               <td class="px-4 py-3 text-xs text-gray-500 italic max-w-[140px] truncate">{{ broker.wallet || '—' }}</td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  :class="broker.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                  class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase"
+                >
+                  {{ broker.is_active ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
               <td class="px-4 py-3 text-right">
                 <div class="flex justify-end gap-1">
-                  <button @click="goToDetail(broker.id)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs"><i class="fas fa-eye"></i></button>
-                  <button @click="openUpdateModal(broker)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white transition text-xs"><i class="fas fa-edit"></i></button>
-                  <button @click="askDeleteConfirmation(broker)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-xs"><i class="fas fa-trash-alt"></i></button>
+                  <button @click="goToDetail(broker.id)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs" title="View Details" aria-label="View Details"><i class="fas fa-eye"></i></button>
+                  <button @click="openUpdateModal(broker)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white transition text-xs" title="Edit Broker" aria-label="Edit Broker"><i class="fas fa-edit"></i></button>
+                  <button
+                    v-if="!broker.is_active"
+                    @click="askConfirmation('activate', broker)"
+                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition text-xs"
+                    title="Activate Broker" aria-label="Activate Broker"
+                  ><i class="fas fa-check"></i></button>
+                  <button
+                    v-else
+                    @click="askConfirmation('deactivate', broker)"
+                    class="h-7 w-7 flex items-center justify-center rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white transition text-xs"
+                    title="Deactivate Broker" aria-label="Deactivate Broker"
+                  ><i class="fas fa-power-off"></i></button>
+                  <button @click="askDeleteConfirmation(broker)" class="h-7 w-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-xs" title="Delete Broker" aria-label="Delete Broker"><i class="fas fa-trash-alt"></i></button>
                 </div>
               </td>
             </tr>
             <tr v-if="!brokers.length && !loading">
-              <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400 italic">No brokers found.</td>
+              <td colspan="7" class="px-4 py-10 text-center text-sm text-gray-400 italic">No brokers found.</td>
             </tr>
           </tbody>
         </table>
@@ -92,7 +113,7 @@
 
     <AddBroker :visible="showAddBroker" @close="showAddBroker = false" @success="fetchBrokers" />
     <UpdateBroker :visible="showUpdateModal" :broker="selectedBroker" @close="showUpdateModal = false" @success="fetchBrokers" />
-    <ConfirmModal :visible="confirmVisible" title="Confirm Deletion" message="Are you sure you want to delete this broker?" @confirm="confirmDelete" @cancel="confirmVisible = false" />
+    <ConfirmModal :visible="confirmVisible" :title="confirmTitle" :message="confirmMessage" @confirm="confirmBrokerAction" @cancel="confirmVisible = false" />
   </div>
 </template>
 
@@ -122,7 +143,20 @@ export default {
       showAddBroker: false, showUpdateModal: false, confirmVisible: false,
       brokerToDelete: null, sortKey: "name", sortAsc: true,
       searchTimeout: null, selectedBroker: null, loading: false,
+      selectedAction: null, brokerForStatusChange: null,
     };
+  },
+  computed: {
+    confirmTitle() {
+      if (this.selectedAction === "activate") return "Activate Broker";
+      if (this.selectedAction === "deactivate") return "Deactivate Broker";
+      return "Confirm Deletion";
+    },
+    confirmMessage() {
+      if (this.selectedAction === "activate") return "Are you sure you want to activate this broker?";
+      if (this.selectedAction === "deactivate") return "Are you sure you want to deactivate this broker?";
+      return "Are you sure you want to delete this broker?";
+    },
   },
   mounted() { this.fetchBrokers(); },
   methods: {
@@ -140,7 +174,8 @@ export default {
           try {
             const u = await this.$apiGetById("/get_user", broker.user);
             broker.user = u.id; broker.first_name = u.first_name; broker.middle_name = u.middle_name; broker.last_name = u.last_name; broker.email = u.email;
-          } catch (e) { broker.first_name = ""; broker.last_name = ""; broker.email = ""; }
+            broker.is_active = Boolean(u.is_active);
+          } catch (e) { broker.first_name = ""; broker.last_name = ""; broker.email = ""; broker.is_active = false; }
         }));
         this.currentPage = data.current_page || 1; this.totalPages = data.total_pages || 1;
         this.next = data.next; this.previous = data.previous;
@@ -148,15 +183,63 @@ export default {
       finally { this.loading = false; }
     },
     sortBy(key) { this.sortKey === key ? (this.sortAsc = !this.sortAsc) : ((this.sortKey = key), (this.sortAsc = true)); },
-    askDeleteConfirmation(broker) { this.brokerToDelete = broker; this.confirmVisible = true; },
-    async confirmDelete() {
+    askConfirmation(action, broker) {
+      this.selectedAction = action;
+      this.brokerForStatusChange = broker;
+      this.confirmVisible = true;
+    },
+    askDeleteConfirmation(broker) {
+      this.selectedAction = "delete";
+      this.brokerToDelete = broker;
+      this.confirmVisible = true;
+    },
+    async confirmBrokerAction() {
+      const action = this.selectedAction;
       this.confirmVisible = false;
+
+      if (action === "delete") {
+        try {
+          await this.$apiDelete(`/delete_broker/${this.brokerToDelete.id}`);
+          this.$root.$refs.toast?.showToast("Broker deleted", "success");
+          await this.fetchBrokers();
+        } catch (e) {
+          this.$root.$refs.toast?.showToast("Failed to delete broker", "error");
+        } finally {
+          this.brokerToDelete = null;
+          this.selectedAction = null;
+        }
+        return;
+      }
+
+      const broker = this.brokerForStatusChange;
+      if (!broker || !broker.user) {
+        this.$root.$refs.toast?.showToast("Unable to identify the broker's user account.", "error");
+        this.brokerForStatusChange = null;
+        this.selectedAction = null;
+        return;
+      }
+
       try {
-        await this.$apiDelete(`/delete_broker/${this.brokerToDelete.id}`);
-        this.$root.$refs.toast.showToast("Broker deleted", "success");
-        this.fetchBrokers();
-      } catch (e) { this.$root.$refs.toast.showToast("Failed to delete broker", "error"); }
-      finally { this.brokerToDelete = null; }
+        if (action === "activate") {
+          await this.$apiPost(`/activate_user/${broker.user}`, { id: broker.user });
+        } else if (action === "deactivate") {
+          await this.$apiDelete("/deactivate_user", broker.user);
+        }
+        this.$root.$refs.toast?.showToast(
+          action === "activate" ? "Broker activated" : "Broker deactivated",
+          "success"
+        );
+        await this.fetchBrokers();
+      } catch (e) {
+        console.error(e);
+        this.$root.$refs.toast?.showToast(
+          action === "activate" ? "Failed to activate broker" : "Failed to deactivate broker",
+          "error"
+        );
+      } finally {
+        this.brokerForStatusChange = null;
+        this.selectedAction = null;
+      }
     },
   },
 };
