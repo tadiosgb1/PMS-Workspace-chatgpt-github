@@ -185,13 +185,54 @@ export default {
       }
       this.loading = true;
       try {
+        let saleListingId = this.listing?.id ?? this.listing?.property_zone_id?.id;
+        let salePrice = Number(
+          this.listing?.listing_price ??
+          this.listing?.selling_price ??
+          this.listing?.sale_price ??
+          this.listing?.price ??
+          0
+        );
+
+        // PropertyDetail can open this modal with a property-only fallback
+        // when the listings endpoint does not return the existing listing.
+        // Create the listing here so /sell_property always receives its ID.
+        if (!saleListingId) {
+          const linkedProperty = this.listing?.property_id ?? this.listing?.property;
+          const propertyId = linkedProperty && typeof linkedProperty === "object"
+            ? linkedProperty.id
+            : linkedProperty;
+          if (!propertyId) {
+            this.saleError = "The property ID is missing, so a sale listing cannot be created.";
+            return;
+          }
+          if (!Number.isFinite(salePrice) || salePrice <= 0) {
+            this.saleError = "This property has no valid selling price. Update the property's selling price, then try again.";
+            return;
+          }
+
+          const createResponse = await this.$apiPost("/create_property_sale_listing", {
+            property_id: propertyId,
+            listing_price: salePrice,
+          });
+          const createPayload = createResponse?.data ?? createResponse?.result ?? createResponse;
+          const createdListingId = createPayload?.id ?? createPayload?.data?.id ?? createPayload?.result?.id;
+          if (createResponse?.error || !createdListingId) {
+            this.saleError = this.extractSaleError(createResponse, false)
+              || "Could not create a sale listing for this property.";
+            return;
+          }
+          saleListingId = createdListingId;
+          salePrice = Number(createPayload?.listing_price ?? salePrice);
+        }
+
         const buyerId = this.buyerMode === "search" ? this.selectedBuyer.id : (await this.$apiPost("/sign_up", { ...this.buyer, is_owner: true })).id;
         const brokerId = this.brokerMode === "search" ? this.selectedBroker.id : (await this.$apiPost("/sign_up", { ...this.broker, is_broker: true })).id;
         const fd = new FormData();
         fd.append("buyer_id", buyerId);
         fd.append("broker_id", brokerId);
-        fd.append("selling_price", this.listing.listing_price);
-        fd.append("property_zone_sale_id", this.listing.id ?? this.listing.property_zone_id?.id);
+        fd.append("selling_price", salePrice);
+        fd.append("property_zone_sale_id", saleListingId);
         fd.append("payment_method", this.payment_method);
         fd.append("transaction_id", this.transaction_id);
         fd.append("status", "pending");
