@@ -172,7 +172,7 @@
             <!-- For Sale Actions -->
             <div v-if="property.status === 'for_sale'" class="space-y-2">
               <h4 class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Sales Actions</h4>
-              <button @click="updateStatus('sale')" class="action-card bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100">
+              <button @click="openMakePropertySale" class="action-card bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Mark as Sold</span>
               </button>
@@ -513,6 +513,8 @@
       @close="updateVisible = false" @refresh="fetchProperty" />
     <AddRent v-if="addRentVisible" :visible="addRentVisible" :propertyId="$route.params.id"
       @close="addRentVisible = false" @refresh="fetchProperty " />
+    <MakePropertySale v-if="saleVisible" :visible="saleVisible" :listing="saleListing"
+      @close="saleVisible = false" @success="handleSaleSuccess" />
     <!-- Image preview lightbox -->
     <div v-if="imagePreviewVisible"
       class="fixed inset-0 bg-black/90 flex items-center justify-center z-[100]"
@@ -536,13 +538,16 @@ import Maintenance from "@/views/closed/maintenanceRequests/view1.vue";
 import Loading from "@/components/Loading.vue";
 
 import AddRent from "@/views/closed/rent/add.vue";
+import MakePropertySale from "@/views/closed/propertiesListForSale/MakePropertySale.vue";
 
 export default {
   name: "PropertyDetail",
-  components: { AddPictureModal, UpdatePictureModal, UpdateProperty, ConfirmModal, Toast, Maintenance, Loading,AddRent },
+  components: { AddPictureModal, UpdatePictureModal, UpdateProperty, ConfirmModal, Toast, Maintenance, Loading, AddRent, MakePropertySale },
   data() {
     return {
       addRentVisible: false,
+      saleVisible: false,
+      saleListing: null,
       property: null, 
       loading: false,
       propertyRentals: [], // Add rental data
@@ -708,6 +713,56 @@ export default {
       } else {
         return 'bg-gray-200 text-gray-500';
       }
+    },
+
+    async openMakePropertySale() {
+      if (!this.property || this.property.status !== "for_sale") return;
+      if (!this.$hasPermission("pms.change_property")) {
+        this.$root.$refs.toast.showToast("You do not have permission to complete a property sale.", "error");
+        return;
+      }
+
+      try {
+        const params = new URLSearchParams({
+          type: "property",
+          search: this.property.name || "",
+          page_size: "100",
+        });
+        const response = await this.$apiGet(`/get_property_zone_sales?${params.toString()}`);
+        const listings = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+            ? response.results
+            : [];
+        const propertyId = String(this.property.id);
+        const listing = listings.find(item => {
+          const listedPropertyId = item.property_id?.id ?? item.property?.id ?? item.property_id;
+          return listedPropertyId !== null && listedPropertyId !== undefined
+            && String(listedPropertyId) === propertyId;
+        });
+
+        if (!listing) {
+          this.$root.$refs.toast.showToast("No sale listing was found for this property. Please create or verify its sale listing first.", "error");
+          return;
+        }
+        if (!listing.listing_price) {
+          this.$root.$refs.toast.showToast("The sale listing has no listing price. Update the listing before completing the sale.", "error");
+          return;
+        }
+
+        this.saleListing = listing;
+        this.saleVisible = true;
+      } catch (error) {
+        console.error("Failed to load property sale listing:", error);
+        this.$root.$refs.toast.showToast("Could not load the sale listing. Please try again.", "error");
+      }
+    },
+
+    async handleSaleSuccess() {
+      this.saleVisible = false;
+      this.saleListing = null;
+      await this.fetchProperty();
+      this.$root.$refs.toast.showToast("Property sale submitted successfully.", "success");
     },
 
     async updateStatus(newStatus) {
