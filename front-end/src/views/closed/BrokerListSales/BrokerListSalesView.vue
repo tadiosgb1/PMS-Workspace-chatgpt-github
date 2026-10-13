@@ -306,12 +306,15 @@ export default {
       const zoneId = zoneValue && typeof zoneValue === "object"
         ? zoneValue.id
         : zoneValue;
+      // /get_broker_property_sales returns the sale-listing record itself:
+      // its top-level "id" is the value required by /sell_property as
+      // property_zone_sale_id. Do not substitute property_zone_id (the zone FK).
       const listingId = existingListing?.id
         ?? item.property_zone_sale_id
+        ?? item.property_zone_sale?.id
+        ?? item.property_zone_sale
         ?? property.property_zone_sale_id
-        ?? item.property_zone_id?.id
-        ?? property.property_zone_id?.id
-        ?? zoneId;
+        ?? item.id;
 
       this.saleExecutionListing = {
         ...property,
