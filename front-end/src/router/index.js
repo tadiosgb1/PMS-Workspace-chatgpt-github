@@ -42,7 +42,6 @@ import view_groups from '../views/closed/groups/view.vue'
 import view_managers from '../views/closed/managers/view.vue'
 import view_owners from '../views/closed/owners/view.vue'
 import OwnerDetail from '../views/closed/owners/detail.vue'
-import Sales_Payments from '../views/closed/SalesPayment/view.vue'
 import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
 import Notifications from '../views/closed/notifications/view.vue'
@@ -373,7 +372,6 @@ const routes = [
       { path: '/configurations', name: 'configurations', component: Configurations },
       { path: '/rents', name: 'rents', component: Rents },
       { path: '/overdue-rents', name: 'overdue-rents', component: OverdueRents },
-      { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
       { path: '/rents_payments', name: 'rents_payments', component: Rent_Payments },
       { path: '/rents_payments/:id', name: 'rents_payment_detail', component: Rent_Payments, props: true },
       { path: '/maintenance-requests', name: 'maintenance-requests', component: MaintenanceRequests },

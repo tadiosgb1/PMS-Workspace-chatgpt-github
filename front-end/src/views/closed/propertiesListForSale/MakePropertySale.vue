@@ -206,9 +206,25 @@ export default {
         }
         this.$emit("success"); this.$emit("close");
       } catch (err) {
-        this.saleError = this.extractSaleError(err?.response?.data)
-          || this.extractSaleError(err?.data)
-          || this.extractSaleError(err?.message)
+        // Some API helper paths wrap even a successful response body in an error.
+        const body = err?.response?.data ?? err?.data;
+        const bodyMessage = body && typeof body === "object" ? body.message : undefined;
+        const wrappedMessage = typeof err?.message === "string" ? err.message : "";
+        const successMessage = "Property sale completed successfully.";
+        if (
+          bodyMessage === successMessage ||
+          wrappedMessage.includes(successMessage)
+        ) {
+          this.$emit("success");
+          this.$emit("close");
+          return;
+        }
+
+        // Never render a generic response "message" as an error by itself.
+        this.saleError = this.extractSaleError(body, false)
+          || (typeof err?.message === "string"
+            ? this.extractSaleError(err.message, false)
+            : "")
           || "Unable to complete the sale. Please try again.";
       } finally { this.loading = false; }
     },
