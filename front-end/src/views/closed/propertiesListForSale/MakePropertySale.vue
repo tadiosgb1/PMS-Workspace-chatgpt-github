@@ -134,21 +134,35 @@ export default {
   methods: {
     extractSaleError(value) {
       let payload = value;
-      if (typeof payload === "string") {
-        const trimmed = payload.trim();
-        try {
-          payload = JSON.parse(trimmed);
-        } catch (_) {
-          return trimmed;
+
+      // API helpers may return JSON in a string, or nest it under data/response.
+      for (let i = 0; i < 4; i += 1) {
+        if (typeof payload === "string") {
+          const trimmed = payload.trim();
+          try {
+            payload = JSON.parse(trimmed);
+            continue;
+          } catch (_) {
+            return trimmed;
+          }
         }
-      }
-      if (payload && typeof payload === "object") {
-        const nested = payload.response?.data ?? payload.data ?? payload;
-        if (nested !== payload) return this.extractSaleError(nested);
+
+        if (!payload || typeof payload !== "object") return "";
+        if (payload.response?.data !== undefined) {
+          payload = payload.response.data;
+          continue;
+        }
+        if (payload.data !== undefined) {
+          payload = payload.data;
+          continue;
+        }
+
         const message = payload.error ?? payload.message;
-        if (typeof message === "string") return this.extractSaleError(message);
+        if (message === undefined || message === null) return "";
+        payload = message;
       }
-      return "";
+
+      return typeof payload === "string" ? payload.trim() : "";
     },
     toggleBuyerMode() { this.buyerMode = this.buyerMode === "search" ? "add" : "search"; this.selectedBuyer = null; },
     toggleBrokerMode() { this.brokerMode = this.brokerMode === "search" ? "add" : "search"; this.selectedBroker = null; },
@@ -192,7 +206,7 @@ export default {
       } catch (err) {
         this.saleError = this.extractSaleError(err?.response?.data)
           || this.extractSaleError(err?.data)
-          || (typeof err?.message === "string" ? err.message : "")
+          || this.extractSaleError(err?.message)
           || "Unable to complete the sale. Please try again.";
       } finally { this.loading = false; }
     },
