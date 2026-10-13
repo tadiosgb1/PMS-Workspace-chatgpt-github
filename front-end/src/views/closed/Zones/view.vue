@@ -269,6 +269,7 @@ export default {
   methods: {
     getSalePrice(zone) {
       return zone.zone_sale?.listing_price
+        ?? zone.property_zone?.zone_sale?.listing_price
         ?? zone.zone_property?.zone_sale?.listing_price
         ?? zone.price;
     },
