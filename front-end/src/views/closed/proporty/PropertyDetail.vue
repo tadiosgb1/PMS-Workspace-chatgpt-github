@@ -789,13 +789,20 @@ export default {
           }
         }
 
-        if (!listing?.id) {
-          this.$root.$refs.toast.showToast("The sale listing could not be loaded after creation. Refresh the page and try again.", "error");
-          return;
-        }
-        if (!listing.listing_price) {
-          this.$root.$refs.toast.showToast("The sale listing has no listing price. Update the listing before completing the sale.", "error");
-          return;
+        // Open the sale modal even if the listing endpoint did not return a
+        // matching record. MakePropertySale will create the listing on submit.
+        if (!listing) {
+          const price = Number(
+            this.property.sale_price ??
+            this.property.selling_price ??
+            this.property.listing_price ??
+            this.property.price ??
+            0
+          );
+          listing = {
+            property_id: this.property.id,
+            listing_price: Number.isFinite(price) && price > 0 ? price : "",
+          };
         }
 
         this.saleListing = listing;
