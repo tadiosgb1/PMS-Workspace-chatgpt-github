@@ -206,11 +206,22 @@ export default {
         }
         this.$emit("success"); this.$emit("close");
       } catch (err) {
-        // API helper errors may wrap the response body inside err.message.
-        // Do not treat a generic "message" field as a failure; success bodies
-        // can also contain { message: "Property sale completed successfully." }.
-        this.saleError = this.extractSaleError(err?.response?.data, false)
-          || this.extractSaleError(err?.data, false)
+        // Some API helper paths wrap even a successful response body in an error.
+        const body = err?.response?.data ?? err?.data;
+        const bodyMessage = body && typeof body === "object" ? body.message : undefined;
+        const wrappedMessage = typeof err?.message === "string" ? err.message : "";
+        const successMessage = "Property sale completed successfully.";
+        if (
+          bodyMessage === successMessage ||
+          wrappedMessage.includes(successMessage)
+        ) {
+          this.$emit("success");
+          this.$emit("close");
+          return;
+        }
+
+        // Never render a generic response "message" as an error by itself.
+        this.saleError = this.extractSaleError(body, false)
           || (typeof err?.message === "string"
             ? this.extractSaleError(err.message, false)
             : "")
