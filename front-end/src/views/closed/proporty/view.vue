@@ -70,7 +70,7 @@
 
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full text-xs">
           <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
             <tr>
               <th class="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 transition-colors" @click="changeOrdering('name')">
@@ -110,10 +110,10 @@
               </td>
               <td class="px-4 py-3 text-xs text-gray-500 capitalize">{{ p?.property_type?.name || '—' }}</td>
               <td class="px-4 py-3">
-                <div class="flex flex-col items-center gap-2">
+                <div class="flex flex-col items-center gap-1">
                   <!-- Status Badge with Visual Indicator -->
-                  <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full" :class="{
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="{
                       'bg-gray-400': p.status === 'available',
                       'bg-blue-500': p.status === 'for_rent',
                       'bg-orange-500': p.status === 'for_sale', 
@@ -121,7 +121,7 @@
                       'bg-purple-500': p.status === 'sale',
                       'bg-red-500': p.status === 'under_maintenance'
                     }"></div>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase" :class="{
+                    <span class="px-1.5 py-0.5 rounded-full text-[9px] leading-3 font-semibold uppercase tracking-tight" :class="{
                       'bg-gray-100 text-gray-700': p.status === 'available',
                       'bg-blue-100 text-blue-700': p.status === 'for_rent',
                       'bg-orange-100 text-orange-700': p.status === 'for_sale',
@@ -135,7 +135,7 @@
                 </div>
               </td>
               <td class="px-4 py-3">
-                <div class="flex items-center justify-center gap-1">
+                <div class="flex flex-wrap items-center justify-center gap-1">
                   <button v-if="$hasPermission('pms.view_property')" @click="goToDetail(p.id)" class="btn-action btn-gray" title="View details" aria-label="View details"><i class="fas fa-eye"></i></button>
                   <button v-if="$hasPermission('pms.change_property')" @click="editProperty(p)" class="btn-action btn-blue" title="Edit property" aria-label="Edit property"><i class="fas fa-pen"></i></button>
                   
@@ -155,7 +155,7 @@
                       <i class="fas fa-times text-xs"></i>
                     </button>
                     
-                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="askMarkAsSold(p)" class="status-btn bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white" title="Mark as sold" aria-label="Mark as sold">
+                    <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="openMakeSaleModal(p)" class="status-btn bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white" title="Complete property sale" aria-label="Complete property sale">
                       <i class="fas fa-handshake text-xs"></i>
                     </button>
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="markAvailable(p)" class="status-btn bg-gray-50 text-gray-600 hover:bg-gray-600" title="Remove from Sale">
@@ -185,7 +185,7 @@
                   <!-- Listing Actions -->
                   <button v-if="$hasPermission('pms.change_property') && p.status === 'for_sale'" @click="openSaleModal(p.id)" class="btn-action btn-orange" title="Edit sale listing" aria-label="Edit sale listing"><i class="fas fa-tag"></i></button>
                   
-                  <button v-if="$hasPermission('pms.delete_property')" @click="askDeleteConfirmation(p)" class="btn-action btn-red" title="Delete property" aria-label="Delete property"><i class="fas fa-trash-alt"></i></button>
+                  <button v-if="$hasPermission('pms.delete_property')" @click="askDeleteConfirmation(p)" class="btn-action btn-delete" title="Delete property" aria-label="Delete property"><i class="fas fa-trash-alt"></i></button>
                 </div>
               </td>
             </tr>
@@ -218,8 +218,8 @@
     <UpdateProperty v-if="updateVisible" :visible="updateVisible" :property="propertyToEdit" @close="updateVisible = false" @refresh="fetchProperties" />
     <ConfirmModal v-if="confirmVisible" :visible="confirmVisible" title="Delete Property"
       message="This is permanent. Remove this property?" @confirm="confirmDelete" @cancel="confirmVisible = false" />
-    <ConfirmModal v-if="soldConfirmVisible" :visible="soldConfirmVisible" title="Mark Property as Sold"
-      message="Confirm that this property has been sold?" @confirm="confirmMarkAsSold" @cancel="soldConfirmVisible = false" />
+    <MakePropertySale v-if="makeSaleVisible" :visible="makeSaleVisible" :listing="saleExecutionListing"
+      @close="makeSaleVisible = false" @success="onPropertySaleSuccess" />
     <AddRent v-if="rentModalVisible" :visible="rentModalVisible" :propertyId="rentPropertyId"
       @close="rentModalVisible = false" @refresh="fetchProperties" />
     <SaleModal v-if="saleVisible" :visible="saleVisible" :propertyId="salePropertyId" sourceType="property"
@@ -234,17 +234,18 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import SaleModal from "../propertiesListForSale/add.vue";
 import AddRent from "@/views/closed/rent/add.vue";
+import MakePropertySale from "@/views/closed/propertiesListForSale/MakePropertySale.vue";
 import Loading from "@/components/Loading.vue";
 
 export default {
   name: "PropertyView",
-  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, SaleModal, AddRent, Loading },
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, SaleModal, AddRent, MakePropertySale, Loading },
   data() {
     return {
       zones: [], zone_id: "", zone_id_query_set: false,
       properties: [], visible: false, updateVisible: false, confirmVisible: false,
       propertyToEdit: null, propertyToDelete: null,
-      soldConfirmVisible: false, propertyToMarkSold: null,
+      makeSaleVisible: false, saleExecutionListing: null,
       rentModalVisible: false, rentPropertyId: null,
       searchTerm: "", currentPage: 1, totalPages: 1, next: null, previous: null,
       pageSize: 10, pageSizes: [10, 20, 50, 100, 1000],
@@ -408,20 +409,28 @@ export default {
       this.rentModalVisible = true;
     },
 
-    askMarkAsSold(property) {
+    openMakeSaleModal(property) {
       if (!this.$hasPermission("pms.change_property")) {
-        this.$root.$refs.toast.showToast("You do not have permission to change property status.", "error");
+        this.$root.$refs.toast.showToast("You do not have permission to complete a property sale.", "error");
         return;
       }
-      this.propertyToMarkSold = property;
-      this.soldConfirmVisible = true;
+      const existingListing = property.property_sale_listing
+        || property.property_sale
+        || property.sale_listing
+        || property.sale;
+      const zoneValue = property.property_zone_id;
+      this.saleExecutionListing = {
+        ...(existingListing && typeof existingListing === "object" ? existingListing : {}),
+        ...property,
+        listing_price: existingListing?.listing_price ?? this.getSalePrice(property),
+        property_zone_id: zoneValue && typeof zoneValue === "object" ? zoneValue : { id: zoneValue },
+      };
+      this.makeSaleVisible = true;
     },
 
-    async confirmMarkAsSold() {
-      const property = this.propertyToMarkSold;
-      this.soldConfirmVisible = false;
-      this.propertyToMarkSold = null;
-      if (property) await this.updatePropertyStatus(property, "sale", "Property marked as sold");
+    async onPropertySaleSuccess() {
+      this.makeSaleVisible = false;
+      await this.fetchProperties();
     },
 
     markAvailable(property) {
@@ -515,7 +524,8 @@ export default {
 .btn-green  { @apply bg-green-50 text-green-600 hover:bg-green-600 hover:text-white; }
 .btn-orange { @apply bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white; }
 .btn-red    { @apply bg-red-50 text-red-600 hover:bg-red-600 hover:text-white; }
+.btn-delete { @apply bg-red-100 text-red-700 ring-1 ring-inset ring-red-200 hover:bg-red-600 hover:text-white hover:ring-red-600; }
 .btn-gray   { @apply bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white; }
 .btn-page   { @apply flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all; }
-.status-btn { @apply h-5 w-5 flex items-center justify-center rounded text-[10px] transition-colors; }
+.status-btn { @apply h-5 w-5 flex items-center justify-center rounded text-[9px] transition-colors; }
 </style>
