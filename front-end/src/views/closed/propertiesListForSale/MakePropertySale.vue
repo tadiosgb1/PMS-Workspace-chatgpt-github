@@ -206,9 +206,14 @@ export default {
         }
         this.$emit("success"); this.$emit("close");
       } catch (err) {
-        this.saleError = this.extractSaleError(err?.response?.data)
-          || this.extractSaleError(err?.data)
-          || this.extractSaleError(err?.message)
+        // API helper errors may wrap the response body inside err.message.
+        // Do not treat a generic "message" field as a failure; success bodies
+        // can also contain { message: "Property sale completed successfully." }.
+        this.saleError = this.extractSaleError(err?.response?.data, false)
+          || this.extractSaleError(err?.data, false)
+          || (typeof err?.message === "string"
+            ? this.extractSaleError(err.message, false)
+            : "")
           || "Unable to complete the sale. Please try again.";
       } finally { this.loading = false; }
     },
