@@ -420,8 +420,8 @@ export default {
         || property.sale;
       const zoneValue = property.property_zone_id;
       this.saleExecutionListing = {
-        ...(existingListing && typeof existingListing === "object" ? existingListing : {}),
         ...property,
+        ...(existingListing && typeof existingListing === "object" ? existingListing : {}),
         listing_price: existingListing?.listing_price ?? this.getSalePrice(property),
         property_zone_id: zoneValue && typeof zoneValue === "object" ? zoneValue : { id: zoneValue },
       };
