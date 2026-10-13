@@ -132,6 +132,24 @@ export default {
     };
   },
   methods: {
+    extractSaleError(value) {
+      let payload = value;
+      if (typeof payload === "string") {
+        const trimmed = payload.trim();
+        try {
+          payload = JSON.parse(trimmed);
+        } catch (_) {
+          return trimmed;
+        }
+      }
+      if (payload && typeof payload === "object") {
+        const nested = payload.response?.data ?? payload.data ?? payload;
+        if (nested !== payload) return this.extractSaleError(nested);
+        const message = payload.error ?? payload.message;
+        if (typeof message === "string") return this.extractSaleError(message);
+      }
+      return "";
+    },
     toggleBuyerMode() { this.buyerMode = this.buyerMode === "search" ? "add" : "search"; this.selectedBuyer = null; },
     toggleBrokerMode() { this.brokerMode = this.brokerMode === "search" ? "add" : "search"; this.selectedBroker = null; },
     async fetchBuyers() { const res = await this.$apiGet("/get_users", { search: this.buyerSearch, is_owner: true }); this.buyers = res.data || []; },
@@ -162,30 +180,20 @@ export default {
         fd.append("transaction_id", this.transaction_id);
         fd.append("status", "pending");
         fd.append("slip_picture", this.slip_picture);
-        await this.$apiPost("/sell_property", fd, true);
+        const response = await this.$apiPost("/sell_property", fd, true);
+        // Some project API helpers resolve with the response body even for HTTP errors,
+        // so inspect the returned value before treating the sale as successful.
+        const returnedError = this.extractSaleError(response);
+        if (returnedError) {
+          this.saleError = returnedError;
+          return;
+        }
         this.$emit("success"); this.$emit("close");
       } catch (err) {
-        const responseData = err?.response?.data;
-        let apiError = responseData?.error || responseData?.message;
-        // Some API clients return the response body as a JSON string.
-        if (typeof apiError === "string") {
-          apiError = apiError.trim();
-          try {
-            const parsedError = JSON.parse(apiError);
-            apiError = parsedError?.error || parsedError?.message || apiError;
-          } catch (_) {
-            // The API already returned a plain-text message.
-          }
-        }
-        if (!apiError && typeof responseData === "string") {
-          try {
-            const parsedResponse = JSON.parse(responseData);
-            apiError = parsedResponse?.error || parsedResponse?.message;
-          } catch (_) {
-            apiError = responseData;
-          }
-        }
-        this.saleError = apiError || err?.message || "Unable to complete the sale. Please try again.";
+        this.saleError = this.extractSaleError(err?.response?.data)
+          || this.extractSaleError(err?.data)
+          || (typeof err?.message === "string" ? err.message : "")
+          || "Unable to complete the sale. Please try again.";
       } finally { this.loading = false; }
     },
   },
