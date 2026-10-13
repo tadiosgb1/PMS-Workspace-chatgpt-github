@@ -61,8 +61,6 @@
                 Zone Name <SortIcon field="name" :sort-key="sortKey" :sort-asc="sortAsc" />
               </th>
               <th class="px-4 py-3 text-left">Location</th>
-              <th class="px-4 py-3 text-right whitespace-nowrap">Sale price</th>
-              <th class="px-4 py-3 text-right whitespace-nowrap">Rent price</th>
               <th class="px-4 py-3 text-left">Owner</th>
               <th class="px-4 py-3 text-left">Manager</th>
               <th class="px-4 py-3 text-center">Status & Actions</th>
@@ -89,14 +87,6 @@
                     <i class="fas fa-location-dot"></i>
                   </a>
                 </div>
-              </td>
-
-              <td class="px-4 py-3 text-right whitespace-nowrap">
-                <span class="font-semibold text-gray-700">{{ formatPrice(getSalePrice(zone)) }}</span>
-              </td>
-
-              <td class="px-4 py-3 text-right whitespace-nowrap">
-                <span class="text-gray-600">{{ formatPrice(zone.rent) }}</span>
               </td>
 
               <td class="px-4 py-3">
@@ -185,7 +175,7 @@
               </td>
             </tr>
             <tr v-if="filteredAndSortedZones.length === 0 && !loading">
-              <td colspan="8" class="px-4 py-10 text-center text-sm text-gray-400 italic">No zones found.</td>
+              <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400 italic">No zones found.</td>
             </tr>
           </tbody>
         </table>
@@ -267,23 +257,6 @@ export default {
     await this.fetchZones(); 
   },
   methods: {
-    getSalePrice(zone) {
-      return zone.zone_sale?.listing_price
-        ?? zone.property_zone?.zone_sale?.listing_price
-        ?? zone.zone_property?.zone_sale?.listing_price
-        ?? zone.price;
-    },
-
-    formatPrice(value) {
-      if (value === null || value === undefined || value === "") return "—";
-      const amount = Number(value);
-      if (!Number.isFinite(amount) || amount === 0) return "—";
-      return amount.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      });
-    },
-
     getZoneStatusLabel(status) {
       const labels = {
         'active': 'Active',
@@ -447,7 +420,7 @@ export default {
           return;
         }
 
-        const headers = ["Zone ID", "Zone Name", "Address", "City", "State", "Sale price", "Rent price", "Owner", "Manager", "Status"];
+        const headers = ["Zone ID", "Zone Name", "Address", "City", "State", "Owner", "Manager", "Status"];
         const sanitizeToken = (val) => val ? `"${String(val).replace(/"/g, '""')}"` : '""';
 
         const rowStream = [
@@ -458,8 +431,6 @@ export default {
             sanitizeToken(zone.address || "N/A"),
             sanitizeToken(zone.city || "N/A"),
             sanitizeToken(zone.state || "N/A"),
-            sanitizeToken(this.getSalePrice(zone) ?? "N/A"),
-            sanitizeToken(zone.rent ?? "N/A"),
             sanitizeToken(zone.ownerName || "N/A"),
             sanitizeToken(zone.managerName || "N/A"),
             sanitizeToken(zone.status || "Active")
