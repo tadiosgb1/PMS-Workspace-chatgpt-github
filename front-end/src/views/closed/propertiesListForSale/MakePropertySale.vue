@@ -10,6 +10,9 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-6">
+          <div v-if="saleError" role="alert" class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {{ saleError }}
+          </div>
           <form @submit.prevent="submitSale" class="space-y-6">
 
             <!-- Buyer -->
@@ -119,7 +122,7 @@ export default {
   props: { visible: Boolean, listing: Object },
   data() {
     return {
-      loading: false, slip_picture: null,
+      loading: false, slip_picture: null, saleError: "",
       buyerMode: "search", brokerMode: "search",
       buyers: [], buyerSearch: "", buyerDropdown: false, selectedBuyer: null,
       brokers: [], brokerSearch: "", brokerDropdown: false, selectedBroker: null,
@@ -136,7 +139,16 @@ export default {
     async fetchBrokers() { const res = await this.$apiGet("/get_users", { search: this.brokerSearch, is_broker: true }); this.brokers = res.data || []; },
     selectBroker(u) { this.selectedBroker = u; this.brokerSearch = `${u.first_name} ${u.last_name}`; this.brokerDropdown = false; },
     async submitSale() {
-      if (!this.slip_picture) { alert("Please upload a slip picture"); return; }
+      this.saleError = "";
+      if (!this.slip_picture) { this.saleError = "Please upload a slip picture."; return; }
+      if (this.buyerMode === "search" && !this.selectedBuyer) {
+        this.saleError = "Please select a buyer.";
+        return;
+      }
+      if (this.brokerMode === "search" && !this.selectedBroker) {
+        this.saleError = "Please select a broker.";
+        return;
+      }
       this.loading = true;
       try {
         const buyerId = this.buyerMode === "search" ? this.selectedBuyer.id : (await this.$apiPost("/sign_up", { ...this.buyer, is_owner: true })).id;
@@ -152,6 +164,12 @@ export default {
         fd.append("slip_picture", this.slip_picture);
         await this.$apiPost("/sell_property", fd, true);
         this.$emit("success"); this.$emit("close");
+      } catch (err) {
+        const responseData = err?.response?.data;
+        this.saleError = responseData?.error
+          || responseData?.message
+          || err?.message
+          || "Unable to complete the sale. Please try again.";
       } finally { this.loading = false; }
     },
   },
