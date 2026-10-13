@@ -287,64 +287,46 @@ export default {
       this.showModal = true; 
     },
 
-    async openMakeSaleModal(item) {
-      this.loading = true;
-      try {
-        const property = item.property && typeof item.property === "object"
-          ? item.property
-          : {};
-        const propertyId = property.id ?? item.property_id ?? item.property;
-        if (!propertyId) {
-          this.$root.$refs.toast.showToast("The broker sale does not include a property ID.", "error");
-          return;
-        }
+    openMakeSaleModal(item) {
+      // Match the working property page: build the modal listing directly from
+      // the property's embedded sale listing and zone reference instead of
+      // trying to rediscover it through a name-based listing search.
+      const property = item.property && typeof item.property === "object"
+        ? item.property
+        : {};
+      const existingListing = item.property_sale_listing
+        || item.property_sale
+        || item.sale_listing
+        || item.sale
+        || property.property_sale_listing
+        || property.property_sale
+        || property.sale_listing
+        || property.sale;
+      const zoneValue = item.property_zone_id ?? property.property_zone_id;
+      const zoneId = zoneValue && typeof zoneValue === "object"
+        ? zoneValue.id
+        : zoneValue;
+      const listingId = existingListing?.id
+        ?? item.property_zone_sale_id
+        ?? property.property_zone_sale_id
+        ?? item.property_zone_id?.id
+        ?? property.property_zone_id?.id
+        ?? zoneId;
 
-        // The sale execution endpoint requires the ID of the property-zone sale listing,
-        // not the broker-sale record ID or the property's zone ID.
-        const search = property.name || item.property?.name || "";
-        const response = await this.$apiGet("/get_property_zone_sales", {
-          page: 1,
-          page_size: 100,
-          type: "property",
-          search,
-        });
-        const listings = response?.data || [];
-        const propertyListing = listings.find((listing) => {
-          const listedProperty = listing.property_id ?? listing.property;
-          const listedPropertyId = listedProperty && typeof listedProperty === "object"
-            ? listedProperty.id
-            : listedProperty;
-          return String(listedPropertyId) === String(propertyId);
-        });
-
-        if (!propertyListing?.id) {
-          this.$root.$refs.toast.showToast(
-            "No active property sale listing was found for this broker sale. Please list the property for sale first.",
-            "error"
-          );
-          return;
-        }
-
-        this.saleExecutionListing = {
-          ...property,
-          ...item,
-          ...propertyListing,
-          property,
-          listing_price: item.listing_price
-            ?? propertyListing.listing_price
-            ?? property.listing_price
-            ?? property.sale_price
-            ?? property.price,
-          // MakePropertySale submits this as property_zone_sale_id.
-          property_zone_id: { id: propertyListing.id },
-        };
-        this.makeSaleVisible = true;
-      } catch (error) {
-        console.error("Unable to load property sale listing:", error);
-        this.$root.$refs.toast.showToast("Failed to load the property's sale listing.", "error");
-      } finally {
-        this.loading = false;
-      }
+      this.saleExecutionListing = {
+        ...property,
+        ...item,
+        ...(existingListing && typeof existingListing === "object" ? existingListing : {}),
+        property,
+        listing_price: item.listing_price
+          ?? existingListing?.listing_price
+          ?? property.listing_price
+          ?? property.sale_price
+          ?? property.price,
+        // MakePropertySale uses this value as property_zone_sale_id.
+        property_zone_id: listingId ? { id: listingId } : null,
+      };
+      this.makeSaleVisible = true;
     },
 
     async onPropertySaleSuccess() {
