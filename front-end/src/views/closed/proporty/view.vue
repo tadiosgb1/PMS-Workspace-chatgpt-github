@@ -137,8 +137,6 @@
                       {{ getStatusLabel(p.status) }}
                     </span>
                   </div>
-
-                  </div>
                 </div>
               </td>
               <td class="px-4 py-3">
@@ -183,6 +181,7 @@
                     <button v-if="$hasPermission('pms.change_property') && p.status === 'under_maintenance'" @click="markAvailable(p)" class="status-btn bg-green-50 text-green-600 hover:bg-green-600" title="Mark Fixed">
                       <i class="fas fa-check-circle text-xs"></i>
                     </button>
+                  </div>
 
                   <!-- Payment Related Actions -->
                   <button v-if="p.status === 'rent'" @click="rentPay(p.id)" class="btn-action bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" title="Rental Payments"><i class="fas fa-receipt"></i></button>
