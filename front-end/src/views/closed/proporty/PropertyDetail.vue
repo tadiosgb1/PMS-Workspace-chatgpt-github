@@ -723,26 +723,74 @@ export default {
       }
 
       try {
-        const params = new URLSearchParams({
-          type: "property",
-          search: this.property.name || "",
-          page_size: "100",
-        });
-        const response = await this.$apiGet(`/get_property_zone_sales?${params.toString()}`);
-        const listings = Array.isArray(response?.data)
-          ? response.data
-          : Array.isArray(response?.results)
-            ? response.results
-            : [];
         const propertyId = String(this.property.id);
-        const listing = listings.find(item => {
-          const listedPropertyId = item.property_id?.id ?? item.property?.id ?? item.property_id;
+        const findListing = listings => listings.find(item => {
+          const linkedProperty = item.property_id ?? item.property ?? item.propertyId;
+          const listedPropertyId = linkedProperty && typeof linkedProperty === "object"
+            ? linkedProperty.id
+            : linkedProperty;
           return listedPropertyId !== null && listedPropertyId !== undefined
             && String(listedPropertyId) === propertyId;
         });
 
+        // Do not search by property name here: the listing endpoint's search
+        // can exclude a valid listing even when it belongs to this property.
+        const loadListings = async () => {
+          const response = await this.$apiGet("/get_property_zone_sales?type=property&page_size=100&page=1");
+          const payload = response?.data ?? response?.results ?? response;
+          if (Array.isArray(payload)) return payload;
+          if (Array.isArray(payload?.results)) return payload.results;
+          if (Array.isArray(payload?.data)) return payload.data;
+          return [];
+        };
+
+        let listings = await loadListings();
+        let listing = findListing(listings);
+
+        // If no listing exists yet, create one from the property's selling
+        // price so the sale modal can receive the required listing ID.
         if (!listing) {
-          this.$root.$refs.toast.showToast("No sale listing was found for this property. Please create or verify its sale listing first.", "error");
+          const price = Number(this.property.price ?? this.property.listing_price);
+          if (!Number.isFinite(price) || price <= 0) {
+            this.$root.$refs.toast.showToast("This property has no selling price. Edit the property and set a price first.", "error");
+            return;
+          }
+
+          const created = await this.$apiPost("/create_property_sale_listing", {
+            property_id: this.property.id,
+            listing_price: price,
+          });
+          if (created?.error) {
+            this.$root.$refs.toast.showToast(
+              typeof created.error === "string" ? created.error : "Could not create a sale listing for this property.",
+              "error"
+            );
+            return;
+          }
+
+          listings = await loadListings();
+          listing = findListing(listings);
+
+          // Some API responses include the newly-created listing directly.
+          const createdPayload = created?.data ?? created?.result ?? created;
+          if (!listing && createdPayload && typeof createdPayload === "object" && createdPayload.id) {
+            const createdProperty = createdPayload.property_id ?? createdPayload.property;
+            const createdPropertyId = createdProperty && typeof createdProperty === "object"
+              ? createdProperty.id
+              : createdProperty;
+            if (createdPropertyId === undefined || String(createdPropertyId) === propertyId) {
+              listing = {
+                ...createdPayload,
+                id: createdPayload.id,
+                property_id: createdPayload.property_id ?? this.property.id,
+                listing_price: createdPayload.listing_price ?? price,
+              };
+            }
+          }
+        }
+
+        if (!listing?.id) {
+          this.$root.$refs.toast.showToast("The sale listing could not be loaded after creation. Refresh the page and try again.", "error");
           return;
         }
         if (!listing.listing_price) {
@@ -754,7 +802,7 @@ export default {
         this.saleVisible = true;
       } catch (error) {
         console.error("Failed to load property sale listing:", error);
-        this.$root.$refs.toast.showToast("Could not load the sale listing. Please try again.", "error");
+        this.$root.$refs.toast.showToast("Could not load or create the sale listing. Please try again.", "error");
       }
     },
 
