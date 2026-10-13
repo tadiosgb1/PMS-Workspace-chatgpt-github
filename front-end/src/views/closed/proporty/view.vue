@@ -78,6 +78,8 @@
               </th>
               <th class="px-4 py-3 text-left">Owner & Manager</th>
               <th class="px-4 py-3 text-left">Location</th>
+              <th class="px-4 py-3 text-right whitespace-nowrap">Sale price</th>
+              <th class="px-4 py-3 text-right whitespace-nowrap">Rent price</th>
               <th class="px-4 py-3 text-left">Type</th>
               <th class="px-4 py-3 text-center">Status & Actions</th>
               <th class="px-4 py-3 text-center">Quick Actions</th>
@@ -104,6 +106,12 @@
                 <div class="text-gray-400 cursor-pointer hover:underline mt-0.5" @click="goToZoneDetail(p.property_zone_id)">
                   {{ p.zoneName || '—' }}
                 </div>
+              </td>
+              <td class="px-4 py-3 text-right whitespace-nowrap">
+                <span class="font-semibold text-gray-700">{{ formatPrice(getSalePrice(p)) }}</span>
+              </td>
+              <td class="px-4 py-3 text-right whitespace-nowrap">
+                <span class="text-gray-600">{{ formatPrice(getRentPrice(p)) }}</span>
               </td>
               <td class="px-4 py-3 text-xs text-gray-500 capitalize">{{ p?.property_type?.name || '—' }}</td>
               <td class="px-4 py-3">
@@ -187,7 +195,7 @@
               </td>
             </tr>
             <tr v-if="!properties.length && !loading">
-              <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400 italic">No properties found.</td>
+              <td colspan="8" class="px-4 py-10 text-center text-sm text-gray-400 italic">No properties found.</td>
             </tr>
           </tbody>
         </table>
@@ -253,6 +261,30 @@ export default {
     await this.fetchProperties();
   },
   methods: {
+    getSalePrice(property) {
+      return property.property_sale?.listing_price
+        ?? property.property_sale_listing?.listing_price
+        ?? property.sale_listing?.listing_price
+        ?? property.sale?.listing_price
+        ?? property.listing_price
+        ?? property.sale_price
+        ?? property.price;
+    },
+    getRentPrice(property) {
+      return property.rent
+        ?? property.rent_price
+        ?? property.rental_price
+        ?? property.monthly_rent;
+    },
+    formatPrice(value) {
+      if (value === null || value === undefined || value === "") return "—";
+      const amount = Number(value);
+      if (!Number.isFinite(amount) || amount === 0) return "—";
+      return amount.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+    },
     async fetchProperties(url = null) {
       this.loading = true;
       try {
@@ -417,7 +449,7 @@ export default {
         }
 
         // Establish core headers matching property schema data definitions
-        const headers = ["Property ID", "Property Name", "Owner Name", "Manager Name", "City", "Zone Name", "Property Type", "Status"];
+        const headers = ["Property ID", "Property Name", "Owner Name", "Manager Name", "City", "Zone Name", "Sale price", "Rent price", "Property Type", "Status"];
         const sanitizeToken = (val) => val ? `"${String(val).replace(/"/g, '""')}"` : '""';
 
         const rowStream = [
@@ -429,7 +461,9 @@ export default {
             sanitizeToken(p.managerName || "N/A"),
             sanitizeToken(p.city || "N/A"),
             sanitizeToken(p.zoneName || "N/A"),
-            sanitizeToken(p.property_type || "N/A"),
+            sanitizeToken(this.getSalePrice(p) ?? "N/A"),
+            sanitizeToken(this.getRentPrice(p) ?? "N/A"),
+            sanitizeToken(p.property_type?.name || p.property_type || "N/A"),
             sanitizeToken(p.status || "N/A")
           ].join(","))
         ];
