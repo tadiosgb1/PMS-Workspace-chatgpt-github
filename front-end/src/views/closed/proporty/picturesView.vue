@@ -89,8 +89,8 @@
 </template>
 
 <script>
-import AddPropertyPicture from '@/views/closed/proportyPicture/add.vue';
-import UpdatePropertyPicture from '@/views/closed/proportyPicture/update.vue';
+import AddPropertyPicture from '@/views/closed/proporty/addPicturePage.vue';
+import UpdatePropertyPicture from '@/views/closed/proporty/updatePicturePage.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import Toast from '@/components/Toast.vue';
 
