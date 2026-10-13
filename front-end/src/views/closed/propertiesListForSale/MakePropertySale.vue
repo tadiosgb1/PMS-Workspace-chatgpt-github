@@ -132,7 +132,7 @@ export default {
     };
   },
   methods: {
-    extractSaleError(value) {
+    extractSaleError(value, allowMessage = true) {
       let payload = value;
 
       // API helpers may return JSON in a string, or nest it under data/response.
@@ -157,7 +157,9 @@ export default {
           continue;
         }
 
-        const message = payload.error ?? payload.message;
+        // A successful API response commonly has a "message" field.
+        // Only treat "error" as a failure unless handling a thrown exception.
+        const message = payload.error ?? (allowMessage ? payload.message : undefined);
         if (message === undefined || message === null) return "";
         payload = message;
       }
@@ -197,7 +199,7 @@ export default {
         const response = await this.$apiPost("/sell_property", fd, true);
         // Some project API helpers resolve with the response body even for HTTP errors,
         // so inspect the returned value before treating the sale as successful.
-        const returnedError = this.extractSaleError(response);
+        const returnedError = this.extractSaleError(response, false);
         if (returnedError) {
           this.saleError = returnedError;
           return;
