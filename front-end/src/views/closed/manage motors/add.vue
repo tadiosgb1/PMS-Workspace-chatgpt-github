@@ -111,7 +111,7 @@ export default {
       this.saving = true;
       try {
         const payload = { ...this.form, property_zone: Number(this.form.property_zone) || 0, manager: Number(this.form.manager) || 0 };
-        const result = await this.$apiPost("/**post_motor_property**", payload);
+        const result = await this.$apiPost("/post_motor_property", payload);
         if (result?.error) throw new Error(typeof result.error === "string" ? result.error : "Could not save motor.");
         this.$root.$refs.toast?.showToast("Motor added successfully", "success"); this.$emit("refresh"); this.$emit("close");
       } catch (error) { this.$root.$refs.toast?.showToast(error?.message || "Failed to save motor", "error"); }
