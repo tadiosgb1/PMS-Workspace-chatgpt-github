@@ -327,7 +327,6 @@ export default {
         "property_zone_id__manager_id__email": "",
         "status": "",
         "status__in": "",
-        "property_zone_id": "",
         "property_type__id": "",
         "city": "",
         "city__icontains": "",
@@ -366,6 +365,21 @@ export default {
     propertyTypeOptions() {
       return this.propertyTypes.map((item) => item.name).filter(Boolean);
     },
+    currentRole() {
+      const role = this.$getRole?.() || localStorage.getItem("role") || "";
+      return String(role).toLowerCase().replace(/[ -]/g, "_");
+    },
+    isPrivilegedRole() {
+      return ["superuser", "super_staff"].includes(this.currentRole) || localStorage.getItem("is_superuser") === "true";
+    },
+    canSearchZoneOwnerEmail() {
+      // Privileged users can filter by zone owner; staff and managers cannot.
+      return this.isPrivilegedRole;
+    },
+    canSearchZoneManagerEmail() {
+      // Owners and staff may filter by manager; managers cannot filter people.
+      return !this.isPrivilegedRole && (this.currentRole.includes("owner") || this.currentRole.includes("staff"));
+    },
     ownerEmailOptions() {
       return [...new Set(this.zones.map((zone) => zone?.owner_id?.email || zone?.owner?.email || zone?.owner_email || zone?.owner_id_email).filter(Boolean))].sort();
     },
@@ -374,8 +388,13 @@ export default {
     },
     visibleAdvancedFields() {
       const query = this.filterFieldSearch.trim().toLowerCase();
-      if (!query) return this.advancedFields;
-      return this.advancedFields.filter((field) => field.label.toLowerCase().includes(query) || field.key.toLowerCase().includes(query));
+      const roleVisibleFields = this.advancedFields.filter((field) => {
+        if (field.key === "property_zone_id__owner_id__email") return this.canSearchZoneOwnerEmail;
+        if (field.key === "property_zone_id__manager_id__email") return this.canSearchZoneManagerEmail;
+        return true;
+      });
+      if (!query) return roleVisibleFields;
+      return roleVisibleFields.filter((field) => field.label.toLowerCase().includes(query));
     },
     activeAdvancedFilterCount() {
       return Object.values(this.advancedFilters).filter((value) => value !== "" && value !== null && value !== undefined).length;
@@ -469,8 +488,6 @@ export default {
           params.status = value;
           return;
         }
-        // Keep the main zone dropdown authoritative when the same zone filter is used.
-        if (key === "property_zone_id" && selectedZoneId) return;
         params[key] = value;
       });
       if (this.status) params.status = this.status;
@@ -621,7 +638,7 @@ export default {
         } else if (type === "all") {
           // Direct API query hitting maximum bounds with matching parameters to process background pipeline
           const params = { ...this.buildPropertyQuery(), page: 1, page_size: 1000000 };
-
+          // Export uses exactly the same active filters as the property list.
           const result = await this.$getProperties(params);
           dataset = result.properties || [];
         }
