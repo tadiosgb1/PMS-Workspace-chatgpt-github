@@ -26,9 +26,8 @@
           <div>
             <label for="application-ordering" class="mb-1 block text-[11px] font-semibold text-slate-600">Order by</label>
             <select id="application-ordering" v-model="filters.ordering" class="w-full border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-primary">
-              <option value="-id">Newest first (ID descending)</option><option value="id">Oldest first (ID ascending)</option>
-              <option value="-created_at">Created date — newest first</option><option value="created_at">Created date — oldest first</option>
-              <option value="application_status">Application status — A to Z</option><option value="-application_status">Application status — Z to A</option>
+              <option value="-created_at">Newest first</option><option value="created_at">Oldest first</option>
+              <option value="application_status">Status A to Z</option><option value="-application_status">Status Z to A</option>
             </select>
           </div>
           <div>
@@ -38,7 +37,7 @@
             </select>
           </div>
           <div>
-            <label for="application-payment-product" class="mb-1 block text-[11px] font-semibold text-slate-600">Payment product ID</label>
+            <label for="application-payment-product" class="mb-1 block text-[11px] font-semibold text-slate-600">Payment product</label>
             <input id="application-payment-product" v-model.trim="filters.payment_product" @keyup.enter="applyFilters" class="w-full border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Exact payment product" />
           </div>
           <div>
@@ -101,7 +100,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="item in filteredApplications" :key="item.id" class="hover:bg-slate-50">
-                <td class="px-2 py-1.5"><span class="font-bold text-slate-900">#{{ item.id }}</span><p class="mt-0.5 text-xs text-slate-500">{{ formatDate(item.created_at) }}</p></td>
+                <td class="px-2 py-1.5"><span class="font-bold text-slate-900">{{ formatDate(item.created_at) }}</span></td>
                 <td class="px-5 py-4 text-xs font-medium text-slate-700">{{ customerLabel(item) }}</td>
                 <td class="px-5 py-4 text-xs text-slate-700">{{ propertyLabel(item) }}</td>
                 <td class="px-5 py-4 text-xs font-bold text-slate-900">{{ item.agreed_price || "—" }}</td>
@@ -142,7 +141,7 @@
           </button>
         </div>
 
-        <p class="mb-4 text-xs text-slate-500">Application #{{ actionItem.id }}</p>
+        <p class="mb-4 text-xs text-slate-500">Please confirm this application.</p>
 
         <div v-if="actionType === 'approve'">
           <label class="mb-1 block text-xs font-medium text-slate-700">Start date</label>
@@ -185,7 +184,7 @@ export default {
       ownersLoading: false,
       ownerSearchRequest: 0,
       role: "",
-      filters: { ordering: "-id", offplan_property: "", payment_product: "", customer: "", "customer__phone_number": "", application_status: "", "offplan_property__property_zone": "", "offplan_property__owner": "" },
+      filters: { ordering: "-created_at", offplan_property: "", payment_product: "", customer: "", "customer__phone_number": "", application_status: "", "offplan_property__property_zone": "", "offplan_property__owner": "" },
       loading: false,
       error: "",
       search: "",
@@ -304,7 +303,7 @@ export default {
       this.search = "";
       this.ownerSearch = "";
       this.ownerDropdownOpen = false;
-      this.filters = { ordering: "-id", offplan_property: "", payment_product: "", customer: "", "customer__phone_number": "", application_status: "", "offplan_property__property_zone": "", "offplan_property__owner": "" };
+      this.filters = { ordering: "-created_at", offplan_property: "", payment_product: "", customer: "", "customer__phone_number": "", application_status: "", "offplan_property__property_zone": "", "offplan_property__owner": "" };
       this.load();
     },
     async load() {
