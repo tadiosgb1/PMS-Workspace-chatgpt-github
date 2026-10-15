@@ -5,7 +5,7 @@
     <div v-if="motor && Object.keys(motor).length" class="mx-auto max-w-6xl space-y-6">
       <div class="flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white pb-5 md:pb-6">
         <button @click="$router.back()" class="grid h-10 w-10 place-items-center border border-slate-300 text-slate-700 transition hover:bg-slate-100" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
-        <div class="min-w-0 flex-1"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Motor inventory</p><h1 class="mt-1 truncate text-2xl font-bold tracking-tight text-slate-900">{{ motor.name || 'Motor details' }}</h1><p class="mt-1 text-sm text-slate-500">Review specifications, people and images for this motor.</p></div>
+        <div class="min-w-0 flex-1"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400"></p><h1 class="mt-1 truncate text-2xl font-bold tracking-tight text-slate-900">{{ motor.name || 'Motor details' }}</h1><p class="mt-1 text-sm text-slate-500"></p></div>
         <button v-if="canEdit" type="button" @click="openEditMotor" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-sm font-bold text-white transition hover:opacity-90"><i class="fas fa-pen"></i><span>Edit motor</span></button>
       </div>
 
