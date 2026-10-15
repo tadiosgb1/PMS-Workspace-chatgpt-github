@@ -97,7 +97,7 @@
           </header>
           <div class="overflow-y-auto p-5">
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div v-if="canFilterOwners" class="min-w-0"><label for="offplan-owner-filter" class="mb-1.5 block text-xs font-semibold text-slate-600">Owner</label><select id="offplan-owner-filter" v-model="filters.owner" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary"><option value="">All owners</option><option v-for="person in owners" :key="person.id" :value="String(person.id)">{{ person.name }}</option></select></div><div v-if="canFilterManagers" class="min-w-0"><label for="offplan-manager-filter" class="mb-1.5 block text-xs font-semibold text-slate-600">Manager</label><select id="offplan-manager-filter" v-model="filters.manager" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary"><option value="">All managers</option><option v-for="person in managers" :key="person.id" :value="String(person.id)">{{ person.name }}</option></select></div><div v-for="field in exactTextFilters" :key="field.key" class="min-w-0">
+              <div v-if="canFilterOwners" class="relative min-w-0"><label for="offplan-owner-filter" class="mb-1.5 block text-xs font-semibold text-slate-600">Owner</label><input id="offplan-owner-filter" v-model="ownerSearch" type="search" autocomplete="off" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" placeholder="Search owners…" @focus="onOwnerFocus" @input="searchOwners" @keydown.esc="ownerDropdownOpen = false" /><button v-if="filters.owner" type="button" class="absolute right-2 top-8 px-1 text-xs text-slate-500 hover:text-slate-900" aria-label="Clear owner" @click="clearOwner">×</button><div v-if="ownerDropdownOpen" class="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto border border-slate-200 bg-white shadow-lg"><div v-if="ownersLoading" class="px-3 py-2 text-xs text-slate-500">Searching owners…</div><button v-else-if="owners.length === 0" type="button" class="w-full px-3 py-2 text-left text-xs text-slate-500" disabled>No owners found</button><button v-else v-for="person in owners" :key="person.id" type="button" class="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50" @mousedown.prevent="selectOwner(person)">{{ person.name }}</button></div></div><div v-if="canFilterManagers" class="min-w-0"><label for="offplan-manager-filter" class="mb-1.5 block text-xs font-semibold text-slate-600">Manager</label><select id="offplan-manager-filter" v-model="filters.manager" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary"><option value="">All managers</option><option v-for="person in managers" :key="person.id" :value="String(person.id)">{{ person.name }}</option></select></div><div v-for="field in exactTextFilters" :key="field.key" class="min-w-0">
                 <label :for="'offplan-filter-' + field.key" class="mb-1.5 block text-xs font-semibold text-slate-600">{{ field.label }}</label>
                 <input :id="'offplan-filter-' + field.key" v-model.trim="filters[field.key]" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" :placeholder="'Any ' + field.label.toLowerCase()" />
               </div>
@@ -225,6 +225,10 @@ export default {
       zones: [],
       propertyTypes: [],
       owners: [],
+      ownerSearch: "",
+      ownerDropdownOpen: false,
+      ownersLoading: false,
+      ownerSearchRequest: 0,
       managers: [],
       role: "",
       search: "",
@@ -306,6 +310,41 @@ export default {
       const name = item?.name || item?.full_name || [item?.first_name, item?.last_name].filter(Boolean).join(" ") || item?.username || item?.email || ("User " + id);
       return { id: Number(id), name: String(name).trim() };
     },
+    async onOwnerFocus() {
+      this.ownerDropdownOpen = true;
+      if (this.owners.length === 0) await this.fetchOwners(this.ownerSearch);
+    },
+    async searchOwners() {
+      this.filters.owner = "";
+      this.ownerDropdownOpen = true;
+      await this.fetchOwners(this.ownerSearch);
+    },
+    async fetchOwners(search = "") {
+      const requestId = ++this.ownerSearchRequest;
+      this.ownersLoading = true;
+      try {
+        const params = { page: 1, page_size: 50 };
+        if (String(search).trim()) params.search = String(search).trim();
+        const response = await this.$apiGet("/get_owners", params);
+        if (requestId !== this.ownerSearchRequest) return;
+        this.owners = this.normalizeList(response, ["owners", "results"]).map(this.normalizePerson).filter(item => item.id);
+      } catch (e) {
+        if (requestId === this.ownerSearchRequest) this.owners = [];
+      } finally {
+        if (requestId === this.ownerSearchRequest) this.ownersLoading = false;
+      }
+    },
+    selectOwner(person) {
+      this.filters.owner = String(person.id);
+      this.ownerSearch = person.name;
+      this.ownerDropdownOpen = false;
+    },
+    clearOwner() {
+      this.filters.owner = "";
+      this.ownerSearch = "";
+      this.ownerDropdownOpen = true;
+      this.fetchOwners("");
+    },
     async loadLookups() {
       try {
         const [zoneResponse, typeResponse] = await Promise.all([
@@ -314,10 +353,6 @@ export default {
         ]);
         this.zones = (zoneResponse?.zones || []).map(item => ({ id: item.id ?? item.zone_id, name: item.name || item.zone_name || item.title || "Unnamed zone" })).filter(item => item.id != null);
         this.propertyTypes = this.normalizeList(typeResponse, ["property_types", "results"]).filter(item => item?.name).map(item => ({ id: item.id, name: item.name }));
-        if (this.canFilterOwners) {
-          const response = await this.$apiGet("/get_owners", { page: 1, page_size: 1000 });
-          this.owners = this.normalizeList(response, ["owners", "results"]).map(this.normalizePerson).filter(item => item.id);
-        }
         if (this.canFilterManagers) {
           const userId = Number(localStorage.getItem("userId") || localStorage.getItem("user_id") || localStorage.getItem("id") || 0);
           const response = this.role === "owner"
@@ -356,6 +391,8 @@ export default {
     },
     resetFilters() {
       this.search = "";
+      this.ownerSearch = "";
+      this.ownerDropdownOpen = false;
       this.ordering = "-id";
       this.filters = {
         property_zone: "", owner: "", manager: "", property_type: "", completion_status: "",
