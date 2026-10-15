@@ -6,10 +6,27 @@
       <div><h1 class="text-xl font-black tracking-tight text-primary">Manage Motors</h1><p class="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Motor property records</p></div>
       <button @click="addVisible = true" class="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold text-white hover:bg-primary/90"><i class="fas fa-plus"></i> Add Motor</button>
     </div>
-    <div class="mb-4 flex flex-col gap-3 rounded-lg border border-primary/10 bg-white p-4 sm:flex-row sm:items-center">
-      <input v-model="search" @input="fetchMotors" type="search" placeholder="Search motors..." class="w-full max-w-sm rounded-lg border border-primary/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-      <div class="text-xs text-gray-500 sm:ml-auto">{{ motors.length }} record(s)</div>
-    </div>
+    <section class="mb-4 border border-primary/10 bg-white">
+      <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
+        <input v-model="search" @input="fetchMotors" type="search" placeholder="Search motors..." class="w-full max-w-sm border border-primary/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <div class="text-xs text-gray-500 sm:ml-auto">{{ filteredMotors.length }} record(s)</div>
+      </div>
+      <form @submit.prevent="applyFilters" class="p-4">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div><h2 class="text-sm font-bold text-gray-800">Filter motors</h2><p class="mt-1 text-xs text-gray-500">Combine filters to narrow the results. List filters accept comma-separated values.</p></div>
+          <div class="flex gap-2">
+            <button type="button" @click="clearFilters" class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Clear filters</button>
+            <button type="submit" class="bg-primary px-4 py-2 text-xs font-bold text-white hover:opacity-90">Apply filters</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <label v-for="field in filterFields" :key="field.key" class="block min-w-0">
+            <span class="mb-1.5 block text-xs font-semibold text-gray-600">{{ field.label }}</span>
+            <input v-model="filters[field.key]" :type="field.type || 'text'" :step="field.type === 'number' ? 'any' : undefined" :placeholder="field.placeholder || field.label" class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+          </label>
+        </div>
+      </form>
+    </section>
     <div class="overflow-hidden rounded-lg border border-primary/10 bg-white">
       <div class="overflow-x-auto"><table class="w-full text-left text-sm">
         <thead class="border-b border-primary/10 bg-gray-50 text-xs uppercase tracking-wide text-gray-500"><tr><th class="px-4 py-3">Image</th><th class="px-4 py-3">Motor</th><th class="px-4 py-3">Type</th><th class="px-4 py-3">Brand / Model</th><th class="px-4 py-3">Registration</th><th class="px-4 py-3">Price</th><th class="px-4 py-3 text-right">Actions</th></tr></thead>
@@ -33,17 +50,33 @@ import Toast from "@/components/Toast.vue";
 import Loading from "@/components/Loading.vue";
 export default {
   name: "ManageMotorsView", components: { AddMotor, EditMotor, Toast, Loading },
-  data: () => ({ motors: [], loading: false, addVisible: false, editVisible: false, selectedMotor: null, search: "", searchTimeout: null }),
-  computed: { canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); }, filteredMotors() { const q = this.search.trim().toLowerCase(); return this.motors.filter(m => !q || Object.values(m || {}).some(v => this.displayValue(v).toLowerCase().includes(q))); } },
+  data: () => ({ motors: [], loading: false, addVisible: false, editVisible: false, selectedMotor: null, search: "", searchTimeout: null, filters: { property_zone: "", owner: "", manager: "", property_type: "", property_type__in: "", usage: "", usage__in: "", make: "", make__icontains: "", model: "", model__icontains: "", year: "", year__gte: "", year__lte: "", price: "", price__gte: "", price__lte: "", price__gt: "", price__lt: "", location: "", location__icontains: "" } }),
+  computed: {
+    canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); },
+    filterFields() { return [
+      {key:"property_zone",label:"Property zone (exact)"},{key:"owner",label:"Owner (exact)"},{key:"manager",label:"Manager (exact)"},{key:"property_type",label:"Property type (exact)"},{key:"property_type__in",label:"Property types (comma-separated)",placeholder:"car, boat"},
+      {key:"usage",label:"Usage (exact)"},{key:"usage__in",label:"Usages (comma-separated)",placeholder:"new, used"},{key:"make",label:"Make (exact)"},{key:"make__icontains",label:"Make contains"},{key:"model",label:"Model (exact)"},{key:"model__icontains",label:"Model contains"},
+      {key:"year",label:"Year (exact)"},{key:"year__gte",label:"Year from",type:"number"},{key:"year__lte",label:"Year to",type:"number"},{key:"price",label:"Price (exact)"},{key:"price__gte",label:"Minimum price",type:"number"},{key:"price__lte",label:"Maximum price",type:"number"},{key:"price__gt",label:"Price greater than",type:"number"},{key:"price__lt",label:"Price less than",type:"number"},
+      {key:"location",label:"Location (exact)"},{key:"location__icontains",label:"Location contains"}
+    ]; },
+    filteredMotors() { const q = this.search.trim().toLowerCase(); return this.motors.filter(m => !q || Object.values(m || {}).some(v => this.displayValue(v).toLowerCase().includes(q))); }
+  },
   mounted() { this.fetchMotors(); },
   beforeUnmount() { clearTimeout(this.searchTimeout); },
   methods: {
-    async fetchMotors() {
+    applyFilters() { this.fetchMotors(true); },
+    clearFilters() { this.filters = { property_zone: "", owner: "", manager: "", property_type: "", property_type__in: "", usage: "", usage__in: "", make: "", make__icontains: "", model: "", model__icontains: "", year: "", year__gte: "", year__lte: "", price: "", price__gte: "", price__lte: "", price__gt: "", price__lt: "", location: "", location__icontains: "" }; this.fetchMotors(true); },
+    async fetchMotors(immediate = false) {
       clearTimeout(this.searchTimeout);
+      const params = {};
+      if (this.search.trim()) params.search = this.search.trim();
+      Object.entries(this.filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && String(value).trim() !== "") params[key] = String(value).trim();
+      });
       this.searchTimeout = setTimeout(async () => {
         this.loading = true;
         try {
-          const response = await this.$apiGet("/get_motor_properties", this.search.trim() ? { search: this.search.trim() } : {});
+          const response = await this.$apiGet("/get_motor_properties", params);
           const payload = response?.data ?? response?.results ?? response;
           this.motors = Array.isArray(payload) ? payload : Array.isArray(payload?.results) ? payload.results : Array.isArray(payload?.motor_properties) ? payload.motor_properties : [];
           try {
@@ -57,7 +90,7 @@ export default {
           } catch (pictureError) { console.warn("Motor pictures could not be loaded:", pictureError); }
         } catch (error) { console.error("Failed to load motors:", error); this.motors = []; this.$root.$refs.toast?.showToast("Failed to load motor properties", "error"); }
         finally { this.loading = false; }
-      }, this.search ? 250 : 0);
+      }, immediate ? 0 : (this.search ? 250 : 0));
     },
     displayValue(value) { if (value === null || value === undefined || value === "") return "—"; if (typeof value === "object") { const preferred = value.name ?? value.title ?? value.label ?? value.description ?? value.url ?? value.image ?? value.id; return preferred !== undefined ? this.displayValue(preferred) : Object.entries(value).map(([k,v]) => this.labelKey(k) + ": " + this.displayValue(v)).join(", "); } if (typeof value === "boolean") return value ? "Yes" : "No"; return String(value).replace(/_/g, " "); },
     labelKey(key) { return key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()); },
