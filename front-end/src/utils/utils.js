@@ -410,12 +410,18 @@ export async function getZones(options = null, pageSize = 1000) {
         page_size: String(size),
       });
 
-      if (config.search && String(config.search).trim()) {
-        params.set("search", String(config.search).trim());
-      }
-      if (config.ordering && String(config.ordering).trim()) {
-        params.set("ordering", String(config.ordering).trim());
-      }
+      // Forward every populated filter to the API, not just search and ordering.
+      // Pagination keys are normalized above so the API receives page_size.
+      Object.entries(config).forEach(([key, value]) => {
+        if (["page", "pageSize", "page_size"].includes(key) || value == null) {
+          return;
+        }
+
+        const normalizedValue = typeof value === "string" ? value.trim() : String(value);
+        if (!normalizedValue) return;
+
+        params.set(key, normalizedValue);
+      });
 
       apiUrl = `/get_property_zones?${params.toString()}`;
     }
