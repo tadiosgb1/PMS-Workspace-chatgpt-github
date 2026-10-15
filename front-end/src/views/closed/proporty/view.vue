@@ -94,6 +94,8 @@
             <input v-model="filterFieldSearch" type="search" placeholder="Find a filter (e.g. owner email, price, address)"
               class="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
           </div>
+          <datalist id="owner-email-options"><option v-for="email in ownerEmailOptions" :key="email" :value="email" /></datalist>
+          <datalist id="manager-email-options"><option v-for="email in managerEmailOptions" :key="email" :value="email" /></datalist>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <label v-for="field in visibleAdvancedFields" :key="field.key" class="block min-w-0">
               <span class="mb-1.5 block text-xs font-semibold text-gray-600">{{ field.label }}</span>
@@ -105,10 +107,8 @@
                 <option value="">Choose a zone</option>
                 <option v-for="z in zones" :key="z.id" :value="field.key === 'property_zone_id' ? z.id : z.name">{{ z.name }}</option>
               </select>
-              <select v-else-if="field.options === 'ordering'" v-model="advancedFilters[field.key]" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
-                <option value="">Default order</option>
-                <option v-for="item in orderingOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
-              </select>
+              <input v-else-if="field.options === 'ownerEmails'" v-model="advancedFilters[field.key]" :list="'owner-email-options'" type="search" placeholder="Search and select owner email" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+              <input v-else-if="field.options === 'managerEmails'" v-model="advancedFilters[field.key]" :list="'manager-email-options'" type="search" placeholder="Search and select manager email" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
               <select v-else-if="field.options === 'propertyTypes'" v-model="advancedFilters[field.key]" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
                 <option value="">Any property type</option>
                 <option v-for="item in propertyTypes" :key="item.id" :value="field.key === 'property_type__id' ? item.id : item.name">{{ item.name }}</option>
@@ -316,64 +316,6 @@ export default {
       pageSize: 10, pageSizes: [10, 20, 50, 100, 1000],
       ordering: "-id", status: "",
       showMoreFilters: false, filterFieldSearch: "",
-      orderingOptions: [
-        { value: "id", label: "ID" },
-        { value: "-id", label: "ID (descending)" },
-        { value: "property_zone_id", label: "Zone" },
-        { value: "-property_zone_id", label: "Zone (descending)" },
-        { value: "owner_id", label: "Owner" },
-        { value: "-owner_id", label: "Owner (descending)" },
-        { value: "manager_id", label: "Manager" },
-        { value: "-manager_id", label: "Manager (descending)" },
-        { value: "property_type", label: "Property type" },
-        { value: "-property_type", label: "Property type (descending)" },
-        { value: "property_type_category", label: "Property type category" },
-        { value: "-property_type_category", label: "Property type category (descending)" },
-        { value: "name", label: "Name" },
-        { value: "-name", label: "Name (descending)" },
-        { value: "address", label: "Address" },
-        { value: "-address", label: "Address (descending)" },
-        { value: "city", label: "City" },
-        { value: "-city", label: "City (descending)" },
-        { value: "state", label: "State" },
-        { value: "-state", label: "State (descending)" },
-        { value: "zip_code", label: "ZIP code" },
-        { value: "-zip_code", label: "ZIP code (descending)" },
-        { value: "price", label: "Price" },
-        { value: "-price", label: "Price (descending)" },
-        { value: "bed_rooms", label: "Bedrooms" },
-        { value: "-bed_rooms", label: "Bedrooms (descending)" },
-        { value: "bath_rooms", label: "Bathrooms" },
-        { value: "-bath_rooms", label: "Bathrooms (descending)" },
-        { value: "rent", label: "Rent" },
-        { value: "-rent", label: "Rent (descending)" },
-        { value: "content", label: "Content" },
-        { value: "-content", label: "Content (descending)" },
-        { value: "area", label: "Area" },
-        { value: "-area", label: "Area (descending)" },
-        { value: "block_number", label: "Block number" },
-        { value: "-block_number", label: "Block number (descending)" },
-        { value: "floor_number", label: "Floor number" },
-        { value: "-floor_number", label: "Floor number (descending)" },
-        { value: "house_number", label: "House number" },
-        { value: "-house_number", label: "House number (descending)" },
-        { value: "latitude", label: "Latitude" },
-        { value: "-latitude", label: "Latitude (descending)" },
-        { value: "longitude", label: "Longitude" },
-        { value: "-longitude", label: "Longitude (descending)" },
-        { value: "furnished", label: "Furnished" },
-        { value: "-furnished", label: "Furnished (descending)" },
-        { value: "description", label: "Description" },
-        { value: "-description", label: "Description (descending)" },
-        { value: "status", label: "Status" },
-        { value: "-status", label: "Status (descending)" },
-        { value: "is_zone_property", label: "Zone property" },
-        { value: "-is_zone_property", label: "Zone property (descending)" },
-        { value: "created_at", label: "Created date" },
-        { value: "-created_at", label: "Created date (descending)" },
-        { value: "updated_at", label: "Updated date" },
-        { value: "-updated_at", label: "Updated date (descending)" },
-      ],
       statusOptions: [
         { value: "available", label: "Available (New)" },
         { value: "for_rent", label: "Available for Rent" },
@@ -383,8 +325,6 @@ export default {
         { value: "under_maintenance", label: "Under Maintenance" },
       ],
       advancedFilters: {
-        "ordering": "",
-        "property_zone_id__name": "",
         "property_zone_id__owner_id__email": "",
         "property_zone_id__manager_id__email": "",
         "status": "",
@@ -404,13 +344,10 @@ export default {
         "furnished": "",
       },
       advancedFields: [
-        { key: "ordering", label: "Sort order", hint: "Use a minus sign for descending order" },
-        { key: "property_zone_id__name", label: "Zone name", options: "zones" },
-        { key: "property_zone_id__owner_id__email", label: "Zone owner email" },
-        { key: "property_zone_id__manager_id__email", label: "Zone manager email" },
+        { key: "property_zone_id__owner_id__email", label: "Zone owner email", options: "ownerEmails" },
+        { key: "property_zone_id__manager_id__email", label: "Zone manager email", options: "managerEmails" },
         { key: "status", label: "Status", options: "status" },
         { key: "status__in", label: "Statuses", hint: "Separate multiple statuses with commas" },
-        { key: "property_zone_id", label: "Property zone", options: "zones" },
         { key: "property_type__id", label: "Property type", options: "propertyTypes" },
         { key: "city", label: "City" },
         { key: "city__icontains", label: "City contains" },
@@ -430,6 +367,12 @@ export default {
   computed: {
     propertyTypeOptions() {
       return this.propertyTypes.map((item) => item.name).filter(Boolean);
+    },
+    ownerEmailOptions() {
+      return [...new Set(this.zones.map((zone) => zone?.owner_id?.email || zone?.owner?.email || zone?.owner_email || zone?.owner_id_email).filter(Boolean))].sort();
+    },
+    managerEmailOptions() {
+      return [...new Set(this.zones.map((zone) => zone?.manager_id?.email || zone?.manager?.email || zone?.manager_email || zone?.manager_id_email).filter(Boolean))].sort();
     },
     visibleAdvancedFields() {
       const query = this.filterFieldSearch.trim().toLowerCase();
@@ -511,21 +454,15 @@ export default {
         page: this.currentPage,
         page_size: this.pageSize,
         search: this.searchTerm.trim(),
-        ordering: this.advancedFilters.ordering || this.ordering || "-id",
+        ordering: this.ordering || "-id",
       };
       const selectedZoneId = this.$route.query.zone_id || this.zone_id;
       if (selectedZoneId) {
         params.property_zone_id = selectedZoneId;
-        const selectedZone = this.zones.find((zone) => String(zone.id) === String(selectedZoneId));
-        if (selectedZone?.name) params["property_zone_id__name"] = selectedZone.name;
       }
       Object.entries(this.advancedFilters).forEach(([key, rawValue]) => {
         const value = rawValue == null ? "" : String(rawValue).trim();
         if (!value) return;
-        if (key === "ordering") {
-          params.ordering = value;
-          return;
-        }
         if (key === "furnished") {
           if (rawValue === "true" || rawValue === true) params.furnished = "true";
           return;
