@@ -22,6 +22,15 @@
         <template v-if="canSearchManagers"><input v-model.trim="managerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Exact manager email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><input v-model.trim="managerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Manager account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /></template>
       </div>
 
+      <div class="flex flex-wrap items-center gap-2">
+        <button @click="applyAdvancedFilters" class="rounded-lg bg-gray-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-700">
+          Apply Filters
+        </button>
+        <button @click="clearFilters" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-100">
+          Clear Filters
+        </button>
+      </div>
+
       <div class="flex flex-wrap items-center gap-4 text-xs">
         <div class="flex items-center gap-2 text-gray-500 ml-auto lg:ml-0">
           <label class="font-semibold">Show</label>
@@ -227,6 +236,18 @@ export default {
       this.fetchSpaces();
     },
     applyAdvancedFilters() {
+      this.currentPage = 1;
+      this.fetchSpaces();
+    },
+    clearFilters() {
+      this.searchTerm = "";
+      this.zoneId = "";
+      this.zoneSearch = "";
+      this.ordering = "";
+      this.ownerEmail = "";
+      this.ownerRef = "";
+      this.managerEmail = "";
+      this.managerRef = "";
       this.currentPage = 1;
       this.fetchSpaces();
     },
