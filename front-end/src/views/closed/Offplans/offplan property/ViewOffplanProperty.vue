@@ -273,7 +273,7 @@ export default {
       ];
     },
     orderingFields() {
-      const fields = [["id","Property ID"],["property_zone","Property zone"],["owner","Owner"],["manager","Manager"],["property_type","Property type"],["completion_status","Completion status"],["price","Price"],["bedrooms","Bedrooms"],["bathrooms","Bathrooms"],["min_area","Minimum area"],["max_area","Maximum area"],["sale_type","Sale type"],["project_completion","Project completion"],["pre_handover_payment","Pre-handover payment"],["project_status","Project status"],["location","Location"],["handover_period","Handover period"],["developer","Developer"],["is_furnished","Furnishing"],["created_at","Date added"],["updated_at","Last updated"]];
+      const fields = [["id","Recently added"],["property_zone","Property zone"],["owner","Owner"],["manager","Manager"],["property_type","Property type"],["completion_status","Completion status"],["price","Price"],["bedrooms","Bedrooms"],["bathrooms","Bathrooms"],["min_area","Minimum area"],["max_area","Maximum area"],["sale_type","Sale type"],["project_completion","Project completion"],["pre_handover_payment","Pre-handover payment"],["project_status","Project status"],["location","Location"],["handover_period","Handover period"],["developer","Developer"],["is_furnished","Furnishing"],["created_at","Date added"],["updated_at","Last updated"]];
       return fields.flatMap(([value,label]) => [{value,label:label+" — Ascending (A to Z / lowest first)"},{value:"-"+value,label:label+" — Descending (Z to A / highest first)"}]);
     },
     activeAdvancedFilterCount() {
@@ -338,7 +338,8 @@ export default {
           if (value === "" || value === null || value === undefined) return;
           if (key === "owner" && !this.canFilterOwners) return;
           if (key === "manager" && !this.canFilterManagers) return;
-          params[key] = value;
+          const apiKey = key === "property_zone" ? "property_zone_id" : key === "owner" ? "owner_id" : key === "manager" ? "manager_id" : key;
+          params[apiKey] = value;
         });
         const response = await this.$apiGet("/get_offplan_properties", params);
         const data = response?.data?.data || response?.data || response?.properties || response;
