@@ -193,7 +193,7 @@ const routes = [
         name: "ManageMotors-detail",
         component: () => import('../views/closed/manage motors/detail.vue'),
         props: true,
-        meta: { roles: ["superuser", "owner"] },
+        meta: { roles: ["superuser", "owner", "manager", "staff"] },
       },
       {
         path: "brands",
