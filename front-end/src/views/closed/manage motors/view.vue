@@ -16,7 +16,7 @@
         <tbody class="divide-y divide-gray-100">
           <tr v-for="motor in filteredMotors" :key="motor.id" class="hover:bg-primary/5">
             <td class="px-4 py-3 font-semibold text-primary">{{ motor.name || '—' }}</td><td class="px-4 py-3">{{ motor.motor_type || '—' }}</td><td class="px-4 py-3">{{ [motor.brand, motor.model].filter(Boolean).join(' / ') || '—' }}</td><td class="px-4 py-3">{{ motor.registration_number || '—' }}</td><td class="px-4 py-3">{{ motor.price ?? '—' }}</td>
-            <td class="px-4 py-3"><div class="flex justify-end gap-1"><button @click="viewDetail(motor.id)" title="View details" class="h-8 w-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white"><i class="fas fa-eye"></i></button><button @click="editMotor(motor)" title="Edit" class="h-8 w-8 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white"><i class="fas fa-edit"></i></button></div></td>
+            <td class="px-4 py-3"><div class="flex justify-end gap-1"><button @click="viewDetail(motor.id)" title="View details" class="h-8 w-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white"><i class="fas fa-eye"></i></button><button v-if="canEdit" @click="editMotor(motor)" title="Edit" class="h-8 w-8 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white"><i class="fas fa-edit"></i></button></div></td>
           </tr>
           <tr v-if="!loading && filteredMotors.length === 0"><td colspan="6" class="px-4 py-12 text-center text-gray-400">No motor properties found.</td></tr>
         </tbody>
@@ -34,7 +34,8 @@ import Loading from "@/components/Loading.vue";
 export default {
   name: "ManageMotorsView", components: { AddMotor, EditMotor, Toast, Loading },
   data: () => ({ motors: [], loading: false, addVisible: false, editVisible: false, selectedMotor: null, search: "", searchTimeout: null }),
-  computed: { filteredMotors() { const q = this.search.trim().toLowerCase(); return this.motors.filter(m => !q || Object.values(m || {}).some(v => String(v ?? "").toLowerCase().includes(q))); } },
+  computed: { canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); }, filteredMotors() { const q = this.search.trim().toLowerCase(); return this.motors.filter(m => !q || Object.values(m || {}).some(v => String(v ?? "").toLowerCase().includes(q))); } },
+  /*computed: { */
   mounted() { this.fetchMotors(); },
   beforeUnmount() { clearTimeout(this.searchTimeout); },
   methods: {
