@@ -353,6 +353,7 @@ export default {
         "status__in": "",
         "property_type__id": "",
         "city": "",
+        "city__icontains": "",
         "address": "",
         "state": "",
         "price": "",
