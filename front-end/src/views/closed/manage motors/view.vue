@@ -45,7 +45,16 @@ export default {
         try {
           const response = await this.$apiGet("/get_motor_properties", this.search.trim() ? { search: this.search.trim() } : {});
           const payload = response?.data ?? response?.results ?? response;
-          this.motors = Array.isArray(payload) ? payload : Array.isArray(payload?.results) ? payload.results : [];
+          this.motors = Array.isArray(payload) ? payload : Array.isArray(payload?.results) ? payload.results : Array.isArray(payload?.motor_properties) ? payload.motor_properties : [];
+          try {
+            const pictureResponse = await this.$apiGet("/get_motor_property_pictures", {});
+            const picturePayload = pictureResponse?.data ?? pictureResponse?.results ?? pictureResponse;
+            const pictures = Array.isArray(picturePayload) ? picturePayload : picturePayload?.results || picturePayload?.motor_property_pictures || picturePayload?.data || [];
+            this.motors = this.motors.map(motor => {
+              const related = pictures.filter(pic => Number(pic.motor_property?.id ?? pic.motor_property ?? pic.motor_property_id) === Number(motor.id));
+              return { ...motor, pictures: motor.pictures || motor.motor_property_pictures || related };
+            });
+          } catch (pictureError) { console.warn("Motor pictures could not be loaded:", pictureError); }
         } catch (error) { console.error("Failed to load motors:", error); this.motors = []; this.$root.$refs.toast?.showToast("Failed to load motor properties", "error"); }
         finally { this.loading = false; }
       }, this.search ? 250 : 0);
