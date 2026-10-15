@@ -1,42 +1,37 @@
 <template>
-  <div class="min-h-screen bg-slate-50/70 p-4 text-sm text-slate-800 md:p-7">
+  <div class="min-h-screen bg-white p-4 text-base text-slate-800 md:px-8 md:py-6">
     <Toast ref="toast" />
     <Loading :visible="loading || savingImage" :message="savingImage ? 'Saving image...' : 'Loading motor details...'" />
     <div v-if="motor && Object.keys(motor).length" class="mx-auto max-w-6xl space-y-6">
-      <div class="flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-        <button @click="$router.back()" class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-50" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+      <div class="flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white pb-5 md:pb-6">
+        <button @click="$router.back()" class="grid h-10 w-10 place-items-center border border-slate-300 text-slate-700 transition hover:bg-slate-100" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
         <div class="min-w-0 flex-1"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Motor inventory</p><h1 class="mt-1 truncate text-2xl font-bold tracking-tight text-slate-900">{{ motor.name || 'Motor details' }}</h1><p class="mt-1 text-sm text-slate-500">Review specifications, people and images for this motor.</p></div>
-        <button v-if="canEdit" type="button" @click="openEditMotor" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90"><i class="fas fa-pen"></i><span>Edit motor</span></button>
+        <button v-if="canEdit" type="button" @click="openEditMotor" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-sm font-bold text-white transition hover:opacity-90"><i class="fas fa-pen"></i><span>Edit motor</span></button>
       </div>
 
-      <nav class="flex items-center gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm" aria-label="Motor detail tabs">
-        <button v-for="tab in tabs" :key="tab.id" type="button" @click="activeTab = tab.id" :class="['border-b-2 px-4 py-3 text-xs font-bold transition', activeTab === tab.id ? 'rounded-lg border-primary bg-primary/5 text-primary' : 'rounded-lg border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800']">{{ tab.label }} <span v-if="tab.id === 'pictures'" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px]">{{ pictures.length }}</span></button>
+      <nav class="flex items-center gap-6 overflow-x-auto border-b border-slate-200 bg-white" aria-label="Motor detail tabs">
+        <button v-for="tab in tabs" :key="tab.id" type="button" @click="activeTab = tab.id" :class="['whitespace-nowrap border-b-2 px-1 py-4 text-sm font-semibold transition', activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-900']">{{ tab.label }} <span v-if="tab.id === 'pictures'" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px]">{{ pictures.length }}</span></button>
       </nav>
 
-      <section v-if="activeTab === 'details'" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <header class="border-b border-slate-100 px-6 py-5"><p class="text-[10px] font-bold uppercase tracking-[.16em] text-primary">Overview</p><h2 class="mt-1 text-lg font-bold text-slate-900">Motor information</h2><p class="mt-1 text-sm text-slate-500">Core specifications and assigned contacts.</p></header>
-        <div class="grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3">
-          <div v-for="entry in entries" :key="entry.key" class="min-w-0 border-b border-slate-100 px-6 py-5 transition hover:bg-slate-50/70"><p class="text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{{ entry.label }}</p><p class="mt-2 break-words text-sm font-medium text-slate-800">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p></div>
+      <section v-if="activeTab === 'details'" class="bg-white">
+        <header class="border-b border-slate-200 py-5"><p class="text-xs font-bold uppercase tracking-wider text-primary">Motor details</p><h2 class="mt-1 text-xl font-bold text-slate-950">Specifications and contacts</h2><p class="mt-1 text-sm text-slate-600">Each field is listed clearly below. Empty values are left blank.</p></header>
+        <div class="grid grid-cols-1 gap-0">
+          <div v-for="entry in entries" :key="entry.key" class="grid min-w-0 grid-cols-1 gap-1 border-b border-slate-200 py-4 sm:grid-cols-[minmax(190px,260px)_minmax(0,1fr)] sm:gap-6"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 sm:pt-1">{{ entry.label }}</p><p class="min-h-6 break-words text-base font-medium leading-6 text-slate-950">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p></div>
         </div>
       </section>
 
-      <section v-else-if="activeTab === 'pictures'" class="overflow-hidden rounded-xl border border-primary/10 bg-white shadow-sm">
-        <header class="flex flex-wrap items-center justify-between gap-3 border-b border-primary/10 bg-primary/5 px-5 py-3"><div><h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">Motor pictures</h2><p class="mt-1 text-xs text-gray-500">Add pictures or edit their descriptions and image files.</p></div><button type="button" @click="openAddImage" class="rounded-md bg-primary px-4 py-2 text-xs font-bold text-white hover:opacity-90"><i class="fas fa-plus mr-2"></i>Add image</button></header>
-        <div v-if="pictures.length" class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3">
-          <article v-for="(picture, index) in pictures" :key="picture.id || index" class="overflow-hidden rounded-lg border border-gray-200 bg-white">
-            <img v-if="pictureUrl(picture)" :src="pictureUrl(picture)" :alt="picture.description || motor.name || 'Motor picture'" class="h-48 w-full bg-gray-50 object-cover" />
-            <div v-else class="grid h-48 place-items-center bg-gray-50 text-xs text-gray-400"><i class="fas fa-image mr-2"></i>No image URL available</div>
-            <div class="flex items-start justify-between gap-3 p-3"><div class="min-w-0"><p class="break-words text-sm font-semibold text-gray-800">{{ picture.description || 'No description' }}</p><p class="mt-1 text-[10px] text-gray-500">Image {{ index + 1 }}</p></div><button type="button" @click="openEditImage(picture)" class="shrink-0 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"><i class="fas fa-pen mr-1"></i>Edit</button></div>
+      <section v-else-if="activeTab === 'pictures'" class="overflow-hidden border-t border-slate-200 bg-white">
+        <header class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 py-5"><div><h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">Motor pictures</h2><p class="mt-1 text-xs text-gray-500">Add pictures or edit their descriptions and image files.</p></div><button type="button" @click="openAddImage" class="bg-primary px-4 py-3 text-sm font-bold text-white hover:opacity-90"><i class="fas fa-plus mr-2"></i>Add image</button></header>
+        <div v-if="pictures.length" class="grid grid-cols-1 gap-5 py-5 sm:grid-cols-2 lg:grid-cols-3">
+          <article v-for="(picture, index) in pictures" :key="picture.id || index" class="overflow-hidden border border-slate-200 bg-white">
+            <img v-if="pictureUrl(picture)" :src="pictureUrl(picture)" :alt="picture.description || motor.name || 'Motor picture'" class="h-52 w-full bg-slate-50 object-cover" />
+            <div v-else class="grid h-52 place-items-center bg-slate-50 text-sm text-slate-500"><i class="fas fa-image mr-2"></i>No image URL available</div>
+            <div class="flex items-start justify-between gap-3 border-t border-slate-100 p-4"><div class="min-w-0"><p class="break-words text-sm font-semibold text-gray-800">{{ picture.description || 'No description' }}</p><p class="mt-1 text-[10px] text-gray-500">Image {{ index + 1 }}</p></div><button type="button" @click="openEditImage(picture)" class="shrink-0 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"><i class="fas fa-pen mr-1"></i>Edit</button></div>
           </article>
         </div>
         <div v-else class="p-10 text-center"><i class="fas fa-images text-3xl text-gray-300"></i><p class="mt-3 text-sm font-semibold text-gray-700">No pictures yet</p><p class="mt-1 text-xs text-gray-500">Add an image to keep it with this motor's details.</p><button type="button" @click="openAddImage" class="mt-4 rounded-md bg-primary px-4 py-2 text-xs font-bold text-white">Add first image</button></div>
       </section>
 
-      <section v-else-if="activeTab === 'additional'" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <header class="border-b border-primary/10 bg-primary/5 px-5 py-3"><h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">Additional information</h2></header>
-        <div v-if="extraEntries.length" class="grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3"><div v-for="entry in extraEntries" :key="entry.key" class="min-w-0 border-b border-slate-100 px-6 py-5"><p class="text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{{ label(entry.key) }}</p><p class="mt-2 break-words text-sm font-medium text-slate-800">{{ display(entry.value) }}</p></div></div>
-        <p v-else class="p-8 text-sm text-slate-500">No additional information available.</p>
-      </section>
     </div>
     <div v-else-if="!loading" class="py-20 text-center text-gray-500">Motor property not found.</div>
 
@@ -67,7 +62,7 @@ export default {
   components: { Loading, Toast, EditMotor },
   data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, imageForm: { description: "" }, editMotorVisible: false }),
   computed: {
-    tabs() { return [{ id: "details", label: "Motor details" }, { id: "additional", label: "Additional information" }, { id: "pictures", label: "Images" }]; },
+    tabs() { return [{ id: "details", label: "Motor details" }, { id: "pictures", label: "Images" }]; },
     canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); },
     entries() { return [{key:"name",label:"Motor name"},{key:"property_type",label:"Motor type"},{key:"motor_type",label:"Motor subtype"},{key:"usage",label:"Condition"},{key:"make",label:"Make"},{key:"brand",label:"Brand"},{key:"model",label:"Model"},{key:"year",label:"Year"},{key:"color",label:"Color"},{key:"registration_number",label:"Registration number"},{key:"price",label:"Price"},{key:"location",label:"Location"},{key:"owner",label:"Owner"},{key:"manager",label:"Manager"},{key:"description",label:"Description"},{key:"created_at",label:"Created"},{key:"updated_at",label:"Last updated"}]; },
     extraEntries() { return Object.entries(this.motor || {}).filter(([key]) => !known.includes(key) && key !== "id" && !key.endsWith("_id") && !["user_permissions","groups","is_staff","is_superuser","is_active","last_login","date_joined","profile_picture","whats_app_link"].includes(key)).map(([key,value]) => ({key,value})); },
