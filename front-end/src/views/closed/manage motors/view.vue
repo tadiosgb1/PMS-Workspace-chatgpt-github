@@ -29,7 +29,7 @@
             <select v-if="field.key === 'usage'" v-model="filters.usage" class="w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">All usages</option><option v-for="usage in usageOptions" :key="usage" :value="usage">{{ usage }}</option></select>
             <select v-else-if="field.key === 'usage__in'" v-model="usageSelect" @change="syncUsageFilter" class="w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">Add usage...</option><option v-for="usage in usageOptions" :key="usage" :value="usage">{{ usage }}</option></select>
             <input v-if="field.key === 'usage__in'" v-model="filters.usage__in" type="text" placeholder="new, used" class="mt-2 w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary" />
-            <input v-else v-model="filters[field.key]" :type="field.type || 'text'" :step="field.type === 'number' ? 'any' : undefined" :placeholder="field.placeholder || field.label" class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            <input v-else-if="field.key !== 'usage' && field.key !== 'usage__in'" v-model="filters[field.key]" :type="field.type || 'text'" :step="field.type === 'number' ? 'any' : undefined" :placeholder="field.placeholder || field.label" class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
             <span v-if="field.key === 'usage__in'" class="mt-1 block text-[11px] text-gray-500">Choose multiple usages from the dropdown or type comma-separated values.</span>
           </label>
         </div>
