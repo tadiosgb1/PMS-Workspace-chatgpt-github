@@ -16,9 +16,9 @@
       <section v-if="activeTab === 'details'" class="overflow-hidden border border-slate-200 bg-white">
         <header class="border-b border-slate-200 bg-slate-50/70 px-5 py-5 md:px-6"><p class="text-xs font-bold uppercase tracking-wider text-primary">Motor details</p><h2 class="mt-1 text-xl font-bold text-slate-950">Specifications and contacts</h2><p class="mt-1 text-sm text-slate-600">A clear overview of the motor, its pricing, and assigned contacts.</p></header>
         <div class="grid grid-cols-1 gap-3 p-4 sm:p-5 md:grid-cols-2 xl:gap-4">
-          <article v-for="entry in entries" :key="entry.key" class="min-w-0 border border-slate-200 bg-white p-4 transition hover:border-slate-300 hover:shadow-sm sm:p-5" :class="entry.key === 'description' ? 'md:col-span-2' : ''">
-            <p class="text-[11px] font-bold uppercase tracking-[.12em] text-slate-500">{{ entry.label }}</p>
-            <p class="mt-2 min-h-6 break-words text-sm font-medium leading-6 text-slate-900">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p>
+          <article v-for="entry in entries" :key="entry.key" class="flex min-w-0 items-start gap-3 border border-slate-200 bg-white px-3 py-2.5 transition hover:border-slate-300 hover:shadow-sm" :class="entry.key === 'description' ? 'md:col-span-2' : ''">
+            <p class="w-28 shrink-0 pt-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ entry.label }}</p>
+            <p class="min-w-0 flex-1 break-words text-sm font-medium leading-5 text-slate-900">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p>
           </article>
         </div>
       </section>
