@@ -51,6 +51,23 @@
           </form>
         </section>
       </div>
+      <div v-if="deleteConfirmPicture" class="fixed inset-0 z-[10001] flex items-center justify-center bg-slate-950/60 p-4" @click.self="cancelDeletePicture">
+        <section class="w-full max-w-md overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="delete-picture-title">
+          <div class="flex items-start gap-4 p-5">
+            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-red-50 text-red-600"><i class="fas fa-trash"></i></div>
+            <div class="min-w-0 flex-1">
+              <h2 id="delete-picture-title" class="text-base font-bold text-slate-900">Delete motor picture?</h2>
+              <p class="mt-2 text-sm leading-5 text-slate-600">Are you sure you want to delete this picture? This action cannot be undone.</p>
+              <p v-if="deleteConfirmPicture.description" class="mt-2 break-words text-xs font-medium text-slate-500">{{ deleteConfirmPicture.description }}</p>
+            </div>
+            <button type="button" @click="cancelDeletePicture" class="grid h-8 w-8 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Close confirmation"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex justify-end gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-4">
+            <button type="button" @click="cancelDeletePicture" :disabled="deletingPictureId !== null" class="h-9 rounded-md border border-slate-300 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50">Cancel</button>
+            <button type="button" @click="confirmDeletePicture" :disabled="deletingPictureId !== null" class="inline-flex h-9 items-center gap-2 rounded-md bg-red-600 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:cursor-not-allowed disabled:opacity-50"><i class="fas fa-trash text-[10px]"></i>{{ deletingPictureId !== null ? 'Deleting…' : 'Delete picture' }}</button>
+          </div>
+        </section>
+      </div>
     </Teleport>
   </div>
 </template>
@@ -63,7 +80,7 @@ const known = ["name", "motor_type", "property_type", "brand", "model", "registr
 export default {
   name: "ManageMotorsDetail",
   components: { Loading, Toast, EditMotor },
-  data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, deletingPictureId: null, imageForm: { description: "" }, editMotorVisible: false }),
+  data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, deletingPictureId: null, deleteConfirmPicture: null, imageForm: { description: "" }, editMotorVisible: false }),
   computed: {
     tabs() { return [{ id: "details", label: "Motor details" }, { id: "pictures", label: "Images" }]; },
     canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); },
@@ -105,13 +122,22 @@ export default {
     label(key) { return key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()); },
     openAddImage() { this.editingPicture = null; this.imageForm = { description: "" }; this.selectedImage = null; this.resetPreview(); this.imageModalOpen = true; },
     openEditImage(picture) { this.editingPicture = picture; this.imageForm = { description: picture?.description || "" }; this.selectedImage = null; this.resetPreview(); this.imageModalOpen = true; },
-    async deletePicture(picture) {
+    deletePicture(picture) {
       if (!picture?.id) { this.$root.$refs.toast?.showToast("Image ID is missing; cannot delete this picture.", "error"); return; }
-      if (!window.confirm("Are you sure you want to delete this motor picture? This action cannot be undone.")) return;
+      this.deleteConfirmPicture = picture;
+    },
+    cancelDeletePicture() {
+      if (this.deletingPictureId !== null) return;
+      this.deleteConfirmPicture = null;
+    },
+    async confirmDeletePicture() {
+      const picture = this.deleteConfirmPicture;
+      if (!picture?.id || this.deletingPictureId !== null) return;
       this.deletingPictureId = picture.id;
       try {
         const response = await this.$apiDelete("/delete_motor_property_picture", picture.id);
         if (response?.error) throw new Error(typeof response.error === "string" ? response.error : "Could not delete the image.");
+        this.deleteConfirmPicture = null;
         this.$root.$refs.toast?.showToast("Motor picture deleted successfully", "success");
         await this.loadMotor();
         this.activeTab = "pictures";
