@@ -32,16 +32,16 @@
               <label for="offplan-search" class="mb-1 block text-[11px] font-semibold text-slate-600">Search properties</label>
               <div class="relative">
                 <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
-                <input id="offplan-search" v-model="search" type="search" class="w-full border border-slate-300 bg-white py-2 pl-8 pr-3 text-xs text-slate-800 outline-none focus:border-primary" placeholder="Search developer, type, location…" />
+                <input id="offplan-search" v-model="search" @keyup.enter="applyFilters" type="search" class="w-full border border-slate-300 bg-white py-2 pl-8 pr-3 text-xs text-slate-800 outline-none focus:border-primary" placeholder="Search developer, type, location…" />
               </div>
             </div>
             <div>
               <label for="offplan-zone" class="mb-1 block text-[11px] font-semibold text-slate-600">Property zone</label>
-              <input id="offplan-zone" v-model.trim="filters.property_zone" class="w-full border border-slate-300 px-2.5 py-2 text-xs outline-none focus:border-primary" placeholder="Any zone" />
+              <select id="offplan-zone" v-model="filters.property_zone" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary"><option value="">All zones</option><option v-for="zone in zones" :key="zone.id" :value="String(zone.id)">{{ zone.name }}</option></select>
             </div>
             <div>
               <label for="offplan-type" class="mb-1 block text-[11px] font-semibold text-slate-600">Property type</label>
-              <input id="offplan-type" v-model.trim="filters.property_type" class="w-full border border-slate-300 px-2.5 py-2 text-xs outline-none focus:border-primary" placeholder="Any type" />
+              <select id="offplan-type" v-model="filters.property_type" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary"><option value="">All property types</option><option v-for="type in propertyTypes" :key="type.id" :value="type.name">{{ type.name }}</option><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="industrial">Industrial</option><option value="land">Land</option><option value="mixed_use">Mixed use</option></select>
             </div>
             <div>
               <label for="offplan-project-status" class="mb-1 block text-[11px] font-semibold text-slate-600">Project status</label>
@@ -78,7 +78,7 @@
                 <option value="">Default order</option>
                 <option v-for="field in orderingFields" :key="field.value" :value="field.value">{{ field.label }}</option>
               </select>
-              <span class="text-[10px] text-slate-500">{{ filteredProperties.length }} result<span v-if="filteredProperties.length !== 1">s</span></span>
+              <span class="text-[10px] text-slate-500">{{ filteredProperties.length }} result<span v-if="filteredProperties.length !== 1">s</span></span><button @click="applyFilters" class="border border-primary bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90"><i class="fas fa-filter mr-1"></i>Apply filters</button>
               <button @click="resetFilters" class="border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Clear filters</button>
               <button @click="loadProperties" class="border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"><i class="fas fa-rotate mr-1"></i>Refresh</button>
             </div>
@@ -97,7 +97,7 @@
           </header>
           <div class="overflow-y-auto p-5">
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div v-for="field in exactTextFilters" :key="field.key" class="min-w-0">
+              <div v-if="canFilterOwners" class="min-w-0"><label for="offplan-owner-filter" class="mb-1.5 block text-xs font-semibold text-slate-600">Owner</label><select id="offplan-owner-filter" v-model="filters.owner" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary"><option value="">All owners</option><option v-for="person in owners" :key="person.id" :value="String(person.id)">{{ person.name }}</option></select></div><div v-if="canFilterManagers" class="min-w-0"><label for="offplan-manager-filter" class="mb-1.5 block text-xs font-semibold text-slate-600">Manager</label><select id="offplan-manager-filter" v-model="filters.manager" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary"><option value="">All managers</option><option v-for="person in managers" :key="person.id" :value="String(person.id)">{{ person.name }}</option></select></div><div v-for="field in exactTextFilters" :key="field.key" class="min-w-0">
                 <label :for="'offplan-filter-' + field.key" class="mb-1.5 block text-xs font-semibold text-slate-600">{{ field.label }}</label>
                 <input :id="'offplan-filter-' + field.key" v-model.trim="filters[field.key]" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" :placeholder="'Any ' + field.label.toLowerCase()" />
               </div>
@@ -138,7 +138,7 @@
             <button type="button" @click="resetFilters" class="border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Clear filters</button>
             <div class="flex justify-end gap-2">
               <button type="button" @click="showMoreFilters = false" class="border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
-              <button type="button" @click="showMoreFilters = false" class="bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"><i class="fas fa-filter mr-2"></i>Apply filters</button>
+              <button type="button" @click="applyFilters" class="bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"><i class="fas fa-filter mr-2"></i>Apply filters</button>
             </div>
           </footer>
         </section>
@@ -222,9 +222,14 @@ export default {
   data() {
     return {
       properties: [],
+      zones: [],
+      propertyTypes: [],
+      owners: [],
+      managers: [],
+      role: "",
       search: "",
       showMoreFilters: false,
-      ordering: "",
+      ordering: "-id",
       filters: {
         property_zone: "", owner: "", manager: "", property_type: "", completion_status: "",
         sale_type: "", project_completion: "", project_status: "", pre_handover_payment: "",
@@ -242,16 +247,16 @@ export default {
   },
   computed: {
     filterOptions() {
-      const fields = ["project_status", "completion_status", "sale_type", "project_completion"];
-      return fields.reduce((options, key) => {
-        options[key] = [...new Set(this.properties.map(item => item?.[key]).filter(value => value !== null && value !== undefined && value !== ""))].sort((a, b) => String(a).localeCompare(String(b)));
+      const fields = { project_status: ["planned", "under_construction", "completed"], completion_status: ["ready", "offplan", "under_construction"], sale_type: ["initial_sale", "resale", "rent", "lease"], project_completion: ["under_25", "25_50", "50_75", "over_75"] };
+      return Object.keys(fields).reduce((options, key) => {
+        options[key] = [...new Set([...fields[key], ...this.properties.map(item => item?.[key])].filter(value => value !== null && value !== undefined && value !== ""))].sort((a, b) => String(a).localeCompare(String(b)));
         return options;
       }, {});
     },
+    canFilterOwners() { return ["superuser", "super_user", "super_staff"].includes(this.role); },
+    canFilterManagers() { return ["owner", "staff"].includes(this.role); },
     exactTextFilters() {
       return [
-        { key: "owner", label: "Owner" },
-        { key: "manager", label: "Manager" },
         { key: "developer", label: "Developer" },
         { key: "location", label: "Location" },
         { key: "handover_period", label: "Handover period" }
@@ -268,68 +273,15 @@ export default {
       ];
     },
     orderingFields() {
-      return [
-        "id", "property_zone", "owner", "manager", "property_type", "completion_status", "price",
-        "bedrooms", "bathrooms", "min_area", "max_area", "sale_type", "project_completion",
-        "pre_handover_payment", "project_status", "location", "handover_period", "developer",
-        "is_furnished", "picture", "has_maids_room", "has_study", "has_central_or_ac_and_heating",
-        "has_balcony", "has_private_garden", "has_private_pool", "has_private_gym",
-        "has_private_jacuzzi", "has_shared_pool", "has_shared_spa", "created_at", "updated_at"
-      ].map(value => ({ value, label: this.display(value) })).flatMap(field => [
-        field,
-        { value: "-" + field.value, label: field.label + " (descending)" }
-      ]);
+      const fields = [["id","Property ID"],["property_zone","Property zone"],["owner","Owner"],["manager","Manager"],["property_type","Property type"],["completion_status","Completion status"],["price","Price"],["bedrooms","Bedrooms"],["bathrooms","Bathrooms"],["min_area","Minimum area"],["max_area","Maximum area"],["sale_type","Sale type"],["project_completion","Project completion"],["pre_handover_payment","Pre-handover payment"],["project_status","Project status"],["location","Location"],["handover_period","Handover period"],["developer","Developer"],["is_furnished","Furnishing"],["created_at","Date added"],["updated_at","Last updated"]];
+      return fields.flatMap(([value,label]) => [{value,label:label+" — Ascending (A to Z / lowest first)"},{value:"-"+value,label:label+" — Descending (Z to A / highest first)"}]);
     },
     activeAdvancedFilterCount() {
       const advancedKeys = Object.keys(this.filters).filter(key => !["property_zone", "property_type", "project_status", "completion_status", "price__gte", "price__lte"].includes(key));
       return advancedKeys.filter(key => this.filters[key] !== "" && this.filters[key] !== null && this.filters[key] !== undefined).length;
     },
     filteredProperties() {
-      const q = this.search.trim().toLowerCase();
-      const exactKeys = ["property_zone", "owner", "manager", "property_type", "completion_status", "sale_type", "project_completion", "project_status", "pre_handover_payment", "developer", "location", "handover_period"];
-      const numericKeys = ["price", "price__gte", "price__lte", "min_area", "min_area__gte", "min_area__lte", "max_area", "max_area__gte", "max_area__lte"];
-      const filtered = this.properties.filter(item => {
-        if (q && ![item.developer, item.property_type, item.project_status, item.completion_status, item.sale_type, item.project_completion, item.location]
-          .some(value => String(value ?? "").toLowerCase().includes(q))) return false;
-        for (const key of exactKeys) {
-          const expected = this.filters[key];
-          if (!expected) continue;
-          if (String(item?.[key] ?? "").trim().toLowerCase() !== String(expected).trim().toLowerCase()) return false;
-        }
-        if (this.filters.is_furnished !== "") {
-          const actual = item.is_furnished;
-          const isFurnished = actual === true || actual === 1 || String(actual).toLowerCase() === "true" || String(actual) === "1";
-          if (isFurnished !== (this.filters.is_furnished === "true")) return false;
-        }
-        for (const key of numericKeys) {
-          const expected = this.filters[key];
-          if (expected === "" || expected === null || expected === undefined) continue;
-          const rawValue = item[key.split("__")[0]];
-          const actual = Number(rawValue);
-          const target = Number(expected);
-          if (!Number.isFinite(actual) || !Number.isFinite(target)) return false;
-          if (key.endsWith("__gte") && actual < target) return false;
-          else if (key.endsWith("__lte") && actual > target) return false;
-          else if (!key.includes("__") && actual !== target) return false;
-        }
-        return true;
-      });
-      if (!this.ordering) return filtered;
-      const descending = this.ordering.startsWith("-");
-      const key = descending ? this.ordering.slice(1) : this.ordering;
-      return [...filtered].sort((a, b) => {
-        const left = a?.[key];
-        const right = b?.[key];
-        if (left == null && right == null) return 0;
-        if (left == null) return descending ? 1 : -1;
-        if (right == null) return descending ? -1 : 1;
-        const leftNumber = Number(left);
-        const rightNumber = Number(right);
-        const comparison = left !== "" && right !== "" && Number.isFinite(leftNumber) && Number.isFinite(rightNumber)
-          ? leftNumber - rightNumber
-          : String(left).localeCompare(String(right), undefined, { numeric: true, sensitivity: "base" });
-        return descending ? -comparison : comparison;
-      });
+      return this.properties;
     },
     underConstruction() {
       return this.filteredProperties.filter(p => p.project_status === "under_construction").length;
@@ -339,25 +291,71 @@ export default {
     }
   },
   async mounted() {
-    await this.loadProperties();
+    this.role = String(this.$getRole ? this.$getRole() : localStorage.getItem("role") || "").trim().toLowerCase().replace(/[ -]/g, "_");
+    await Promise.all([this.loadLookups(), this.loadProperties()]);
   },
   methods: {
+    normalizeList(response, keys = []) {
+      const raw = response?.data ?? response;
+      if (Array.isArray(raw)) return raw;
+      for (const key of keys) if (Array.isArray(raw?.[key])) return raw[key];
+      return Array.isArray(raw?.results) ? raw.results : [];
+    },
+    normalizePerson(item) {
+      const id = item?.id ?? item?.user_id ?? item?.owner_id ?? item?.manager_id;
+      const name = item?.name || item?.full_name || [item?.first_name, item?.last_name].filter(Boolean).join(" ") || item?.username || item?.email || ("User " + id);
+      return { id: Number(id), name: String(name).trim() };
+    },
+    async loadLookups() {
+      try {
+        const [zoneResponse, typeResponse] = await Promise.all([
+          this.$getZones({ page: 1, pageSize: 1000 }),
+          this.$apiGet("/get_property_types", { page: 1, page_size: 1000 }).catch(() => null)
+        ]);
+        this.zones = (zoneResponse?.zones || []).map(item => ({ id: item.id ?? item.zone_id, name: item.name || item.zone_name || item.title || "Unnamed zone" })).filter(item => item.id != null);
+        this.propertyTypes = this.normalizeList(typeResponse, ["property_types", "results"]).filter(item => item?.name).map(item => ({ id: item.id, name: item.name }));
+        if (this.canFilterOwners) {
+          const response = await this.$apiGet("/get_owners", { page: 1, page_size: 1000 });
+          this.owners = this.normalizeList(response, ["owners", "results"]).map(this.normalizePerson).filter(item => item.id);
+        }
+        if (this.canFilterManagers) {
+          const userId = Number(localStorage.getItem("userId") || localStorage.getItem("user_id") || localStorage.getItem("id") || 0);
+          const response = this.role === "owner"
+            ? await this.$apiGet("/get_owner_managers", { owner_id: userId, page: 1, page_size: 1000 })
+            : await this.$apiGet("/get_managers", { page: 1, page_size: 1000 });
+          this.managers = this.normalizeList(response, ["managers", "results"]).map(this.normalizePerson).filter(item => item.id);
+        }
+      } catch (e) {
+        this.error = e?.message || "Unable to load filter options.";
+      }
+    },
     async loadProperties() {
       this.loading = true;
       this.error = "";
       try {
-        const res = await this.$apiGet("/get_offplan_properties");
-        const data = res?.data?.data || res?.data || res?.properties || res;
-        this.properties = Array.isArray(data) ? data : (data?.results || []);
+        const params = { search: this.search.trim(), ordering: this.ordering || "-id" };
+        Object.entries(this.filters).forEach(([key, value]) => {
+          if (value === "" || value === null || value === undefined) return;
+          if (key === "owner" && !this.canFilterOwners) return;
+          if (key === "manager" && !this.canFilterManagers) return;
+          params[key] = value;
+        });
+        const response = await this.$apiGet("/get_offplan_properties", params);
+        const data = response?.data?.data || response?.data || response?.properties || response;
+        this.properties = Array.isArray(data) ? data : (data?.results || data?.properties || []);
       } catch (e) {
         this.error = e?.message || "Unable to load offplan properties.";
       } finally {
         this.loading = false;
       }
     },
+    applyFilters() {
+      this.showMoreFilters = false;
+      this.loadProperties();
+    },
     resetFilters() {
       this.search = "";
-      this.ordering = "";
+      this.ordering = "-id";
       this.filters = {
         property_zone: "", owner: "", manager: "", property_type: "", completion_status: "",
         sale_type: "", project_completion: "", project_status: "", pre_handover_payment: "",
@@ -367,6 +365,7 @@ export default {
         developer: "", location: "", handover_period: ""
       };
       this.showMoreFilters = false;
+      this.loadProperties();
     },
     openAdd() {
       this.addOpen = true;
