@@ -9,13 +9,21 @@
           </div>
           <button type="button" @click="$emit('close')" aria-label="Close modal" class="grid h-9 w-9 place-items-center border border-gray-300 text-xl text-gray-600 hover:bg-gray-100">&times;</button>
         </header>
-        <form id="motorAddForm" @submit.prevent="submit" class="max-h-[75vh] overflow-y-auto px-5 py-5 sm:px-6">
+        <form id="motorAddForm" @submit.prevent="step === 1 ? nextStep() : submit()" class="max-h-[75vh] overflow-y-auto px-5 py-5 sm:px-6">
           <div class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-            <label class="field">Motor name <span class="required">*</span><input v-model.trim="form.name" required class="control" placeholder="Motor name" /></label>
-            <label class="field">Motor type <span class="required">*</span><select v-model="form.motor_type" required class="control"><option value="">Select motor type</option><option v-for="type in motorTypes" :key="type" :value="type">{{ type }}</option></select></label>
-            <label class="field">Property type <span class="required">*</span><input v-model.trim="form.property_type" required class="control" placeholder="Property type" /></label>
-            <label class="field">Usage <span class="required">*</span><input v-model.trim="form.usage" required class="control" placeholder="e.g. Personal, business, rental" /></label>
-            <label class="field sm:col-span-2">Location <span class="required">*</span><input v-model.trim="form.location" required class="control" placeholder="Enter motor location" /></label>
+            <div v-if="step === 1" class="contents">
+              <label class="field">Motor name <span class="required">*</span><input v-model.trim="form.name" required class="control" placeholder="Motor name" /></label>
+              <label class="field">Motor type <span class="required">*</span><select v-model="form.motor_type" required class="control"><option value="">Select motor type</option><option v-for="type in motorTypes" :key="type" :value="type">{{ type }}</option></select></label>
+              <label class="field">Property type <span class="required">*</span><input v-model.trim="form.property_type" required class="control" placeholder="Property type" /></label>
+              <label class="field">Usage <span class="required">*</span><input v-model.trim="form.usage" required class="control" placeholder="e.g. Personal, business, rental" /></label>
+              <label class="field sm:col-span-2">Location <span class="required">*</span><input v-model.trim="form.location" required class="control" placeholder="Enter motor location" /></label>
+            </div>
+            <div v-else class="contents">
+            
+            
+            
+            
+            
             <label class="field">Brand<input v-model.trim="form.brand" class="control" placeholder="e.g. Toyota" /></label>
             <label class="field">Model<input v-model.trim="form.model" class="control" placeholder="e.g. Hilux" /></label>
             <label class="field">Registration number<input v-model.trim="form.registration_number" class="control" placeholder="Registration number" /></label>
@@ -28,8 +36,13 @@
           </div>
         </form>
         <footer class="flex items-center justify-between border-t border-gray-200 px-5 py-4 sm:px-6">
-          <button type="button" @click="$emit('close')" class="btn-secondary">Cancel</button>
-          <button form="motorAddForm" type="submit" :disabled="saving || loadingOptions" class="btn-primary">{{ saving ? "Saving…" : "Add Motor" }}</button>
+          <button v-if="step === 1" type="button" @click="$emit('close')" class="btn-secondary">Cancel</button>
+          <button v-else type="button" @click="previousStep" class="btn-secondary"><i class="fas fa-arrow-left mr-2"></i>Previous</button>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-gray-500">Step {{ step }} of 2</span>
+            <button v-if="step === 1" form="motorAddForm" type="submit" :disabled="saving || loadingOptions" class="btn-primary">Next <i class="fas fa-arrow-right ml-2"></i></button>
+            <button v-else form="motorAddForm" type="submit" :disabled="saving || loadingOptions" class="btn-primary">{{ saving ? "Saving…" : "Add Motor" }}</button>
+          </div>
         </footer>
       </section>
     </div>
@@ -56,17 +69,10 @@ export default {
       finally { this.loadingOptions = false; }
     },
     nextStep() {
-      if (this.step === 1) {
-        if (!this.form.name || !this.form.motor_type) return;
-        this.step = 2;
-        return;
-      }
-      if (this.step === 2) {
-        if (!Number(this.form.property_zone)) { this.$root.$refs.toast?.showToast("Please select a property zone", "error"); return; }
-        this.step = 3;
-      }
+      if (!this.form.name || !this.form.motor_type || !this.form.property_type || !this.form.usage || !this.form.location) return;
+      this.step = 2;
     },
-    previousStep() { if (this.step > 1) this.step -= 1; },
+    previousStep() { if (this.step > 1) this.step = 1; },
     async submit() {
       
       if (!Number(this.form.property_zone)) { this.$root.$refs.toast?.showToast("Please select a property zone", "error"); return; }
