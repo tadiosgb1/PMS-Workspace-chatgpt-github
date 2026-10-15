@@ -13,14 +13,18 @@
       </button>
     </div>
 
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-gray-100">
-      <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <input v-model="searchTerm" @input="onSearch" type="search" placeholder="Search zones..." class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <input v-if="canSearchOwnerEmail" v-model.trim="filters.owner_id__email" @input="onSearch" type="email" placeholder="Filter by owner email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <input v-if="!canSearchOwnerEmail" v-model.trim="filters.manager_id__email" @input="onSearch" type="email" placeholder="Filter by manager email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <input v-model.trim="filters.name" @input="onSearch" type="text" placeholder="Zone name (exact match)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <input v-model.trim="filters.name__icontains" @input="onSearch" type="text" placeholder="Zone name contains..." class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <select v-model="filters.ordering" @change="onSearch" aria-label="Order zones by" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+    <div class="mb-4 rounded-lg border border-gray-100 bg-white p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-sm font-bold text-gray-700">Filter zones</h2>
+        <span class="text-xs text-gray-400">Set your criteria, then apply</span>
+      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <input v-model="searchTerm" type="search" placeholder="Search zones..." class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-if="canSearchOwnerEmail" v-model.trim="filters.owner_id__email" type="email" placeholder="Filter by owner email (exact)" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-if="!canSearchOwnerEmail" v-model.trim="filters.manager_id__email" type="email" placeholder="Filter by manager email (exact)" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-model.trim="filters.name" type="text" placeholder="Zone name (exact match)" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-model.trim="filters.name__icontains" type="text" placeholder="Zone name contains..." class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <select v-model="filters.ordering" aria-label="Order zones by" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
           <option value="-id">Newest first (ID)</option>
           <option value="id">Oldest first (ID)</option>
           <option value="name">Name (A–Z)</option>
@@ -47,32 +51,32 @@
           <option value="-updated_at">Updated (newest first)</option>
         </select>
       </div>
-      <button v-if="hasActiveFilters" type="button" @click="clearFilters" class="self-start rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-50">Clear filters</button>
-
-      <div class="flex flex-wrap items-center gap-4 text-xs">
-        <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg p-1">
-          <span class="text-gray-500 px-2 font-bold uppercase tracking-wider text-[10px]">Export CSV:</span>
-          <button 
-            @click="exportToCSV('displayed')" 
-            :disabled="filteredAndSortedZones.length === 0"
-            class="px-3 py-1.5 bg-white hover:bg-gray-800 hover:text-white rounded border border-gray-200 font-semibold text-gray-700 transition disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-gray-700"
-          >
-            <i class="fas fa-file-csv mr-1 text-emerald-600"></i> Current Page
+      <div class="flex flex-col gap-3 border-t border-gray-100 pt-4 xl:flex-row xl:items-center xl:justify-between">
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" @click="applyFilters" class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-700">
+            <i class="fas fa-filter"></i> Apply filters
           </button>
-          <button 
-            @click="exportToCSV('all')" 
-            class="px-3 py-1.5 bg-white hover:bg-gray-800 hover:text-white rounded border border-gray-200 font-semibold text-gray-700 transition"
-          >
-            <i class="fas fa-file-zipper mr-1 text-emerald-600"></i> All Zones
+          <button v-if="hasActiveFilters" type="button" @click="clearFilters" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-50">
+            <i class="fas fa-rotate-left"></i> Clear filters
           </button>
         </div>
-
-        <div class="flex items-center gap-2 text-gray-500 ml-auto lg:ml-0">
-          <label class="font-semibold">Show</label>
-          <select v-model="pageSize" @change="fetchZones" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition cursor-pointer">
-            <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
-          </select>
-          <span class="text-gray-400">Total: <span class="font-semibold text-gray-600">{{ globalZones.length }}</span></span>
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between xl:justify-end">
+          <div class="flex flex-wrap items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2">
+            <span class="px-1 text-[10px] font-bold uppercase tracking-wider text-gray-500">Export CSV</span>
+            <button @click="exportToCSV('displayed')" :disabled="filteredAndSortedZones.length === 0" class="inline-flex items-center justify-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-40">
+              <i class="fas fa-file-csv text-emerald-600"></i> Current page
+            </button>
+            <button @click="exportToCSV('all')" class="inline-flex items-center justify-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-800 hover:text-white">
+              <i class="fas fa-file-zipper text-emerald-600"></i> All zones
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+            <label class="font-semibold" for="zone-page-size">Show</label>
+            <select id="zone-page-size" v-model="pageSize" @change="fetchZones" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
+              <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
+            </select>
+            <span class="text-gray-400">Total: <span class="font-semibold text-gray-600">{{ globalZones.length }}</span></span>
+          </div>
         </div>
       </div>
     </div>
@@ -353,7 +357,7 @@ export default {
       }
     },
 
-    onSearch() {
+    applyFilters() {
       this.currentPage = 1;
       this.fetchZones();
     },
