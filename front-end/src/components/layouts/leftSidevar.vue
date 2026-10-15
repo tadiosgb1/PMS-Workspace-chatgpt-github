@@ -208,7 +208,7 @@ export default {
           name: "Manage Motors",
           icon: "fas fa-motorcycle",
           route: "ManageMotors-view",
-          explicitRoles: ["superuser", "owner"],
+          explicitRoles: ["superuser", "owner", "manager", "staff"],
         },
         {
           id: "maintenance",
