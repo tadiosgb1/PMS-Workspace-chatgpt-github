@@ -183,6 +183,19 @@ const routes = [
         props: true,
       },
       {
+        path: "manage-motors",
+        name: "ManageMotors-view",
+        component: () => import('../views/closed/manage motors/view.vue'),
+        meta: { roles: ["superuser", "owner"] },
+      },
+      {
+        path: "manage-motors/detail/:id",
+        name: "ManageMotors-detail",
+        component: () => import('../views/closed/manage motors/detail.vue'),
+        props: true,
+        meta: { roles: ["superuser", "owner"] },
+      },
+      {
         path: "brands",
         name: "Brands-view",
         component: Brands,
@@ -415,12 +428,15 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
   const requiredRole = to.meta.role;
+  const requiredRoles = to.meta.roles;
   const requiredPermission = to.meta.permission;
 
   if (requiresAuth) {
     if (!isAuthenticated) {
       return next("/login");
     } else if (requiredRole && userRole !== requiredRole) {
+      return next("/access-denied");
+    } else if (requiredRoles && !requiredRoles.includes(userRole)) {
       return next("/access-denied");
     } else if (requiredPermission && !hasPermission(requiredPermission)) {
       return next("/access-denied");
