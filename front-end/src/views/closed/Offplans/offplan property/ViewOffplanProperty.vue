@@ -240,8 +240,6 @@ export default {
     },
     numericRangeFilters() {
       return [
-        { key: "price__gte", label: "Price at least", placeholder: "Minimum price" },
-        { key: "price__lte", label: "Price up to", placeholder: "Maximum price" },
         { key: "min_area", label: "Exact minimum area", placeholder: "Exact minimum area" },
         { key: "min_area__gte", label: "Minimum area at least", placeholder: "Area lower bound" },
         { key: "min_area__lte", label: "Minimum area up to", placeholder: "Area upper bound" },
