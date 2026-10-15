@@ -14,69 +14,93 @@
       </button>
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-4 bg-white p-4 rounded-lg border border-gray-100">
-      <div class="flex flex-wrap gap-3 items-center flex-1 w-full">
-        <div class="relative flex-1 max-w-sm w-full">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-          <input v-model="searchTerm" @input="onSearchInput" type="search"
-            placeholder="Search name, city, owner..."
-            class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-300 bg-white transition" />
+    <div class="mb-5 space-y-3">
+      <section aria-label="Property filters" class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div class="min-w-0 sm:col-span-2 xl:col-span-2">
+            <label for="property-search" class="mb-1.5 block text-xs font-semibold text-gray-500">Search properties</label>
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <input id="property-search" v-model="searchTerm" @input="onSearchInput" type="search"
+                placeholder="Name, city, owner..."
+                class="w-full min-w-0 rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" />
+            </div>
+          </div>
+
+          <div v-if="!zone_id_query_set" class="min-w-0">
+            <label for="property-zone-filter" class="mb-1.5 block text-xs font-semibold text-gray-500">Zone</label>
+            <select id="property-zone-filter" v-model="zone_id" @change="applyFilters()"
+              class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200">
+              <option value="">All Zones</option>
+              <option v-for="z in zones" :key="z.id" :value="z.id">{{ z.name }}</option>
+            </select>
+          </div>
+
+          <div class="min-w-0">
+            <label for="property-status-filter" class="mb-1.5 block text-xs font-semibold text-gray-500">Status</label>
+            <select id="property-status-filter" v-model="status" @change="applyFilters()"
+              class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200">
+              <option value="">All Statuses</option>
+              <option v-for="item in statusOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
+            </select>
+          </div>
+
+          <div class="min-w-0">
+            <label for="property-type-filter" class="mb-1.5 block text-xs font-semibold text-gray-500">Property type</label>
+            <select id="property-type-filter" v-model="advancedFilters['property_type__id']" @change="applyFilters()"
+              class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200">
+              <option value="">All Types</option>
+              <option v-for="item in propertyTypes" :key="item.id" :value="item.id">{{ item.name }}</option>
+            </select>
+          </div>
+
+          <div class="min-w-0">
+            <label for="property-city-filter" class="mb-1.5 block text-xs font-semibold text-gray-500">City</label>
+            <input id="property-city-filter" v-model="advancedFilters.city__icontains" @keyup.enter="applyFilters()" @change="applyFilters()" type="search"
+              placeholder="Search city"
+              class="w-full min-w-0 rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" />
+          </div>
+
+          <div class="flex min-w-0 flex-col">
+            <span class="mb-1.5 block text-xs font-semibold text-gray-500">Advanced options</span>
+            <button @click="showMoreFilters = true" type="button"
+              class="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
+              <i class="fas fa-sliders-h"></i> More filters
+              <span v-if="activeAdvancedFilterCount" class="rounded-full bg-gray-800 px-1.5 py-0.5 text-[10px] text-white">{{ activeAdvancedFilterCount }}</span>
+            </button>
+          </div>
+
+          <div class="min-w-0">
+            <label for="property-page-size" class="mb-1.5 block text-xs font-semibold text-gray-500">Rows per page</label>
+            <select id="property-page-size" v-model="pageSize" @change="applyFilters()"
+              class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200">
+              <option v-for="s in pageSizes" :key="s" :value="s">{{ s }} per page</option>
+            </select>
+          </div>
         </div>
+      </section>
 
-        <select v-if="!zone_id_query_set" v-model="zone_id" @change="applyFilters()"
-          class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
-          <option value="">All Zones</option>
-          <option v-for="z in zones" :key="z.id" :value="z.id">{{ z.name }}</option>
-        </select>
-
-        <select v-model="status" @change="applyFilters()"
-          class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
-          <option value="">All Status</option>
-          <option v-for="item in statusOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
-        </select>
-
-        <select v-model="advancedFilters['property_type__id']" @change="applyFilters()"
-          class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
-          <option value="">All Property Types</option>
-          <option v-for="item in propertyTypes" :key="item.id" :value="item.id">{{ item.name }}</option>
-        </select>
-
-        <input v-model="advancedFilters.city__icontains" @keyup.enter="applyFilters()" @change="applyFilters()" type="search"
-          placeholder="Search city"
-          class="w-full sm:w-32 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-
-        <button @click="showMoreFilters = true" type="button"
-          class="inline-flex items-center justify-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 whitespace-nowrap">
-          <i class="fas fa-sliders-h"></i> More filters
-          <span v-if="activeAdvancedFilterCount" class="rounded-full bg-gray-800 text-white text-[10px] px-1.5 py-0.5">{{ activeAdvancedFilterCount }}</span>
-        </button>
-
-        <select v-model="pageSize" @change="applyFilters()"
-          class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
-          <option v-for="s in pageSizes" :key="s" :value="s">{{ s }} / page</option>
-        </select>
-      </div>
-
-      <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg p-1 w-full lg:w-auto justify-between lg:justify-start">
-        <span class="text-gray-500 px-2 font-bold uppercase tracking-wider text-[10px] whitespace-nowrap">Export Data:</span>
-        <div class="flex items-center gap-1">
-          <button 
-            @click="exportToCSV('displayed')" 
+      <section aria-label="Export property data" class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-gray-800">Export data</h2>
+          <p class="mt-0.5 text-xs text-gray-500">Download results using the current filters.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+          <button
+            @click="exportToCSV('displayed')"
             :disabled="properties.length === 0"
-            class="px-2.5 py-1.5 bg-white hover:bg-gray-800 hover:text-white rounded border border-gray-200 text-xs font-semibold text-gray-700 transition disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-gray-700"
-            title="Export properties visible on current page matching filters"
-          >
-            <i class="fas fa-file-csv mr-1 text-emerald-600"></i> Current page
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            title="Export properties visible on current page matching filters">
+            <i class="fas fa-file-csv text-emerald-600"></i> Current page
           </button>
-          <button 
-            @click="exportToCSV('all')" 
-            class="px-2.5 py-1.5 bg-white hover:bg-gray-800 hover:text-white rounded border border-gray-200 text-xs font-semibold text-gray-700 transition"
-            title="Export all database records across pages matching filters"
-          >
-            <i class="fas fa-database mr-1 text-emerald-600"></i> All properties
+          <button
+            @click="exportToCSV('all')"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700"
+            title="Export all properties matching the current filters">
+            <i class="fas fa-download"></i> All matching properties
           </button>
         </div>
-      </div>
+      </section>
     </div>
 
     <div v-if="showMoreFilters" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-3 sm:p-6" @click.self="showMoreFilters = false">
