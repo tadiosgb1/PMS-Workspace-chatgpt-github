@@ -41,7 +41,7 @@
           <option v-for="item in propertyTypes" :key="item.id" :value="item.id">{{ item.name }}</option>
         </select>
 
-        <input v-model="advancedFilters.city__icontains" @keyup.enter="applyFilters()" type="search"
+        <input v-model="advancedFilters.city__icontains" @keyup.enter="applyFilters()" @change="applyFilters()" type="search"
           placeholder="Search city"
           class="w-full sm:w-32 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
 
@@ -478,6 +478,8 @@ export default {
         params.property_zone_id = selectedZoneId;
       }
       Object.entries(this.advancedFilters).forEach(([key, rawValue]) => {
+        if (key === "property_zone_id__owner_id__email" && !this.canSearchZoneOwnerEmail) return;
+        if (key === "property_zone_id__manager_id__email" && !this.canSearchZoneManagerEmail) return;
         const value = rawValue == null ? "" : String(rawValue).trim();
         if (!value) return;
         if (key === "furnished") {
@@ -636,11 +638,19 @@ export default {
         if (type === "displayed") {
           dataset = this.properties;
         } else if (type === "all") {
-          // Direct API query hitting maximum bounds with matching parameters to process background pipeline
-          const params = { ...this.buildPropertyQuery(), page: 1, page_size: 1000000 };
-          // Export uses exactly the same active filters as the property list.
-          const result = await this.$getProperties(params);
-          dataset = result.properties || [];
+          // Fetch every page with the same active filters used by the property list.
+          const baseParams = this.buildPropertyQuery();
+          const exportPageSize = 1000;
+          let page = 1;
+          let totalPages = 1;
+          do {
+            const result = await this.$getProperties({ ...baseParams, page, page_size: exportPageSize });
+            const pageRows = result.properties || [];
+            dataset.push(...pageRows);
+            totalPages = Number(result.totalPages) || 1;
+            page += 1;
+            if (pageRows.length === 0) break;
+          } while (page <= totalPages);
         }
 
         if (dataset.length === 0) {
