@@ -32,8 +32,8 @@
           <Field label="Bathrooms"><input v-model="form.bathrooms" class="input" /></Field>
           <Field label="Area / size"><input v-model="form.area_or_size" class="input" /></Field>
           <Field label="Sale type"><select v-model="form.sale_type" class="input"><option value="initial_sale">Initial sale</option><option value="resale">Resale</option></select></Field>
-          <Field label="Project completion"><select v-model="form.project_completion" class="input"><option value="under_25">Under 25%</option><option value="25_50">25% – 50%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
-          <Field label="Pre-handover payment"><select v-model="form.pre_handover_payment" class="input"><option value="under_25">Under 25%</option><option value="25_50">25% – 50%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
+          <Field label="Project completion"><select v-model="form.project_completion" class="input"><option value="under_25">Under 25%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
+          <Field label="Pre-handover payment"><select v-model="form.pre_handover_payment" class="input"><option value="under_25">Under 25%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
           <Field label="Project status"><select v-model="form.project_status" class="input"><option value="under_construction">Under construction</option><option value="planned">Planned</option><option value="completed">Completed</option></select></Field>
           <Field label="Developer"><input v-model="form.developer" class="input" /></Field>
           <Field label="Property zone" required>
