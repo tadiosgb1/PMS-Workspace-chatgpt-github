@@ -13,10 +13,13 @@
         <button v-for="tab in tabs" :key="tab.id" type="button" @click="activeTab = tab.id" :class="['whitespace-nowrap border-b-2 px-1 py-4 text-sm font-semibold transition', activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-900']">{{ tab.label }} <span v-if="tab.id === 'pictures'" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px]">{{ pictures.length }}</span></button>
       </nav>
 
-      <section v-if="activeTab === 'details'" class="bg-white">
-        <header class="border-b border-slate-200 py-5"><p class="text-xs font-bold uppercase tracking-wider text-primary">Motor details</p><h2 class="mt-1 text-xl font-bold text-slate-950">Specifications and contacts</h2><p class="mt-1 text-sm text-slate-600">Each field is listed clearly below. Empty values are left blank.</p></header>
-        <div class="grid grid-cols-1 gap-0">
-          <div v-for="entry in entries" :key="entry.key" class="grid min-w-0 grid-cols-1 gap-1 border-b border-slate-200 py-4 sm:grid-cols-[minmax(190px,260px)_minmax(0,1fr)] sm:gap-6"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 sm:pt-1">{{ entry.label }}</p><p class="min-h-6 break-words text-base font-medium leading-6 text-slate-950">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p></div>
+      <section v-if="activeTab === 'details'" class="overflow-hidden border border-slate-200 bg-white">
+        <header class="border-b border-slate-200 bg-slate-50/70 px-5 py-5 md:px-6"><p class="text-xs font-bold uppercase tracking-wider text-primary">Motor details</p><h2 class="mt-1 text-xl font-bold text-slate-950">Specifications and contacts</h2><p class="mt-1 text-sm text-slate-600">A clear overview of the motor, its pricing, and assigned contacts.</p></header>
+        <div class="grid grid-cols-1 gap-3 p-4 sm:p-5 md:grid-cols-2 xl:gap-4">
+          <article v-for="entry in entries" :key="entry.key" class="min-w-0 border border-slate-200 bg-white p-4 transition hover:border-slate-300 hover:shadow-sm sm:p-5" :class="entry.key === 'description' ? 'md:col-span-2' : ''">
+            <p class="text-[11px] font-bold uppercase tracking-[.12em] text-slate-500">{{ entry.label }}</p>
+            <p class="mt-2 min-h-6 break-words text-sm font-medium leading-6 text-slate-900">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p>
+          </article>
         </div>
       </section>
 
