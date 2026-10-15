@@ -33,6 +33,7 @@
             <label class="field">Property zone <span class="required">*</span><select v-model.number="form.property_zone" required class="control"><option :value="0" disabled>Select a zone</option><option v-for="zone in zones" :key="zone.id" :value="Number(zone.id)">{{ zone.name || zone.zone_name || ('Zone #' + zone.id) }}</option></select></label>
             <label class="field">Manager <span class="optional">Optional</span><select v-model.number="form.manager" class="control"><option :value="0">No manager assigned</option><option v-for="manager in managers" :key="manager.id" :value="Number(manager.id)">{{ managerLabel(manager) }}</option></select></label>
             <label class="field sm:col-span-2">Description <span class="optional">Optional</span><textarea v-model.trim="form.description" rows="2" class="control resize-y" placeholder="Additional details (optional)"></textarea></label>
+            </div>
           </div>
         </form>
         <footer class="flex items-center justify-between border-t border-gray-200 px-5 py-4 sm:px-6">
