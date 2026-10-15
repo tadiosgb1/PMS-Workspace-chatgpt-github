@@ -29,18 +29,29 @@
           <option v-for="z in zones" :key="z.id" :value="z.id">{{ z.name }}</option>
         </select>
 
-        <select v-model="status" @change="fetchProperties()"
+        <select v-model="status" @change="applyFilters()"
           class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
           <option value="">All Status</option>
-          <option value="available">Available (New)</option>
-          <option value="for_rent">Available for Rent</option>
-          <option value="for_sale">Available for Sale</option>
-          <option value="rent">Rented</option>
-          <option value="sale">Sold</option>
-          <option value="under_maintenance">Under Maintenance</option>
+          <option v-for="item in statusOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
         </select>
 
-        <select v-model="pageSize" @change="fetchProperties()"
+        <select v-model="advancedFilters['property_type__name']" @change="applyFilters()"
+          class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
+          <option value="">All Property Types</option>
+          <option v-for="item in propertyTypeOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
+
+        <input v-model="advancedFilters.city__icontains" @keyup.enter="applyFilters()" type="search"
+          placeholder="City"
+          class="w-full sm:w-32 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+
+        <button @click="showMoreFilters = true" type="button"
+          class="inline-flex items-center justify-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 whitespace-nowrap">
+          <i class="fas fa-sliders-h"></i> More filters
+          <span v-if="activeAdvancedFilterCount" class="rounded-full bg-gray-800 text-white text-[10px] px-1.5 py-0.5">{{ activeAdvancedFilterCount }}</span>
+        </button>
+
+        <select v-model="pageSize" @change="applyFilters()"
           class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
           <option v-for="s in pageSizes" :key="s" :value="s">{{ s }} / page</option>
         </select>
@@ -66,6 +77,52 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <div v-if="showMoreFilters" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-3 sm:p-6" @click.self="showMoreFilters = false">
+      <section role="dialog" aria-modal="true" aria-labelledby="property-filter-title" class="w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col">
+        <header class="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4">
+          <div>
+            <h2 id="property-filter-title" class="text-base font-bold text-gray-800">More property filters</h2>
+            <p class="mt-1 text-xs text-gray-500">Combine filters to narrow results. For list filters, enter comma-separated values.</p>
+          </div>
+          <button type="button" @click="showMoreFilters = false" aria-label="Close filters" class="h-8 w-8 rounded-lg text-gray-500 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+        </header>
+        <div class="overflow-y-auto p-5">
+          <div class="mb-4 relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input v-model="filterFieldSearch" type="search" placeholder="Find a filter (e.g. owner email, price, address)"
+              class="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <label v-for="field in visibleAdvancedFields" :key="field.key" class="block min-w-0">
+              <span class="mb-1.5 block text-xs font-semibold text-gray-600">{{ field.label }}</span>
+              <select v-if="field.options === 'status'" v-model="advancedFilters[field.key]" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <option value="">Any status</option>
+                <option v-for="item in statusOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
+              </select>
+              <select v-else-if="field.options === 'zones'" v-model="advancedFilters[field.key]" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <option value="">Choose a zone</option>
+                <option v-for="z in zones" :key="z.id" :value="field.key === 'property_zone_id' ? z.id : z.name">{{ z.name }}</option>
+              </select>
+              <select v-else-if="field.options === 'propertyTypes'" v-model="advancedFilters[field.key]" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <option value="">Any property type</option>
+                <option v-for="item in propertyTypeOptions" :key="item" :value="item">{{ item }}</option>
+              </select>
+              <input v-else v-model="advancedFilters[field.key]" :type="field.type || 'text'" :placeholder="field.placeholder || field.key"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+              <span v-if="field.hint" class="mt-1 block text-[10px] text-gray-400">{{ field.hint }}</span>
+            </label>
+          </div>
+        </div>
+        <footer class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 bg-gray-50 px-5 py-4">
+          <button type="button" @click="clearFilters" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Clear filters</button>
+          <div class="flex gap-2 justify-end">
+            <button type="button" @click="showMoreFilters = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700">Cancel</button>
+            <button type="button" @click="applyFilters" class="rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"><i class="fas fa-filter mr-2"></i>Apply filters</button>
+          </div>
+        </footer>
+      </section>
     </div>
 
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
@@ -250,8 +307,135 @@ export default {
       searchTerm: "", currentPage: 1, totalPages: 1, next: null, previous: null,
       pageSize: 10, pageSizes: [10, 20, 50, 100, 1000],
       ordering: "-id", status: "",
+      showMoreFilters: false, filterFieldSearch: "",
+      statusOptions: [
+        { value: "available", label: "Available (New)" },
+        { value: "for_rent", label: "Available for Rent" },
+        { value: "for_sale", label: "Available for Sale" },
+        { value: "rent", label: "Rented" },
+        { value: "sale", label: "Sold" },
+        { value: "under_maintenance", label: "Under Maintenance" },
+      ],
+      advancedFilters: {
+        "ordering": "",
+        "property_zone_id__name": "",
+        "property_zone_id__owner_id__email": "",
+        "property_zone_id__manager_id__email": "",
+        "property_zone_id__owner_id__id": "",
+        "property_zone_id__manager_id__id": "",
+        "status": "",
+        "status__in": "",
+        "property_zone_id": "",
+        "property_type__name": "",
+        "property_type__name__in": "",
+        "property_type__name__icontains": "",
+        "property_type__id": "",
+        "property_type__id__in": "",
+        "property_type__parent_property_type__name": "",
+        "property_type__parent_property_type__name__in": "",
+        "property_type__parent_property_type__name__icontains": "",
+        "property_type__parent_property_type__id": "",
+        "property_type__parent_property_type__id__in": "",
+        "property_type_category": "",
+        "property_type_category__id": "",
+        "property_type_category__id__in": "",
+        "property_type_category__name": "",
+        "property_type_category__name__in": "",
+        "property_type_category__name__icontains": "",
+        "property_type_category__property_type__id": "",
+        "property_type_category__property_type__id__in": "",
+        "property_type_category__property_type__name": "",
+        "property_type_category__property_type__name__in": "",
+        "property_type_category__property_type__name__icontains": "",
+        "city": "",
+        "city__icontains": "",
+        "address": "",
+        "address__icontains": "",
+        "state": "",
+        "state__icontains": "",
+        "price": "",
+        "price__gte": "",
+        "price__lte": "",
+        "price__gt": "",
+        "price__lt": "",
+        "property_type_category__property_type__is_sellable": "",
+        "property_type_category__property_type__is_rentable": "",
+        "furnished": "",
+        "property_type_category__property_type__has_project_completion": "",
+        "property_type_category__property_type__project_completion_year": "",
+        "property_type_category__property_type__has_project_status": "",
+        "property_type_category__property_type__project_status": "",
+        "property_type_category__property_type__has_pre_handover_payment": "",
+        "property_type_category__property_type__pre_handover_payment": "",
+      },
+      advancedFields: [
+        { key: "ordering", label: "Sort order" },
+        { key: "property_zone_id__name", label: "Zone name", options: "zones" },
+        { key: "property_zone_id__owner_id__email", label: "Zone owner email" },
+        { key: "property_zone_id__manager_id__email", label: "Zone manager email" },
+        { key: "property_zone_id__owner_id__id", label: "Zone owner ID" },
+        { key: "property_zone_id__manager_id__id", label: "Zone manager ID" },
+        { key: "status", label: "Status", options: "status" },
+        { key: "status__in", label: "Statuses (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_zone_id", label: "Property zone", options: "zones" },
+        { key: "property_type__name", label: "Property type", options: "propertyTypes" },
+        { key: "property_type__name__in", label: "Property types (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type__name__icontains", label: "Property type contains" },
+        { key: "property_type__id", label: "Property type ID" },
+        { key: "property_type__id__in", label: "Property type IDs (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type__parent_property_type__name", label: "Parent property type" },
+        { key: "property_type__parent_property_type__name__in", label: "Parent types (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type__parent_property_type__name__icontains", label: "Parent type contains" },
+        { key: "property_type__parent_property_type__id", label: "Parent property type ID" },
+        { key: "property_type__parent_property_type__id__in", label: "Parent type IDs (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type_category", label: "Property type category" },
+        { key: "property_type_category__id", label: "Category ID" },
+        { key: "property_type_category__id__in", label: "Category IDs (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type_category__name", label: "Category name" },
+        { key: "property_type_category__name__in", label: "Category names (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type_category__name__icontains", label: "Category name contains" },
+        { key: "property_type_category__property_type__id", label: "Category property type ID" },
+        { key: "property_type_category__property_type__id__in", label: "Category property type IDs (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type_category__property_type__name", label: "Category property type name" },
+        { key: "property_type_category__property_type__name__in", label: "Category property type names (comma-separated)", hint: "Comma-separated values" },
+        { key: "property_type_category__property_type__name__icontains", label: "Category property type contains" },
+        { key: "city", label: "City (exact)" },
+        { key: "city__icontains", label: "City contains" },
+        { key: "address", label: "Address (exact)" },
+        { key: "address__icontains", label: "Address contains" },
+        { key: "state", label: "State (exact)" },
+        { key: "state__icontains", label: "State contains" },
+        { key: "price", label: "Price (exact)", type: "number" },
+        { key: "price__gte", label: "Minimum price", type: "number" },
+        { key: "price__lte", label: "Maximum price", type: "number" },
+        { key: "price__gt", label: "Price greater than", type: "number" },
+        { key: "price__lt", label: "Price less than", type: "number" },
+        { key: "property_type_category__property_type__is_sellable", label: "Sellable" },
+        { key: "property_type_category__property_type__is_rentable", label: "Rentable" },
+        { key: "furnished", label: "Furnished" },
+        { key: "property_type_category__property_type__has_project_completion", label: "Has project completion" },
+        { key: "property_type_category__property_type__project_completion_year", label: "Project completion year", type: "number" },
+        { key: "property_type_category__property_type__has_project_status", label: "Has project status" },
+        { key: "property_type_category__property_type__project_status", label: "Project status" },
+        { key: "property_type_category__property_type__has_pre_handover_payment", label: "Has pre-handover payment" },
+        { key: "property_type_category__property_type__pre_handover_payment", label: "Pre-handover payment" },
+      ],
       saleVisible: false, salePropertyId: null, loading: false,
     };
+  },
+  computed: {
+    propertyTypeOptions() {
+      const values = this.properties.map((p) => p?.property_type?.name || p?.property_type).filter((v) => typeof v === "string" && v.trim());
+      return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+    },
+    visibleAdvancedFields() {
+      const query = this.filterFieldSearch.trim().toLowerCase();
+      if (!query) return this.advancedFields;
+      return this.advancedFields.filter((field) => field.label.toLowerCase().includes(query) || field.key.toLowerCase().includes(query));
+    },
+    activeAdvancedFilterCount() {
+      return Object.values(this.advancedFilters).filter((value) => value !== "" && value !== null && value !== undefined).length;
+    },
   },
   async created() {
     if (this.$route.query.zone_id) this.zone_id_query_set = true;
@@ -291,26 +475,14 @@ export default {
     async fetchProperties(url = null) {
       this.loading = true;
       try {
-        let params = {
-          page: this.currentPage,
-          page_size: this.pageSize,
-          search: this.searchTerm,
-          ordering: this.ordering,
-          status: this.status,
-        };
-        if (this.$route.query.zone_id || this.zone_id) {
-          params.property_zone_id = this.$route.query.zone_id || this.zone_id;
-        }
-
+        let params = this.buildPropertyQuery();
         if (url) {
           const urlObj = new URL(url, window.location.origin);
           params = Object.fromEntries(urlObj.searchParams.entries());
           const pageParam = urlObj.searchParams.get("page");
           if (pageParam) this.currentPage = parseInt(pageParam, 10);
-          params.status = this.status;
-          if (this.$route.query.zone_id || this.zone_id) {
-            params.property_zone_id = this.$route.query.zone_id || this.zone_id;
-          }
+          // Preserve currently selected filters while following API pagination links.
+          params = { ...this.buildPropertyQuery(), ...params, page: pageParam || this.currentPage, page_size: this.pageSize };
         }
 
         const result = await this.$getProperties(params);
@@ -322,6 +494,53 @@ export default {
       } catch (e) {
         console.error(e); this.properties = [];
       } finally { this.loading = false; }
+    },
+    buildPropertyQuery() {
+      const params = {
+        page: this.currentPage,
+        page_size: this.pageSize,
+        search: this.searchTerm.trim(),
+        ordering: this.advancedFilters.ordering || this.ordering || "-id",
+      };
+      const selectedZoneId = this.$route.query.zone_id || this.zone_id;
+      if (selectedZoneId) {
+        params.property_zone_id = selectedZoneId;
+        const selectedZone = this.zones.find((zone) => String(zone.id) === String(selectedZoneId));
+        if (selectedZone?.name) params["property_zone_id__name"] = selectedZone.name;
+      }
+      Object.entries(this.advancedFilters).forEach(([key, rawValue]) => {
+        const value = rawValue == null ? "" : String(rawValue).trim();
+        if (!value) return;
+        if (key === "ordering") {
+          params.ordering = value;
+          return;
+        }
+        if (key === "status") {
+          params.status = value;
+          return;
+        }
+        // Keep the main zone dropdown authoritative when the same zone filter is used.
+        if (key === "property_zone_id" && selectedZoneId) return;
+        params[key] = value;
+      });
+      if (this.status) params.status = this.status;
+      return params;
+    },
+    applyFilters() {
+      this.currentPage = 1;
+      this.showMoreFilters = false;
+      this.fetchProperties();
+    },
+    clearFilters() {
+      this.searchTerm = "";
+      this.zone_id = this.zone_id_query_set ? (this.$route.query.zone_id || this.$route.query.zone || "") : "";
+      this.status = "";
+      this.ordering = "-id";
+      Object.keys(this.advancedFilters).forEach((key) => { this.advancedFilters[key] = ""; });
+      this.advancedFilters.ordering = "";
+      this.currentPage = 1;
+      this.showMoreFilters = false;
+      this.fetchProperties();
     },
     onSearchInput() {
       this.currentPage = 1;
@@ -456,16 +675,7 @@ export default {
           dataset = this.properties;
         } else if (type === "all") {
           // Direct API query hitting maximum bounds with matching parameters to process background pipeline
-          const params = {
-            page: 1,
-            page_size: 1000000,
-            search: this.searchTerm,
-            ordering: this.ordering,
-            status: this.status,
-          };
-          if (this.$route.query.zone_id || this.zone_id) {
-            params.property_zone_id = this.$route.query.zone_id || this.zone_id;
-          }
+          const params = { ...this.buildPropertyQuery(), page: 1, page_size: 1000000 };
 
           const result = await this.$getProperties(params);
           dataset = result.properties || [];
