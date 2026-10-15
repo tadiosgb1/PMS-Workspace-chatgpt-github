@@ -67,9 +67,9 @@
             </div>
           </div>
           <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <button @click="showMoreFilters = !showMoreFilters" class="inline-flex items-center gap-2 border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-              <i :class="showMoreFilters ? 'fas fa-chevron-up' : 'fas fa-sliders-h'"></i>
-              {{ showMoreFilters ? 'Hide additional filters' : 'More filters' }}
+            <button @click="showMoreFilters = true" type="button" class="inline-flex items-center gap-2 border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+              <i class="fas fa-sliders-h"></i>
+              More filters
               <span v-if="activeAdvancedFilterCount" class="inline-flex min-w-5 items-center justify-center bg-slate-100 px-1.5 py-0.5 text-[10px]">{{ activeAdvancedFilterCount }}</span>
             </button>
             <div class="flex flex-wrap items-center gap-2">
@@ -84,46 +84,65 @@
             </div>
           </div>
         </div>
-        <div v-if="showMoreFilters" class="border-t border-slate-100 bg-slate-50/60 p-3">
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div v-for="field in exactTextFilters" :key="field.key">
-              <label :for="'offplan-filter-' + field.key" class="mb-1 block text-[11px] font-semibold text-slate-600">{{ field.label }}</label>
-              <input :id="'offplan-filter-' + field.key" v-model.trim="filters[field.key]" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary" :placeholder="'Any ' + field.label.toLowerCase()" />
-            </div>
-            <div>
-              <label for="offplan-sale-type" class="mb-1 block text-[11px] font-semibold text-slate-600">Sale type</label>
-              <select id="offplan-sale-type" v-model="filters.sale_type" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary">
-                <option value="">All sale types</option><option v-for="value in filterOptions.sale_type" :key="value" :value="value">{{ display(value) }}</option>
-              </select>
-            </div>
-            <div>
-              <label for="offplan-project-completion" class="mb-1 block text-[11px] font-semibold text-slate-600">Project completion</label>
-              <select id="offplan-project-completion" v-model="filters.project_completion" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary">
-                <option value="">Any completion period</option><option v-for="value in filterOptions.project_completion" :key="value" :value="value">{{ display(value) }}</option>
-              </select>
-            </div>
-            <div>
-              <label for="offplan-prehandover" class="mb-1 block text-[11px] font-semibold text-slate-600">Pre-handover payment</label>
-              <input id="offplan-prehandover" v-model.trim="filters.pre_handover_payment" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary" placeholder="Any payment plan" />
-            </div>
-            <div>
-              <label for="offplan-furnished" class="mb-1 block text-[11px] font-semibold text-slate-600">Furnishing</label>
-              <select id="offplan-furnished" v-model="filters.is_furnished" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary">
-                <option value="">Any furnishing</option><option value="true">Furnished</option><option value="false">Unfurnished</option>
-              </select>
-            </div>
-            <div>
-              <label for="offplan-price-exact" class="mb-1 block text-[11px] font-semibold text-slate-600">Exact price</label>
-              <input id="offplan-price-exact" v-model="filters.price" type="number" min="0" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary" placeholder="Exact price" />
-            </div>
-            <div v-for="field in numericRangeFilters" :key="field.key">
-              <label :for="'offplan-filter-' + field.key" class="mb-1 block text-[11px] font-semibold text-slate-600">{{ field.label }}</label>
-              <input :id="'offplan-filter-' + field.key" v-model="filters[field.key]" type="number" min="0" class="w-full border border-slate-300 bg-white px-2.5 py-2 text-xs outline-none focus:border-primary" :placeholder="field.placeholder" />
-            </div>
-          </div>
-          <p class="mt-3 text-[10px] text-slate-500">Text fields use exact matching. Numeric fields support exact, minimum and maximum values.</p>
-        </div>
       </section>
+
+      <div v-if="showMoreFilters" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-3 sm:p-6" @click.self="showMoreFilters = false">
+        <section role="dialog" aria-modal="true" aria-labelledby="offplan-filter-title" class="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
+          <header class="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
+            <div>
+              <h2 id="offplan-filter-title" class="text-base font-semibold text-slate-900">More offplan filters</h2>
+              <p class="mt-1 text-xs text-slate-500">Add details to narrow the property list. Leave fields blank to ignore them.</p>
+            </div>
+            <button type="button" @click="showMoreFilters = false" aria-label="Close filters" class="flex h-8 w-8 items-center justify-center text-slate-500 hover:bg-slate-100"><i class="fas fa-times"></i></button>
+          </header>
+          <div class="overflow-y-auto p-5">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div v-for="field in exactTextFilters" :key="field.key" class="min-w-0">
+                <label :for="'offplan-filter-' + field.key" class="mb-1.5 block text-xs font-semibold text-slate-600">{{ field.label }}</label>
+                <input :id="'offplan-filter-' + field.key" v-model.trim="filters[field.key]" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" :placeholder="'Any ' + field.label.toLowerCase()" />
+              </div>
+              <div>
+                <label for="offplan-sale-type" class="mb-1.5 block text-xs font-semibold text-slate-600">Sale type</label>
+                <select id="offplan-sale-type" v-model="filters.sale_type" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary">
+                  <option value="">All sale types</option><option v-for="value in filterOptions.sale_type" :key="value" :value="value">{{ display(value) }}</option>
+                </select>
+              </div>
+              <div>
+                <label for="offplan-project-completion" class="mb-1.5 block text-xs font-semibold text-slate-600">Project completion</label>
+                <select id="offplan-project-completion" v-model="filters.project_completion" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary">
+                  <option value="">Any completion period</option><option v-for="value in filterOptions.project_completion" :key="value" :value="value">{{ display(value) }}</option>
+                </select>
+              </div>
+              <div>
+                <label for="offplan-prehandover" class="mb-1.5 block text-xs font-semibold text-slate-600">Pre-handover payment</label>
+                <input id="offplan-prehandover" v-model.trim="filters.pre_handover_payment" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" placeholder="Any payment plan" />
+              </div>
+              <div>
+                <label for="offplan-furnished" class="mb-1.5 block text-xs font-semibold text-slate-600">Furnishing</label>
+                <select id="offplan-furnished" v-model="filters.is_furnished" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary">
+                  <option value="">Any furnishing</option><option value="true">Furnished</option><option value="false">Unfurnished</option>
+                </select>
+              </div>
+              <div>
+                <label for="offplan-price-exact" class="mb-1.5 block text-xs font-semibold text-slate-600">Exact price</label>
+                <input id="offplan-price-exact" v-model="filters.price" type="number" min="0" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" placeholder="Exact price" />
+              </div>
+              <div v-for="field in numericRangeFilters" :key="field.key" class="min-w-0">
+                <label :for="'offplan-filter-' + field.key" class="mb-1.5 block text-xs font-semibold text-slate-600">{{ field.label }}</label>
+                <input :id="'offplan-filter-' + field.key" v-model="filters[field.key]" type="number" min="0" class="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary" :placeholder="field.placeholder" />
+              </div>
+            </div>
+            <p class="mt-4 text-[11px] text-slate-500">Text filters match the full value. Numeric filters let you set exact values or area bounds.</p>
+          </div>
+          <footer class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <button type="button" @click="resetFilters" class="border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Clear filters</button>
+            <div class="flex justify-end gap-2">
+              <button type="button" @click="showMoreFilters = false" class="border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
+              <button type="button" @click="showMoreFilters = false" class="bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"><i class="fas fa-filter mr-2"></i>Apply filters</button>
+            </div>
+          </footer>
+        </section>
+      </div>
 
       <section v-if="loading" class="border border-slate-200 bg-white p-8 text-center text-xs text-slate-500">
         <i class="fas fa-spinner fa-spin mr-2"></i>Loading offplan properties…
