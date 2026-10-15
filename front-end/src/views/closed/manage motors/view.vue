@@ -14,16 +14,33 @@
       <form @submit.prevent="applyFilters" class="p-4">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div><h2 class="text-sm font-bold text-gray-800">Filter motors</h2><p class="mt-1 text-xs text-gray-500">Combine filters to narrow the results. List filters accept comma-separated values.</p></div>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
+            <button type="button" @click="showAdvancedFilters = true" class="inline-flex items-center gap-2 border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"><i class="fas fa-sliders-h"></i> More filters <span v-if="advancedFilterCount" class="bg-primary px-1.5 py-0.5 text-[10px] text-white">{{ advancedFilterCount }}</span></button>
             <button type="button" @click="clearFilters" class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Clear filters</button>
             <button type="submit" class="bg-primary px-4 py-2 text-xs font-bold text-white hover:opacity-90">Apply filters</button>
           </div>
         </div>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <label v-for="field in filterFields" :key="field.key" class="block min-w-0">
+          <label class="block min-w-0"><span class="mb-1.5 block text-xs font-semibold text-gray-600">Property zone</span><select v-model="filters.property_zone" class="w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">All property zones</option><option v-for="zone in propertyZones" :key="optionValue(zone)" :value="optionValue(zone)">{{ optionLabel(zone) }}</option></select></label>
+          <label v-if="isSuperRole" class="block min-w-0"><span class="mb-1.5 block text-xs font-semibold text-gray-600">Owner (searchable)</span><input v-model="ownerSearch" @input="searchOwners" list="motor-owner-options" placeholder="Search owner..." class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary" /><datalist id="motor-owner-options"><option v-for="person in owners" :key="optionValue(person)" :value="optionLabel(person)">{{ optionLabel(person) }}</option></datalist><select v-model="filters.owner" class="mt-2 w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">All owners</option><option v-for="person in owners" :key="'owner-' + optionValue(person)" :value="optionValue(person)">{{ optionLabel(person) }}</option></select></label>
+          <label v-else-if="isOwnerOrStaff" class="block min-w-0"><span class="mb-1.5 block text-xs font-semibold text-gray-600">Manager (searchable)</span><input v-model="managerSearch" @input="searchManagers" list="motor-manager-options" placeholder="Search manager..." class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary" /><datalist id="motor-manager-options"><option v-for="person in managers" :key="optionValue(person)" :value="optionLabel(person)">{{ optionLabel(person) }}</option></datalist><select v-model="filters.manager" class="mt-2 w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">All managers</option><option v-for="person in managers" :key="'manager-' + optionValue(person)" :value="optionValue(person)">{{ optionLabel(person) }}</option></select></label>
+          <label v-for="field in visibleFilterFields" :key="field.key" class="block min-w-0">
             <span class="mb-1.5 block text-xs font-semibold text-gray-600">{{ field.label }}</span>
-            <input v-model="filters[field.key]" :type="field.type || 'text'" :step="field.type === 'number' ? 'any' : undefined" :placeholder="field.placeholder || field.label" class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            <select v-if="field.key === 'usage'" v-model="filters.usage" class="w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">All usages</option><option v-for="usage in usageOptions" :key="usage" :value="usage">{{ usage }}</option></select>
+            <select v-else-if="field.key === 'usage__in'" v-model="usageSelect" @change="syncUsageFilter" class="w-full border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"><option value="">Add usage...</option><option v-for="usage in usageOptions" :key="usage" :value="usage">{{ usage }}</option></select>
+            <input v-if="field.key === 'usage__in'" v-model="filters.usage__in" type="text" placeholder="new, used" class="mt-2 w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary" />
+            <input v-else-if="field.key !== 'usage' && field.key !== 'usage__in'" v-model="filters[field.key]" :type="field.type || 'text'" :step="field.type === 'number' ? 'any' : undefined" :placeholder="field.placeholder || field.label" class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            <span v-if="field.key === 'usage__in'" class="mt-1 block text-[11px] text-gray-500">Choose multiple usages from the dropdown or type comma-separated values.</span>
           </label>
+        </div>
+        <div v-if="showAdvancedFilters" class="fixed inset-0 z-[9998] flex items-center justify-center bg-slate-950/50 p-4" @click.self="showAdvancedFilters = false">
+          <section class="max-h-[90vh] w-full max-w-4xl overflow-y-auto border border-gray-200 bg-white shadow-2xl">
+            <header class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-5 py-4"><div><h3 class="text-base font-bold text-gray-900"><i class="fas fa-sliders-h mr-2 text-primary"></i>Advanced motor filters</h3><p class="mt-1 text-xs text-gray-500">Narrow results with exact matches, ranges and location filters.</p></div><button type="button" @click="showAdvancedFilters = false" class="px-3 py-2 text-xl text-gray-500 hover:bg-gray-100" aria-label="Close filters">&times;</button></header>
+            <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3">
+              <label v-for="field in advancedFilterFields" :key="field.key" class="block min-w-0"><span class="mb-1.5 block text-xs font-semibold text-gray-600">{{ field.label }}</span><input v-model="filters[field.key]" :type="field.type || 'text'" :step="field.type === 'number' ? 'any' : undefined" :placeholder="field.placeholder || field.label" class="w-full border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" /></label>
+            </div>
+            <footer class="sticky bottom-0 flex justify-end gap-2 border-t border-gray-200 bg-white p-4"><button type="button" @click="showAdvancedFilters = false" class="border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700">Done</button><button type="button" @click="showAdvancedFilters = false; applyFilters()" class="bg-primary px-4 py-2 text-xs font-bold text-white">Apply filters</button></footer>
+          </section>
         </div>
       </form>
     </section>
@@ -50,26 +67,44 @@ import Toast from "@/components/Toast.vue";
 import Loading from "@/components/Loading.vue";
 export default {
   name: "ManageMotorsView", components: { AddMotor, EditMotor, Toast, Loading },
-  data: () => ({ motors: [], loading: false, addVisible: false, editVisible: false, selectedMotor: null, search: "", searchTimeout: null, filters: { property_zone: "", owner: "", manager: "", property_type: "", property_type__in: "", usage: "", usage__in: "", make: "", make__icontains: "", model: "", model__icontains: "", year: "", year__gte: "", year__lte: "", price: "", price__gte: "", price__lte: "", price__gt: "", price__lt: "", location: "", location__icontains: "" } }),
+  data: () => ({ motors: [], loading: false, addVisible: false, editVisible: false, selectedMotor: null, search: "", searchTimeout: null, showAdvancedFilters: false, filters: { property_zone: "", owner: "", manager: "", property_type: "", property_type__in: "", usage: "", usage__in: "", make: "", make__icontains: "", model: "", model__icontains: "", year: "", year__gte: "", year__lte: "", price: "", price__gte: "", price__lte: "", price__gt: "", price__lt: "", location: "", location__icontains: "" }, propertyZones: [], owners: [], managers: [], ownerSearch: "", managerSearch: "", usageSelect: "", lookupTimeout: null }),
   computed: {
     canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); },
-    filterFields() { return [
-      {key:"property_zone",label:"Property zone (exact)"},{key:"owner",label:"Owner (exact)"},{key:"manager",label:"Manager (exact)"},{key:"property_type",label:"Property type (exact)"},{key:"property_type__in",label:"Property types (comma-separated)",placeholder:"car, boat"},
-      {key:"usage",label:"Usage (exact)"},{key:"usage__in",label:"Usages (comma-separated)",placeholder:"new, used"},{key:"make",label:"Make (exact)"},{key:"make__icontains",label:"Make contains"},{key:"model",label:"Model (exact)"},{key:"model__icontains",label:"Model contains"},
+    allFilterFields() { return [
+      {key:"property_type",label:"Property type (exact)"},{key:"property_type__in",label:"Property types (comma-separated)",placeholder:"car, boat"},
+      {key:"usage",label:"Usage (exact)"},{key:"usage__in",label:"Usages (select or comma-separated)",placeholder:"new, used"},{key:"make",label:"Make (exact)"},{key:"make__icontains",label:"Make contains"},{key:"model",label:"Model (exact)"},{key:"model__icontains",label:"Model contains"},
       {key:"year",label:"Year (exact)"},{key:"year__gte",label:"Year from",type:"number"},{key:"year__lte",label:"Year to",type:"number"},{key:"price",label:"Price (exact)"},{key:"price__gte",label:"Minimum price",type:"number"},{key:"price__lte",label:"Maximum price",type:"number"},{key:"price__gt",label:"Price greater than",type:"number"},{key:"price__lt",label:"Price less than",type:"number"},
       {key:"location",label:"Location (exact)"},{key:"location__icontains",label:"Location contains"}
     ]; },
+    visibleFilterFields() { return this.allFilterFields.filter(field => ["property_type","usage","usage__in","make__icontains","model__icontains","price__gte","price__lte"].includes(field.key)); },
+    advancedFilterFields() { return this.allFilterFields.filter(field => !["property_type","usage","usage__in","make__icontains","model__icontains","price__gte","price__lte"].includes(field.key)); },
+    advancedFilterCount() { return this.advancedFilterFields.filter(field => String(this.filters[field.key] || "").trim()).length; },
+    isSuperRole() { const role = String(this.$getRole?.() || "").toLowerCase(); return ["superuser","super_user","super staff","super_staff","superstaff"].includes(role); },
+    isOwnerOrStaff() { const role = String(this.$getRole?.() || "").toLowerCase(); return ["owner","staff"].includes(role); },
+    usageOptions() { return ["new","used"]; },
     filteredMotors() { const q = this.search.trim().toLowerCase(); return this.motors.filter(m => !q || Object.values(m || {}).some(v => this.displayValue(v).toLowerCase().includes(q))); }
   },
-  mounted() { this.fetchMotors(); },
-  beforeUnmount() { clearTimeout(this.searchTimeout); },
+  mounted() { this.fetchMotors(); this.loadFilterOptions(); },
+  beforeUnmount() { clearTimeout(this.searchTimeout); clearTimeout(this.lookupTimeout); },
   methods: {
+    optionValue(item) { if (item === null || item === undefined) return ""; if (typeof item !== "object") return String(item); return String(item.id ?? item.value ?? item.uuid ?? item.pk ?? ""); },
+    optionLabel(item) { if (item === null || item === undefined) return ""; if (typeof item !== "object") return String(item); const name = [item.first_name,item.middle_name,item.last_name].filter(Boolean).join(" "); return name || item.full_name || item.name || item.title || item.label || item.username || item.email || this.optionValue(item); },
+    async loadFilterOptions() {
+      try { const response = await this.$apiGet("/get_property_zones", {}); const payload = response?.data ?? response?.results ?? response; this.propertyZones = Array.isArray(payload) ? payload : payload?.results || payload?.property_zones || payload?.zones || []; } catch (error) { console.warn("Property zones could not be loaded", error); }
+      if (this.isSuperRole) await this.searchOwners();
+      if (this.isOwnerOrStaff) await this.searchManagers();
+    },
+    searchOwners() { clearTimeout(this.lookupTimeout); this.lookupTimeout = setTimeout(async () => { try { const response = await this.$apiGet("/get_owners", this.ownerSearch.trim() ? { search: this.ownerSearch.trim() } : {}); const payload = response?.data ?? response?.results ?? response; this.owners = Array.isArray(payload) ? payload : payload?.results || payload?.owners || payload?.users || []; } catch (error) { console.warn("Owners could not be loaded", error); } }, this.ownerSearch ? 250 : 0); },
+    searchManagers() { clearTimeout(this.lookupTimeout); this.lookupTimeout = setTimeout(async () => { try { const response = await this.$apiGet("/get_managers", this.managerSearch.trim() ? { search: this.managerSearch.trim() } : {}); const payload = response?.data ?? response?.results ?? response; this.managers = Array.isArray(payload) ? payload : payload?.results || payload?.managers || payload?.users || []; } catch (error) { console.warn("Managers could not be loaded", error); } }, this.managerSearch ? 250 : 0); },
+    syncUsageFilter() { if (!this.usageSelect) return; const current = this.filters.usage__in.split(",").map(v => v.trim()).filter(Boolean); if (!current.includes(this.usageSelect)) current.push(this.usageSelect); this.filters.usage__in = current.join(", "); this.usageSelect = ""; },
     applyFilters() { this.fetchMotors(true); },
     clearFilters() { this.filters = { property_zone: "", owner: "", manager: "", property_type: "", property_type__in: "", usage: "", usage__in: "", make: "", make__icontains: "", model: "", model__icontains: "", year: "", year__gte: "", year__lte: "", price: "", price__gte: "", price__lte: "", price__gt: "", price__lt: "", location: "", location__icontains: "" }; this.fetchMotors(true); },
     async fetchMotors(immediate = false) {
       clearTimeout(this.searchTimeout);
       const params = {};
       if (this.search.trim()) params.search = this.search.trim();
+      if (this.isSuperRole && this.ownerSearch.trim() && !this.filters.owner) params.owner = this.ownerSearch.trim();
+      if (this.isOwnerOrStaff && this.managerSearch.trim() && !this.filters.manager) params.manager = this.managerSearch.trim();
       Object.entries(this.filters).forEach(([key, value]) => {
         if (value !== null && value !== undefined && String(value).trim() !== "") params[key] = String(value).trim();
       });
