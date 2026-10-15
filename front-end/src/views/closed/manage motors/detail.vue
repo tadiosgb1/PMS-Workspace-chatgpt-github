@@ -1,21 +1,22 @@
 <template>
-  <div class="min-h-screen bg-background p-4 text-sm md:p-6">
+  <div class="min-h-screen bg-slate-50/70 p-4 text-sm text-slate-800 md:p-7">
+    <Toast ref="toast" />
     <Loading :visible="loading || savingImage" :message="savingImage ? 'Saving image...' : 'Loading motor details...'" />
-    <div v-if="motor && Object.keys(motor).length" class="mx-auto max-w-5xl space-y-4">
-      <div class="flex flex-wrap items-center gap-3">
-        <button @click="$router.back()" class="text-xs text-gray-600 hover:text-primary"><i class="fas fa-arrow-left mr-1"></i>Back</button>
-        <span class="h-4 w-px bg-gray-300"></span>
-        <div class="min-w-0 flex-1"><h1 class="text-xl font-black text-primary">{{ motor.name || 'Motor details' }}</h1><p class="mt-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500">Motor property · ID #{{ motor.id ?? $route.params.id }}</p></div>
+    <div v-if="motor && Object.keys(motor).length" class="mx-auto max-w-6xl space-y-6">
+      <div class="flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+        <button @click="$router.back()" class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-50" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+        <div class="min-w-0 flex-1"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Motor inventory</p><h1 class="mt-1 truncate text-2xl font-bold tracking-tight text-slate-900">{{ motor.name || 'Motor details' }}</h1><p class="mt-1 text-sm text-slate-500">Review specifications, people and images for this motor.</p></div>
+        <button v-if="canEdit" type="button" @click="openEditMotor" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90"><i class="fas fa-pen"></i><span>Edit motor</span></button>
       </div>
 
-      <nav class="flex flex-wrap gap-2 border-b border-gray-200" aria-label="Motor detail tabs">
-        <button v-for="tab in tabs" :key="tab.id" type="button" @click="activeTab = tab.id" :class="['border-b-2 px-4 py-3 text-xs font-bold transition', activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800']">{{ tab.label }} <span v-if="tab.id === 'pictures'" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px]">{{ pictures.length }}</span></button>
+      <nav class="flex items-center gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm" aria-label="Motor detail tabs">
+        <button v-for="tab in tabs" :key="tab.id" type="button" @click="activeTab = tab.id" :class="['border-b-2 px-4 py-3 text-xs font-bold transition', activeTab === tab.id ? 'rounded-lg border-primary bg-primary/5 text-primary' : 'rounded-lg border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800']">{{ tab.label }} <span v-if="tab.id === 'pictures'" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px]">{{ pictures.length }}</span></button>
       </nav>
 
-      <section v-if="activeTab === 'details'" class="overflow-hidden rounded-xl border border-primary/10 bg-white shadow-sm">
-        <header class="border-b border-primary/10 bg-primary/5 px-5 py-3"><h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">Motor information</h2></header>
-        <div class="grid grid-cols-1 gap-x-8 gap-y-5 p-5 sm:grid-cols-2">
-          <div v-for="entry in entries" :key="entry.key" class="min-w-0"><p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">{{ entry.label }}</p><p class="mt-1 break-words text-sm text-gray-800">{{ display(motor[entry.key]) }}</p></div>
+      <section v-if="activeTab === 'details'" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <header class="border-b border-slate-100 px-6 py-5"><p class="text-[10px] font-bold uppercase tracking-[.16em] text-primary">Overview</p><h2 class="mt-1 text-lg font-bold text-slate-900">Motor information</h2><p class="mt-1 text-sm text-slate-500">Core specifications and assigned contacts.</p></header>
+        <div class="grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="entry in entries" :key="entry.key" class="min-w-0 border-b border-slate-100 px-6 py-5 transition hover:bg-slate-50/70"><p class="text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{{ entry.label }}</p><p class="mt-2 break-words text-sm font-medium text-slate-800">{{ entry.key === 'owner' || entry.key === 'manager' ? displayPerson(motor[entry.key]) : display(motor[entry.key]) }}</p></div>
         </div>
       </section>
 
@@ -25,20 +26,21 @@
           <article v-for="(picture, index) in pictures" :key="picture.id || index" class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <img v-if="pictureUrl(picture)" :src="pictureUrl(picture)" :alt="picture.description || motor.name || 'Motor picture'" class="h-48 w-full bg-gray-50 object-cover" />
             <div v-else class="grid h-48 place-items-center bg-gray-50 text-xs text-gray-400"><i class="fas fa-image mr-2"></i>No image URL available</div>
-            <div class="flex items-start justify-between gap-3 p-3"><div class="min-w-0"><p class="break-words text-sm font-semibold text-gray-800">{{ picture.description || 'No description' }}</p><p class="mt-1 text-[10px] text-gray-500">Picture #{{ picture.id || index + 1 }}</p></div><button type="button" @click="openEditImage(picture)" class="shrink-0 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"><i class="fas fa-pen mr-1"></i>Edit</button></div>
+            <div class="flex items-start justify-between gap-3 p-3"><div class="min-w-0"><p class="break-words text-sm font-semibold text-gray-800">{{ picture.description || 'No description' }}</p><p class="mt-1 text-[10px] text-gray-500">Image {{ index + 1 }}</p></div><button type="button" @click="openEditImage(picture)" class="shrink-0 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"><i class="fas fa-pen mr-1"></i>Edit</button></div>
           </article>
         </div>
         <div v-else class="p-10 text-center"><i class="fas fa-images text-3xl text-gray-300"></i><p class="mt-3 text-sm font-semibold text-gray-700">No pictures yet</p><p class="mt-1 text-xs text-gray-500">Add an image to keep it with this motor's details.</p><button type="button" @click="openAddImage" class="mt-4 rounded-md bg-primary px-4 py-2 text-xs font-bold text-white">Add first image</button></div>
       </section>
 
-      <section v-else class="overflow-hidden rounded-xl border border-primary/10 bg-white shadow-sm">
+      <section v-else-if="activeTab === 'additional'" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <header class="border-b border-primary/10 bg-primary/5 px-5 py-3"><h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">Additional information</h2></header>
-        <div v-if="extraEntries.length" class="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2"><div v-for="entry in extraEntries" :key="entry.key" class="min-w-0"><p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">{{ label(entry.key) }}</p><p class="mt-1 break-words text-sm text-gray-800">{{ display(entry.value) }}</p></div></div>
-        <p v-else class="p-5 text-sm text-gray-500">No additional information available.</p>
+        <div v-if="extraEntries.length" class="grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3"><div v-for="entry in extraEntries" :key="entry.key" class="min-w-0 border-b border-slate-100 px-6 py-5"><p class="text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{{ label(entry.key) }}</p><p class="mt-2 break-words text-sm font-medium text-slate-800">{{ display(entry.value) }}</p></div></div>
+        <p v-else class="p-8 text-sm text-slate-500">No additional information available.</p>
       </section>
     </div>
     <div v-else-if="!loading" class="py-20 text-center text-gray-500">Motor property not found.</div>
 
+    <EditMotor v-if="editMotorVisible" :data="motor" @close="editMotorVisible = false" @refresh="onMotorUpdated" />
     <Teleport to="body">
       <div v-if="imageModalOpen" class="fixed inset-0 z-[10000] flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4" @click.self="closeImageModal">
         <section class="w-full max-w-lg overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl">
@@ -57,15 +59,18 @@
 
 <script>
 import Loading from "@/components/Loading.vue";
-const known = ["name", "motor_type", "property_type", "brand", "model", "registration_number", "year", "color", "price", "description", "created_at", "updated_at", "pictures", "motor_property_pictures", "images", "motor_property_picture"];
+import Toast from "@/components/Toast.vue";
+import EditMotor from "./edit.vue";
+const known = ["name", "motor_type", "property_type", "brand", "model", "registration_number", "year", "color", "price", "description", "usage", "location", "created_at", "updated_at", "pictures", "motor_property_pictures", "images", "motor_property_picture", "owner", "owner_id", "manager", "manager_id", "property_zone", "property_zone_id"];
 export default {
   name: "ManageMotorsDetail",
-  components: { Loading },
-  data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, imageForm: { description: "" } }),
+  components: { Loading, Toast, EditMotor },
+  data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, imageForm: { description: "" }, editMotorVisible: false }),
   computed: {
-    tabs() { return [{ id: "details", label: "Motor details" }, { id: "pictures", label: "Images" }, { id: "additional", label: "Additional information" }]; },
-    entries() { return [{key:"name",label:"Name"},{key:"motor_type",label:"Motor subtype"},{key:"property_type",label:"Motor type"},{key:"brand",label:"Brand"},{key:"model",label:"Model"},{key:"registration_number",label:"Registration number"},{key:"year",label:"Year"},{key:"color",label:"Color"},{key:"price",label:"Price"},{key:"description",label:"Description"},{key:"created_at",label:"Created"},{key:"updated_at",label:"Last updated"}]; },
-    extraEntries() { return Object.entries(this.motor || {}).filter(([key]) => !known.includes(key) && key !== "id").map(([key,value]) => ({key,value})); },
+    tabs() { return [{ id: "details", label: "Motor details" }, { id: "additional", label: "Additional information" }, { id: "pictures", label: "Images" }]; },
+    canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); },
+    entries() { return [{key:"name",label:"Motor name"},{key:"property_type",label:"Motor type"},{key:"motor_type",label:"Motor subtype"},{key:"usage",label:"Condition"},{key:"make",label:"Make"},{key:"brand",label:"Brand"},{key:"model",label:"Model"},{key:"year",label:"Year"},{key:"color",label:"Color"},{key:"registration_number",label:"Registration number"},{key:"price",label:"Price"},{key:"location",label:"Location"},{key:"owner",label:"Owner"},{key:"manager",label:"Manager"},{key:"description",label:"Description"},{key:"created_at",label:"Created"},{key:"updated_at",label:"Last updated"}]; },
+    extraEntries() { return Object.entries(this.motor || {}).filter(([key]) => !known.includes(key) && key !== "id" && !key.endsWith("_id") && !["user_permissions","groups","is_staff","is_superuser","is_active","last_login","date_joined","profile_picture","whats_app_link"].includes(key)).map(([key,value]) => ({key,value})); },
     pictures() { const value = this.motor?.pictures || this.motor?.motor_property_pictures || this.motor?.images || this.motor?.motor_property_picture; if (!value) return []; return Array.isArray(value) ? value : [value]; }
   },
   async mounted() { await this.loadMotor(); },
@@ -94,7 +99,10 @@ export default {
       } catch (error) { console.error("Failed to load motor:", error); this.motor = {}; }
       finally { this.loading = false; }
     },
-    display(value) { if (value === null || value === undefined || value === "") return "—"; if (Array.isArray(value)) return value.map(item => this.display(item)).join(", "); if (typeof value === "object") { const preferred = value.name ?? value.title ?? value.label ?? value.description ?? value.email ?? value.url ?? value.image ?? value.id; return preferred !== undefined ? this.display(preferred) : Object.entries(value).map(([key,item]) => this.label(key) + ": " + this.display(item)).join(" · "); } if (typeof value === "boolean") return value ? "Yes" : "No"; return String(value).replace(/_/g, " "); },
+    displayPerson(value) { if (!value || typeof value !== "object") return ""; return [value.first_name, value.middle_name, value.last_name].filter(Boolean).join(" "); },
+    openEditMotor() { this.editMotorVisible = true; },
+    async onMotorUpdated() { this.editMotorVisible = false; await this.loadMotor(); },
+    display(value) { if (value === null || value === undefined || value === "") return ""; if (Array.isArray(value)) return value.map(item => this.display(item)).join(", "); if (typeof value === "object") { const preferred = value.name ?? value.title ?? value.label ?? value.description ?? value.url ?? value.image; return preferred !== undefined ? this.display(preferred) : Object.entries(value).filter(([key]) => key !== "id" && !key.endsWith("_id") && !["user_permissions","groups","is_staff","is_superuser","is_active","last_login","date_joined","profile_picture","whats_app_link"].includes(key)).map(([key,item]) => this.label(key) + ": " + this.display(item)).filter(part => !part.endsWith(": ")).join(" · "); } if (typeof value === "boolean") return value ? "Yes" : "No"; return String(value).replace(/_/g, " "); },
     pictureUrl(picture) { const image = picture?.image || picture?.url || picture?.image_url || picture?.picture || picture?.motor_property_image; if (typeof image === "string") return image; return image?.url || image?.image || ""; },
     label(key) { return key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()); },
     openAddImage() { this.editingPicture = null; this.imageForm = { description: "" }; this.selectedImage = null; this.resetPreview(); this.imageModalOpen = true; },
