@@ -70,7 +70,7 @@ export default {
     filteredZones() { const q = this.zoneSearch.trim().toLowerCase(); return this.zones.filter(z => !q || String(z.name || z.zone_name || "").toLowerCase().includes(q)); },
     filteredManagers() { const q = this.managerSearch.trim().toLowerCase(); return this.managers.filter(m => this.managerLabel(m).toLowerCase().includes(q) || String(m.manager?.email || m.email || "").toLowerCase().includes(q)); }
   },
-  watch: { data: { immediate: true, handler(value) { this.form = Object.fromEntries(fields.map(key => [key, value?.[key] ?? (["year", "price"].includes(key) ? null : key === "property_zone" || key === "manager" ? 0 : "")])); this.step = 1; } } },
+  watch: { data: { immediate: true, handler(value) { this.form = Object.fromEntries(fields.map(key => { let current = value?.[key]; if (key === "property_zone") current = current ?? value?.property_zone_id ?? value?.zone?.id; if (key === "manager") current = current ?? value?.manager_id ?? value?.manager?.id; if (current && typeof current === "object") current = current.id; return [key, current ?? (["year", "price"].includes(key) ? null : key === "property_zone" || key === "manager" ? 0 : "")]; })); this.step = 1; } } },
   async mounted() { await this.loadOptions(); },
   methods: {
     managerLabel(manager) { const person = manager?.manager || manager?.user || manager; const name = [person?.first_name, person?.middle_name, person?.last_name].filter(Boolean).join(" "); return name || person?.email || manager?.email || ('Manager #' + manager?.id); },
