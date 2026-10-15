@@ -117,7 +117,10 @@ export default {
         else response = await this.$apiPost("/post_motor_property_picture", formData, { "Content-Type": "multipart/form-data" });
         if (response?.error) throw new Error(typeof response.error === "string" ? response.error : "Could not save the image.");
         this.$root.$refs.toast?.showToast(this.editingPicture ? "Motor image updated successfully" : "Motor image added successfully", "success");
-        this.closeImageModal();
+        this.imageModalOpen = false;
+        this.editingPicture = null;
+        this.selectedImage = null;
+        this.resetPreview();
         await this.loadMotor();
         this.activeTab = "pictures";
       } catch (error) { console.error("Failed to save motor picture:", error); this.$root.$refs.toast?.showToast(error?.message || "Failed to save motor image", "error"); }
