@@ -14,15 +14,40 @@
     </div>
 
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-gray-100">
-      <div class="relative flex-1 max-w-sm">
-        <input 
-          v-model="searchTerm" 
-          @input="onSearch" 
-          type="search" 
-          placeholder="Search zones..." 
-          class="border border-gray-200 rounded-lg px-4 py-2 text-sm w-full bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition" 
-        />
+      <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <input v-model="searchTerm" @input="onSearch" type="search" placeholder="Search zones..." class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-if="canSearchOwnerEmail" v-model.trim="filters.owner_id__email" @input="onSearch" type="email" placeholder="Filter by owner email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-model.trim="filters.manager_id__email" @input="onSearch" type="email" placeholder="Filter by manager email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-model.trim="filters.name" @input="onSearch" type="text" placeholder="Zone name (exact match)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-model.trim="filters.name__icontains" @input="onSearch" type="text" placeholder="Zone name contains..." class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <select v-model="filters.ordering" @change="onSearch" aria-label="Order zones by" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+          <option value="-id">Newest first (ID)</option>
+          <option value="id">Oldest first (ID)</option>
+          <option value="name">Name (A–Z)</option>
+          <option value="-name">Name (Z–A)</option>
+          <option value="owner_id">Owner ID (ascending)</option>
+          <option value="-owner_id">Owner ID (descending)</option>
+          <option value="manager_id">Manager ID (ascending)</option>
+          <option value="-manager_id">Manager ID (descending)</option>
+          <option value="address">Address (ascending)</option>
+          <option value="-address">Address (descending)</option>
+          <option value="city">City (ascending)</option>
+          <option value="-city">City (descending)</option>
+          <option value="state">State (ascending)</option>
+          <option value="-state">State (descending)</option>
+          <option value="latitude">Latitude (ascending)</option>
+          <option value="-latitude">Latitude (descending)</option>
+          <option value="longitude">Longitude (ascending)</option>
+          <option value="-longitude">Longitude (descending)</option>
+          <option value="description">Description (ascending)</option>
+          <option value="-description">Description (descending)</option>
+          <option value="created_at">Created (oldest first)</option>
+          <option value="-created_at">Created (newest first)</option>
+          <option value="updated_at">Updated (oldest first)</option>
+          <option value="-updated_at">Updated (newest first)</option>
+        </select>
       </div>
+      <button v-if="hasActiveFilters" type="button" @click="clearFilters" class="self-start rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-50">Clear filters</button>
 
       <div class="flex flex-wrap items-center gap-4 text-xs">
         <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg p-1">
@@ -232,6 +257,7 @@ export default {
       zoneToEdit: null, 
       zoneToDelete: null, 
       searchTerm: "",
+      filters: { owner_id__email: "", manager_id__email: "", name: "", name__icontains: "", ordering: "-id" },
       sortKey: "name", 
       sortAsc: true, 
       currentPage: 1, 
@@ -244,6 +270,16 @@ export default {
     };
   },
   computed: {
+    currentRole() {
+      const role = this.$getRole?.() || "";
+      return String(role).toLowerCase().replace(/[ -]/g, "_");
+    },
+    canSearchOwnerEmail() {
+      return ["superuser", "super_staff"].includes(this.currentRole);
+    },
+    hasActiveFilters() {
+      return Boolean(this.filters.owner_id__email || this.filters.manager_id__email || this.filters.name || this.filters.name__icontains || this.filters.ordering !== "-id");
+    },
     filteredAndSortedZones() {
       return [...this.globalZones].sort((a, b) => {
         let res = 0;
@@ -322,6 +358,27 @@ export default {
       this.fetchZones();
     },
 
+    clearFilters() {
+      this.searchTerm = "";
+      this.filters = { owner_id__email: "", manager_id__email: "", name: "", name__icontains: "", ordering: "-id" };
+      this.currentPage = 1;
+      this.fetchZones();
+    },
+
+    getZoneQueryParams(page = this.currentPage, pageSize = this.pageSize) {
+      const params = {
+        page,
+        pageSize,
+        search: this.searchTerm,
+        ordering: this.filters.ordering || "-id",
+      };
+      if (this.canSearchOwnerEmail && this.filters.owner_id__email) params["owner_id__email"] = this.filters.owner_id__email;
+      if (this.filters.manager_id__email) params["manager_id__email"] = this.filters.manager_id__email;
+      if (this.filters.name) params.name = this.filters.name;
+      if (this.filters.name__icontains) params.name__icontains = this.filters.name__icontains;
+      return params;
+    },
+
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
@@ -380,12 +437,7 @@ export default {
     async fetchZones() {
       this.loading = true;
       try {
-        const result = await this.$getZones({
-          page: this.currentPage,
-          pageSize: this.pageSize,
-          search: this.searchTerm,
-          ordering: "-id",
-        });
+        const result = await this.$getZones(this.getZoneQueryParams());
         
         this.globalZones = result.zones || [];
         this.currentPage = result.currentPage || 1;
@@ -406,12 +458,7 @@ export default {
         if (type === "displayed") {
           dataset = this.filteredAndSortedZones;
         } else if (type === "all") {
-          const result = await this.$getZones({
-            page: 1,
-            pageSize: 1000000,
-            search: this.searchTerm,
-            ordering: "-id",
-          });
+          const result = await this.$getZones(this.getZoneQueryParams(1, 1000000));
           dataset = result.zones || [];
         }
 
