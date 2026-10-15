@@ -17,7 +17,7 @@
       <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <input v-model="searchTerm" @input="onSearch" type="search" placeholder="Search zones..." class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-gray-300" />
         <input v-if="canSearchOwnerEmail" v-model.trim="filters.owner_id__email" @input="onSearch" type="email" placeholder="Filter by owner email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <input v-model.trim="filters.manager_id__email" @input="onSearch" type="email" placeholder="Filter by manager email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <input v-if="!canSearchOwnerEmail" v-model.trim="filters.manager_id__email" @input="onSearch" type="email" placeholder="Filter by manager email (exact)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
         <input v-model.trim="filters.name" @input="onSearch" type="text" placeholder="Zone name (exact match)" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
         <input v-model.trim="filters.name__icontains" @input="onSearch" type="text" placeholder="Zone name contains..." class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
         <select v-model="filters.ordering" @change="onSearch" aria-label="Order zones by" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
@@ -373,7 +373,7 @@ export default {
         ordering: this.filters.ordering || "-id",
       };
       if (this.canSearchOwnerEmail && this.filters.owner_id__email) params["owner_id__email"] = this.filters.owner_id__email;
-      if (this.filters.manager_id__email) params["manager_id__email"] = this.filters.manager_id__email;
+      if (!this.canSearchOwnerEmail && this.filters.manager_id__email) params["manager_id__email"] = this.filters.manager_id__email;
       if (this.filters.name) params.name = this.filters.name;
       if (this.filters.name__icontains) params.name__icontains = this.filters.name__icontains;
       return params;
