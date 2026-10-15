@@ -29,7 +29,7 @@
           <article v-for="(picture, index) in pictures" :key="picture.id || index" class="overflow-hidden border border-slate-200 bg-white">
             <img v-if="pictureUrl(picture)" :src="pictureUrl(picture)" :alt="picture.description || motor.name || 'Motor picture'" class="h-52 w-full bg-slate-50 object-cover" />
             <div v-else class="grid h-52 place-items-center bg-slate-50 text-sm text-slate-500"><i class="fas fa-image mr-2"></i>No image URL available</div>
-            <div class="flex items-start justify-between gap-3 border-t border-slate-100 p-4"><div class="min-w-0"><p class="break-words text-sm font-semibold text-gray-800">{{ picture.description || 'No description' }}</p><p class="mt-1 text-[10px] text-gray-500">Image {{ index + 1 }}</p></div><button type="button" @click="openEditImage(picture)" class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"><i class="fas fa-pen text-[10px]"></i>Edit</button></div>
+            <div class="flex items-start justify-between gap-3 border-t border-slate-100 p-4"><div class="min-w-0"><p class="break-words text-sm font-semibold text-gray-800">{{ picture.description || 'No description' }}</p><p class="mt-1 text-[10px] text-gray-500">Image {{ index + 1 }}</p></div><div class="flex shrink-0 items-center gap-1.5"><button type="button" @click="openEditImage(picture)" class="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"><i class="fas fa-pen text-[10px]"></i>Edit</button><button type="button" @click="deletePicture(picture)" :disabled="deletingPictureId === picture.id || !picture.id" class="inline-flex h-8 items-center gap-1.5 rounded-md border border-red-200 bg-white px-2.5 text-xs font-semibold text-red-600 shadow-sm transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 disabled:cursor-not-allowed disabled:opacity-50"><i class="fas fa-trash text-[10px]"></i>{{ deletingPictureId === picture.id ? 'Deleting…' : 'Delete' }}</button></div></div>
           </article>
         </div>
         <div v-else class="p-10 text-center"><i class="fas fa-images text-3xl text-gray-300"></i><p class="mt-3 text-sm font-semibold text-gray-700">No pictures yet</p><p class="mt-1 text-xs text-gray-500">Add an image to keep it with this motor's details.</p><button type="button" @click="openAddImage" class="mt-4 inline-flex h-9 items-center rounded-md bg-primary px-3.5 text-xs font-semibold text-white shadow-sm transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30">Add first image</button></div>
@@ -63,7 +63,7 @@ const known = ["name", "motor_type", "property_type", "brand", "model", "registr
 export default {
   name: "ManageMotorsDetail",
   components: { Loading, Toast, EditMotor },
-  data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, imageForm: { description: "" }, editMotorVisible: false }),
+  data: () => ({ motor: {}, loading: false, activeTab: "details", imageModalOpen: false, editingPicture: null, selectedImage: null, imagePreview: "", savingImage: false, deletingPictureId: null, imageForm: { description: "" }, editMotorVisible: false }),
   computed: {
     tabs() { return [{ id: "details", label: "Motor details" }, { id: "pictures", label: "Images" }]; },
     canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); },
@@ -105,6 +105,23 @@ export default {
     label(key) { return key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()); },
     openAddImage() { this.editingPicture = null; this.imageForm = { description: "" }; this.selectedImage = null; this.resetPreview(); this.imageModalOpen = true; },
     openEditImage(picture) { this.editingPicture = picture; this.imageForm = { description: picture?.description || "" }; this.selectedImage = null; this.resetPreview(); this.imageModalOpen = true; },
+    async deletePicture(picture) {
+      if (!picture?.id) { this.$root.$refs.toast?.showToast("Image ID is missing; cannot delete this picture.", "error"); return; }
+      if (!window.confirm("Are you sure you want to delete this motor picture? This action cannot be undone.")) return;
+      this.deletingPictureId = picture.id;
+      try {
+        const response = await this.$apiDelete("/delete_motor_property_picture", picture.id);
+        if (response?.error) throw new Error(typeof response.error === "string" ? response.error : "Could not delete the image.");
+        this.$root.$refs.toast?.showToast("Motor picture deleted successfully", "success");
+        await this.loadMotor();
+        this.activeTab = "pictures";
+      } catch (error) {
+        console.error("Failed to delete motor picture:", error);
+        this.$root.$refs.toast?.showToast(error?.message || "Failed to delete motor picture", "error");
+      } finally {
+        this.deletingPictureId = null;
+      }
+    },
     onImageChange(event) { const file = event.target.files?.[0]; if (!file) return; if (!file.type.startsWith("image/")) { this.$root.$refs.toast?.showToast("Please select an image file", "error"); event.target.value = ""; return; } this.selectedImage = file; this.resetPreview(); this.imagePreview = URL.createObjectURL(file); },
     resetPreview() { if (this.imagePreview) URL.revokeObjectURL(this.imagePreview); this.imagePreview = ""; },
     closeImageModal() { if (this.savingImage) return; this.imageModalOpen = false; this.editingPicture = null; this.selectedImage = null; this.resetPreview(); },
