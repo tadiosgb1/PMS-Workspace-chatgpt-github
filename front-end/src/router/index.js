@@ -186,7 +186,7 @@ const routes = [
         path: "manage-motors",
         name: "ManageMotors-view",
         component: () => import('../views/closed/manage motors/view.vue'),
-        meta: { roles: ["superuser", "owner"] },
+        meta: { roles: ["superuser", "owner", "manager", "staff"] },
       },
       {
         path: "manage-motors/detail/:id",
