@@ -35,14 +35,14 @@
           <option v-for="item in statusOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
         </select>
 
-        <select v-model="advancedFilters['property_type__name']" @change="applyFilters()"
+        <select v-model="advancedFilters['property_type__id']" @change="applyFilters()"
           class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
           <option value="">All Property Types</option>
-          <option v-for="item in propertyTypeOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in propertyTypes" :key="item.id" :value="item.id">{{ item.name }}</option>
         </select>
 
         <input v-model="advancedFilters.city__icontains" @keyup.enter="applyFilters()" type="search"
-          placeholder="City"
+          placeholder="Search city"
           class="w-full sm:w-32 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
 
         <button @click="showMoreFilters = true" type="button"
@@ -107,9 +107,13 @@
               </select>
               <select v-else-if="field.options === 'propertyTypes'" v-model="advancedFilters[field.key]" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
                 <option value="">Any property type</option>
-                <option v-for="item in propertyTypeOptions" :key="item" :value="item">{{ item }}</option>
+                <option v-for="item in propertyTypes" :key="item.id" :value="field.key === 'property_type__id' ? item.id : item.name">{{ item.name }}</option>
               </select>
-              <input v-else v-model="advancedFilters[field.key]" :type="field.type || 'text'" :placeholder="field.placeholder || field.key"
+              <label v-else-if="field.type === 'checkbox'" class="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700">
+                <input v-model="advancedFilters[field.key]" type="checkbox" :true-value="'true'" :false-value="''" class="h-4 w-4 rounded border-gray-300 text-gray-800 focus:ring-gray-400" />
+                Furnished
+              </label>
+              <input v-else v-model="advancedFilters[field.key]" :type="field.type || 'text'" :placeholder="field.placeholder || 'Enter value'"
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
               <span v-if="field.hint" class="mt-1 block text-[10px] text-gray-400">{{ field.hint }}</span>
             </label>
@@ -299,7 +303,7 @@ export default {
   components: { AddProperty, UpdateProperty, ConfirmModal, Toast, SaleModal, AddRent, MakePropertySale, Loading },
   data() {
     return {
-      zones: [], zone_id: "", zone_id_query_set: false,
+      zones: [], propertyTypes: [], zone_id: "", zone_id_query_set: false,
       properties: [], visible: false, updateVisible: false, confirmVisible: false,
       propertyToEdit: null, propertyToDelete: null,
       makeSaleVisible: false, saleExecutionListing: null,
@@ -321,36 +325,13 @@ export default {
         "property_zone_id__name": "",
         "property_zone_id__owner_id__email": "",
         "property_zone_id__manager_id__email": "",
-        "property_zone_id__owner_id__id": "",
-        "property_zone_id__manager_id__id": "",
         "status": "",
         "status__in": "",
         "property_zone_id": "",
-        "property_type__name": "",
-        "property_type__name__in": "",
-        "property_type__name__icontains": "",
         "property_type__id": "",
-        "property_type__id__in": "",
-        "property_type__parent_property_type__name": "",
-        "property_type__parent_property_type__name__in": "",
-        "property_type__parent_property_type__name__icontains": "",
-        "property_type__parent_property_type__id": "",
-        "property_type__parent_property_type__id__in": "",
-        "property_type_category": "",
-        "property_type_category__id": "",
-        "property_type_category__id__in": "",
-        "property_type_category__name": "",
-        "property_type_category__name__in": "",
-        "property_type_category__name__icontains": "",
-        "property_type_category__property_type__id": "",
-        "property_type_category__property_type__id__in": "",
-        "property_type_category__property_type__name": "",
-        "property_type_category__property_type__name__in": "",
-        "property_type_category__property_type__name__icontains": "",
         "city": "",
         "city__icontains": "",
         "address": "",
-        "address__icontains": "",
         "state": "",
         "state__icontains": "",
         "price": "",
@@ -358,75 +339,35 @@ export default {
         "price__lte": "",
         "price__gt": "",
         "price__lt": "",
-        "property_type_category__property_type__is_sellable": "",
-        "property_type_category__property_type__is_rentable": "",
         "furnished": "",
-        "property_type_category__property_type__has_project_completion": "",
-        "property_type_category__property_type__project_completion_year": "",
-        "property_type_category__property_type__has_project_status": "",
-        "property_type_category__property_type__project_status": "",
-        "property_type_category__property_type__has_pre_handover_payment": "",
-        "property_type_category__property_type__pre_handover_payment": "",
       },
       advancedFields: [
-        { key: "ordering", label: "Sort order" },
+        { key: "ordering", label: "Sort order", hint: "Use a minus sign for descending order" },
         { key: "property_zone_id__name", label: "Zone name", options: "zones" },
         { key: "property_zone_id__owner_id__email", label: "Zone owner email" },
         { key: "property_zone_id__manager_id__email", label: "Zone manager email" },
-        { key: "property_zone_id__owner_id__id", label: "Zone owner ID" },
-        { key: "property_zone_id__manager_id__id", label: "Zone manager ID" },
         { key: "status", label: "Status", options: "status" },
-        { key: "status__in", label: "Statuses (comma-separated)", hint: "Comma-separated values" },
+        { key: "status__in", label: "Statuses", hint: "Separate multiple statuses with commas" },
         { key: "property_zone_id", label: "Property zone", options: "zones" },
-        { key: "property_type__name", label: "Property type", options: "propertyTypes" },
-        { key: "property_type__name__in", label: "Property types (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type__name__icontains", label: "Property type contains" },
-        { key: "property_type__id", label: "Property type ID" },
-        { key: "property_type__id__in", label: "Property type IDs (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type__parent_property_type__name", label: "Parent property type" },
-        { key: "property_type__parent_property_type__name__in", label: "Parent types (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type__parent_property_type__name__icontains", label: "Parent type contains" },
-        { key: "property_type__parent_property_type__id", label: "Parent property type ID" },
-        { key: "property_type__parent_property_type__id__in", label: "Parent type IDs (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type_category", label: "Property type category" },
-        { key: "property_type_category__id", label: "Category ID" },
-        { key: "property_type_category__id__in", label: "Category IDs (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type_category__name", label: "Category name" },
-        { key: "property_type_category__name__in", label: "Category names (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type_category__name__icontains", label: "Category name contains" },
-        { key: "property_type_category__property_type__id", label: "Category property type ID" },
-        { key: "property_type_category__property_type__id__in", label: "Category property type IDs (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type_category__property_type__name", label: "Category property type name" },
-        { key: "property_type_category__property_type__name__in", label: "Category property type names (comma-separated)", hint: "Comma-separated values" },
-        { key: "property_type_category__property_type__name__icontains", label: "Category property type contains" },
-        { key: "city", label: "City (exact)" },
+        { key: "property_type__id", label: "Property type", options: "propertyTypes" },
+        { key: "city", label: "City" },
         { key: "city__icontains", label: "City contains" },
-        { key: "address", label: "Address (exact)" },
-        { key: "address__icontains", label: "Address contains" },
-        { key: "state", label: "State (exact)" },
+        { key: "address", label: "Address" },
+        { key: "state", label: "State" },
         { key: "state__icontains", label: "State contains" },
-        { key: "price", label: "Price (exact)", type: "number" },
+        { key: "price", label: "Price", type: "number" },
         { key: "price__gte", label: "Minimum price", type: "number" },
         { key: "price__lte", label: "Maximum price", type: "number" },
-        { key: "price__gt", label: "Price greater than", type: "number" },
-        { key: "price__lt", label: "Price less than", type: "number" },
-        { key: "property_type_category__property_type__is_sellable", label: "Sellable" },
-        { key: "property_type_category__property_type__is_rentable", label: "Rentable" },
-        { key: "furnished", label: "Furnished" },
-        { key: "property_type_category__property_type__has_project_completion", label: "Has project completion" },
-        { key: "property_type_category__property_type__project_completion_year", label: "Project completion year", type: "number" },
-        { key: "property_type_category__property_type__has_project_status", label: "Has project status" },
-        { key: "property_type_category__property_type__project_status", label: "Project status" },
-        { key: "property_type_category__property_type__has_pre_handover_payment", label: "Has pre-handover payment" },
-        { key: "property_type_category__property_type__pre_handover_payment", label: "Pre-handover payment" },
+        { key: "price__gt", label: "Price above", type: "number" },
+        { key: "price__lt", label: "Price below", type: "number" },
+        { key: "furnished", label: "Furnished", type: "checkbox" },
       ],
       saleVisible: false, salePropertyId: null, loading: false,
     };
   },
   computed: {
     propertyTypeOptions() {
-      const values = this.properties.map((p) => p?.property_type?.name || p?.property_type).filter((v) => typeof v === "string" && v.trim());
-      return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+      return this.propertyTypes.map((item) => item.name).filter(Boolean);
     },
     visibleAdvancedFields() {
       const query = this.filterFieldSearch.trim().toLowerCase();
@@ -443,8 +384,16 @@ export default {
       this.zone_id = this.$route.query.zone;
       this.zone_id_query_set = true;
     }
-    const r = await this.$getZones();
-    this.zones = r.zones || [];
+    const [zoneResult, typeResult] = await Promise.all([
+      this.$getZones(),
+      this.$apiGet("/get_property_types", { page: 1, page_size: 1000 }).catch((error) => {
+        console.error("Failed to load property types:", error);
+        return { data: [] };
+      }),
+    ]);
+    this.zones = zoneResult.zones || [];
+    const rawTypes = typeResult?.data?.results || typeResult?.data?.property_types || typeResult?.data || typeResult?.results || [];
+    this.propertyTypes = Array.isArray(rawTypes) ? rawTypes.filter((item) => item && item.id != null && item.name) : [];
     await this.fetchProperties();
   },
   methods: {
@@ -515,6 +464,10 @@ export default {
           params.ordering = value;
           return;
         }
+        if (key === "furnished") {
+          if (rawValue === "true" || rawValue === true) params.furnished = "true";
+          return;
+        }
         if (key === "status") {
           params.status = value;
           return;
@@ -537,7 +490,6 @@ export default {
       this.status = "";
       this.ordering = "-id";
       Object.keys(this.advancedFilters).forEach((key) => { this.advancedFilters[key] = ""; });
-      this.advancedFilters.ordering = "";
       this.currentPage = 1;
       this.showMoreFilters = false;
       this.fetchProperties();
