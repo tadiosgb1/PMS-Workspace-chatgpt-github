@@ -17,15 +17,59 @@
         </div>
       </div>
 
-      <div class="mb-3 flex flex-col gap-2 border border-slate-200 bg-white p-3 md:flex-row md:items-center md:justify-between">
-        <div class="relative w-full md:max-w-md">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
-          <input v-model="search" class="w-full border border-slate-200 py-1.5 pl-8 pr-2.5 text-xs outline-none focus:border-primary" placeholder="Search applications, customer or property" />
+      <section class="mb-3 border border-slate-200 bg-white p-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <label class="mb-1 block text-[11px] font-semibold text-slate-600">Search applications</label>
+            <input v-model="search" @keyup.enter="applyFilters" class="w-full border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Search applications, customer or property" />
+          </div>
+          <div>
+            <label for="application-ordering" class="mb-1 block text-[11px] font-semibold text-slate-600">Order by</label>
+            <select id="application-ordering" v-model="filters.ordering" class="w-full border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-primary">
+              <option value="-id">Newest first (ID descending)</option><option value="id">Oldest first (ID ascending)</option>
+              <option value="-created_at">Created date — newest first</option><option value="created_at">Created date — oldest first</option>
+              <option value="application_status">Application status — A to Z</option><option value="-application_status">Application status — Z to A</option>
+            </select>
+          </div>
+          <div>
+            <label for="application-property" class="mb-1 block text-[11px] font-semibold text-slate-600">Offplan property</label>
+            <select id="application-property" v-model="filters.offplan_property" class="w-full border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-primary">
+              <option value="">All properties</option><option v-for="property in offplanProperties" :key="property.id" :value="String(property.id)">{{ property.name }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="application-phone" class="mb-1 block text-[11px] font-semibold text-slate-600">Customer phone number</label>
+            <input id="application-phone" v-model.trim="filters.customer__phone_number" @keyup.enter="applyFilters" class="w-full border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Exact phone number" />
+          </div>
+          <div>
+            <label for="application-status" class="mb-1 block text-[11px] font-semibold text-slate-600">Application status</label>
+            <select id="application-status" v-model="filters.application_status" class="w-full border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-primary">
+              <option value="">All statuses</option><option v-for="status in applicationStatuses" :key="status" :value="status">{{ display(status) }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="application-zone" class="mb-1 block text-[11px] font-semibold text-slate-600">Property zone</label>
+            <select id="application-zone" v-model="filters.offplan_property__property_zone" class="w-full border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-primary">
+              <option value="">All zones</option><option v-for="zone in zones" :key="zone.id" :value="String(zone.id)">{{ zone.name }}</option>
+            </select>
+          </div>
+          <div v-if="canFilterOwners" class="relative">
+            <label for="application-owner-search" class="mb-1 block text-[11px] font-semibold text-slate-600">Property owner</label>
+            <input id="application-owner-search" v-model="ownerSearch" type="search" autocomplete="off" @focus="onOwnerFocus" @input="searchOwners" @keydown.esc="ownerDropdownOpen = false" class="w-full border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Search owners…" />
+            <button v-if="filters.offplan_property__owner" type="button" @click="clearOwner" class="absolute right-2 top-7 px-1 text-sm text-slate-500" aria-label="Clear owner">×</button>
+            <div v-if="ownerDropdownOpen" class="absolute z-30 mt-1 max-h-52 w-full overflow-y-auto border border-slate-200 bg-white shadow-lg">
+              <div v-if="ownersLoading" class="px-3 py-2 text-xs text-slate-500">Searching owners…</div>
+              <div v-else-if="owners.length === 0" class="px-3 py-2 text-xs text-slate-500">No owners found</div>
+              <button v-else v-for="owner in owners" :key="owner.id" type="button" @mousedown.prevent="selectOwner(owner)" class="block w-full px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-50">{{ owner.name }}</button>
+            </div>
+          </div>
         </div>
-        <button type="button" @click="load" :disabled="loading" class="border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60">
-          <i :class="['fas fa-sync-alt mr-2', loading ? 'fa-spin' : '']"></i>Refresh
-        </button>
-      </div>
+        <div class="mt-3 flex flex-wrap justify-end gap-2">
+          <button type="button" @click="resetFilters" :disabled="loading" class="border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Clear filters</button>
+          <button type="button" @click="applyFilters" :disabled="loading" class="bg-primary px-3 py-2 text-xs font-semibold text-white hover:opacity-90">Apply filters</button>
+          <button type="button" @click="load" :disabled="loading" class="border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"><i :class="['fas fa-sync-alt mr-2', loading ? 'fa-spin' : '']"></i>Refresh</button>
+        </div>
+      </section>
 
       <div v-if="error" class="mb-3 flex min-h-8 max-h-8 items-center overflow-hidden border border-red-200 bg-red-50 px-3 text-xs text-red-700" :title="error">
         <i class="fas fa-exclamation-circle mr-2 shrink-0"></i><span class="truncate">{{ error }}</span>
@@ -129,6 +173,15 @@ export default {
   data() {
     return {
       applications: [],
+      offplanProperties: [],
+      zones: [],
+      owners: [],
+      ownerSearch: "",
+      ownerDropdownOpen: false,
+      ownersLoading: false,
+      ownerSearchRequest: 0,
+      role: "",
+      filters: { ordering: "-id", offplan_property: "", payment_product: "", customer: "", "customer__phone_number": "", application_status: "", "offplan_property__property_zone": "", "offplan_property__owner": "" },
       loading: false,
       error: "",
       search: "",
@@ -140,6 +193,12 @@ export default {
     };
   },
   computed: {
+    canFilterOwners() {
+      return ["superuser", "super_user", "super_staff"].includes(this.role);
+    },
+    applicationStatuses() {
+      return [...new Set(this.applications.map(item => item?.application_status).filter(Boolean))].sort();
+    },
     filteredApplications() {
       const query = this.search.trim().toLowerCase();
       if (!query) return this.applications;
@@ -167,15 +226,92 @@ export default {
       return total ? total.toLocaleString() : "—";
     }
   },
-  mounted() {
-    this.load();
+  async mounted() {
+    this.role = String(this.$getRole ? this.$getRole() : localStorage.getItem("role") || "").trim().toLowerCase().replace(/[ -]/g, "_");
+    await Promise.all([this.loadLookups(), this.load()]);
   },
   methods: {
+    normalizeList(response, keys = []) {
+      const raw = response?.data ?? response;
+      if (Array.isArray(raw)) return raw;
+      for (const key of keys) if (Array.isArray(raw?.[key])) return raw[key];
+      return Array.isArray(raw?.results) ? raw.results : [];
+    },
+    normalizeOwner(item) {
+      const id = item?.id ?? item?.user_id ?? item?.owner_id;
+      const name = item?.name || item?.full_name || [item?.first_name, item?.last_name].filter(Boolean).join(" ") || item?.username || item?.email || ("Owner " + id);
+      return { id: Number(id), name: String(name).trim() };
+    },
+    async loadLookups() {
+      try {
+        const [propertiesResponse, zoneResponse] = await Promise.all([
+          this.$getOffplanProperties(),
+          this.$getZones({ page: 1, pageSize: 1000 })
+        ]);
+        this.offplanProperties = this.normalizeList(propertiesResponse, ["properties", "offplan_properties", "results"]).map(item => ({
+          id: item?.id ?? item?.offplan_property_id,
+          name: item?.name || item?.title || item?.developer || ("Property " + (item?.id ?? item?.offplan_property_id))
+        })).filter(item => item.id != null);
+        this.zones = (zoneResponse?.zones || zoneResponse?.data?.zones || []).map(item => ({ id: item.id ?? item.zone_id, name: item.name || item.zone_name || item.title || "Unnamed zone" })).filter(item => item.id != null);
+        if (this.canFilterOwners) await this.fetchOwners("");
+      } catch (e) {
+        this.error = this.shortError(e, "Unable to load application filter options.");
+      }
+    },
+    async onOwnerFocus() {
+      this.ownerDropdownOpen = true;
+      if (!this.owners.length) await this.fetchOwners(this.ownerSearch);
+    },
+    async searchOwners() {
+      this.filters["offplan_property__owner"] = "";
+      this.ownerDropdownOpen = true;
+      await this.fetchOwners(this.ownerSearch);
+    },
+    async fetchOwners(search = "") {
+      const requestId = ++this.ownerSearchRequest;
+      this.ownersLoading = true;
+      try {
+        const params = { page: 1, page_size: 50 };
+        if (String(search).trim()) params.search = String(search).trim();
+        const response = await this.$apiGet("/get_owners", params);
+        if (requestId === this.ownerSearchRequest) this.owners = this.normalizeList(response, ["owners", "results"]).map(this.normalizeOwner).filter(item => item.id);
+      } catch (e) {
+        if (requestId === this.ownerSearchRequest) this.owners = [];
+      } finally {
+        if (requestId === this.ownerSearchRequest) this.ownersLoading = false;
+      }
+    },
+    selectOwner(owner) {
+      this.filters["offplan_property__owner"] = String(owner.id);
+      this.ownerSearch = owner.name;
+      this.ownerDropdownOpen = false;
+    },
+    clearOwner() {
+      this.filters["offplan_property__owner"] = "";
+      this.ownerSearch = "";
+      this.ownerDropdownOpen = true;
+      this.fetchOwners("");
+    },
+    applyFilters() {
+      this.ownerDropdownOpen = false;
+      this.load();
+    },
+    resetFilters() {
+      this.search = "";
+      this.ownerSearch = "";
+      this.ownerDropdownOpen = false;
+      this.filters = { ordering: "-id", offplan_property: "", payment_product: "", customer: "", "customer__phone_number": "", application_status: "", "offplan_property__property_zone": "", "offplan_property__owner": "" };
+      this.load();
+    },
     async load() {
       this.loading = true;
       this.error = "";
       try {
-        this.applications = await this.$getOffplanProductApplications();
+        const params = { ...this.filters };
+        Object.keys(params).forEach(key => { if (params[key] === "" || params[key] == null) delete params[key]; });
+        if (!this.canFilterOwners) delete params["offplan_property__owner"];
+        const response = await this.$getOffplanProductApplications(params);
+        this.applications = this.normalizeList(response, ["applications", "results", "data"]);
       } catch (e) {
         this.error = this.shortError(e, "Unable to load offplan applications.");
       } finally {
