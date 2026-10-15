@@ -10,7 +10,7 @@
     >
       <div
         v-if="showSuccessToast"
-        class="z-[200] flex fixed bottom-96 right-5 items-center p-4 mb-4 text-sm text-green-500 bg-blue-50 border border-green-300 rounded-lg"
+        class="z-[9999] flex fixed bottom-96 right-5 items-center p-4 mb-4 text-sm text-green-500 bg-blue-50 border border-green-300 rounded-lg"
         role="alert"
       >
         <svg
@@ -39,7 +39,7 @@
     >
       <div
         v-if="showErrorToast"
-        class="z-[200] fixed top-5 right-5 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg"
+        class="z-[9999] fixed top-5 right-5 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg"
         role="alert"
       >
         <strong class="font-bold">Error!</strong>
@@ -58,7 +58,7 @@
     >
       <div
         v-if="showWarningToast"
-        class="z-[200] fixed top-5 right-5 bg-yellow-500 text-black px-4 py-2 rounded-lg shadow-lg"
+        class="z-[9999] fixed top-5 right-5 bg-yellow-500 text-black px-4 py-2 rounded-lg shadow-lg"
         role="alert"
       >
         <strong class="font-bold">Warning!</strong>
@@ -82,7 +82,7 @@
         leave-to-class="translate-y-full opacity-0"
       >
         <div
-          class="z-[200] fixed inset-0 flex items-center justify-center"
+          class="z-[9999] fixed inset-0 flex items-center justify-center"
           role="alert"
         >
           <div
