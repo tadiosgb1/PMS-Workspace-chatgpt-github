@@ -13,31 +13,52 @@
       </button>
     </div>
 
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-gray-100">
-      <div class="grid w-full flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <input v-model="searchTerm" @input="onSearchInput" type="search" placeholder="Search spaces…" class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <div><input v-model="zoneSearch" list="coworking-zone-options" @change="selectZone" placeholder="Search zones…" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><datalist id="coworking-zone-options"><option v-for="zone in zones" :key="zone.id" :value="zone.name"></option></datalist></div>
-        <select v-model="ordering" @change="fetchSpaces()" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300"><option value="">Default order</option><option value="name">Name A to Z</option><option value="-name">Name Z to A</option><option value="zone">Zone A to Z</option><option value="-zone">Zone Z to A</option><option value="location">Location A to Z</option><option value="-location">Location Z to A</option><option value="capacity">Capacity: low to high</option><option value="-capacity">Capacity: high to low</option><option value="service_type">Service type A to Z</option><option value="-service_type">Service type Z to A</option><option value="price_daily">Daily price: low to high</option><option value="-price_daily">Daily price: high to low</option><option value="price_monthly">Monthly price: low to high</option><option value="-price_monthly">Monthly price: high to low</option><option value="created_at">Oldest created first</option><option value="-created_at">Newest created first</option><option value="updated_at">Least recently updated</option><option value="-updated_at">Recently updated</option></select>
-        <template v-if="canSearchOwners"><input v-model.trim="ownerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Exact owner email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><input v-model.trim="ownerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Owner account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /></template>
-        <template v-if="canSearchManagers"><input v-model.trim="managerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Exact manager email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><input v-model.trim="managerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Manager account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /></template>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-2">
-        <button @click="applyAdvancedFilters" class="rounded-lg bg-gray-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-700">
-          Apply Filters
-        </button>
-        <button @click="clearFilters" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-100">
-          Clear Filters
-        </button>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-4 text-xs">
-        <div class="flex items-center gap-2 text-gray-500 ml-auto lg:ml-0">
-          <label class="font-semibold">Show</label>
-          <select v-model="pageSize" @change="fetchSpaces()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition cursor-pointer">
+    <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+      <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-gray-800">Filter co-working spaces</h2>
+          <p class="mt-1 text-xs text-gray-500">Choose your criteria, then select Apply Filters.</p>
+        </div>
+        <div class="mt-2 flex items-center gap-2 sm:mt-0">
+          <label for="coworking-page-size" class="whitespace-nowrap text-xs font-medium text-gray-500">Rows per page</label>
+          <select id="coworking-page-size" v-model="pageSize" @change="currentPage = 1; fetchSpaces()" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
             <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
           </select>
-          <span class="text-gray-400">Total: <span class="font-semibold text-gray-600">{{ spaces.length }}</span></span>
+          <span class="whitespace-nowrap text-xs text-gray-500">Total: <strong class="text-gray-700">{{ spaces.length }}</strong></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="min-w-0">
+          <label for="coworking-search" class="mb-1.5 block text-xs font-semibold text-gray-600">Search</label>
+          <input id="coworking-search" v-model="searchTerm" type="search" placeholder="Name, location, capacity…" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" />
+        </div>
+        <div class="min-w-0">
+          <label for="coworking-zone" class="mb-1.5 block text-xs font-semibold text-gray-600">Zone</label>
+          <input id="coworking-zone" v-model="zoneSearch" list="coworking-zone-options" @change="selectZone" placeholder="Search or choose a zone" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" />
+          <datalist id="coworking-zone-options"><option v-for="zone in zones" :key="zone.id" :value="zone.name"></option></datalist>
+        </div>
+        <div class="min-w-0">
+          <label for="coworking-ordering" class="mb-1.5 block text-xs font-semibold text-gray-600">Order by</label>
+          <select id="coworking-ordering" v-model="ordering" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200">
+            <option value="">Default order</option><option value="name">Name A to Z</option><option value="-name">Name Z to A</option><option value="zone">Zone A to Z</option><option value="-zone">Zone Z to A</option><option value="location">Location A to Z</option><option value="-location">Location Z to A</option><option value="capacity">Capacity: low to high</option><option value="-capacity">Capacity: high to low</option><option value="service_type">Service type A to Z</option><option value="-service_type">Service type Z to A</option><option value="price_daily">Daily price: low to high</option><option value="-price_daily">Daily price: high to low</option><option value="price_monthly">Monthly price: low to high</option><option value="-price_monthly">Monthly price: high to low</option><option value="created_at">Oldest created first</option><option value="-created_at">Newest created first</option><option value="updated_at">Least recently updated</option><option value="-updated_at">Recently updated</option>
+          </select>
+        </div>
+        <template v-if="canSearchOwners">
+          <div class="min-w-0"><label for="coworking-owner-email" class="mb-1.5 block text-xs font-semibold text-gray-600">Owner email</label><input id="coworking-owner-email" v-model.trim="ownerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Enter exact owner email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+          <div class="min-w-0"><label for="coworking-owner-ref" class="mb-1.5 block text-xs font-semibold text-gray-600">Owner account reference</label><input id="coworking-owner-ref" v-model.trim="ownerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Enter account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+        </template>
+        <template v-if="canSearchManagers">
+          <div class="min-w-0"><label for="coworking-manager-email" class="mb-1.5 block text-xs font-semibold text-gray-600">Manager email</label><input id="coworking-manager-email" v-model.trim="managerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Enter exact manager email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+          <div class="min-w-0"><label for="coworking-manager-ref" class="mb-1.5 block text-xs font-semibold text-gray-600">Manager account reference</label><input id="coworking-manager-ref" v-model.trim="managerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Enter account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+        </template>
+      </div>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-xs text-gray-400">Filters are applied when you click Apply Filters.</p>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <button type="button" @click="clearFilters" class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 sm:w-auto">Clear Filters</button>
+          <button type="button" @click="applyAdvancedFilters" class="inline-flex w-full items-center justify-center rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 sm:w-auto"><i class="fas fa-filter mr-2 text-xs"></i>Apply Filters</button>
         </div>
       </div>
     </div>
@@ -232,8 +253,6 @@ export default {
     selectZone() {
       const selected = this.zones.find(zone => String(zone.name).toLowerCase() === this.zoneSearch.trim().toLowerCase());
       this.zoneId = selected ? String(selected.id) : "";
-      this.currentPage = 1;
-      this.fetchSpaces();
     },
     applyAdvancedFilters() {
       this.currentPage = 1;
@@ -279,11 +298,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-
-    onSearchInput() {
-      this.currentPage = 1;
-      this.fetchSpaces();
     },
 
     sortBy(key) {
