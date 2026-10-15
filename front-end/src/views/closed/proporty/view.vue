@@ -138,9 +138,7 @@
         <table class="w-full text-xs">
           <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
             <tr>
-              <th class="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 transition-colors" @click="changeOrdering('name')">
-                Property
-              </th>
+              <th class="px-4 py-3 text-left">Property</th>
               <th class="px-4 py-3 text-left">Owner & Manager</th>
               <th class="px-4 py-3 text-left">Location</th>
               <th class="px-4 py-3 text-right whitespace-nowrap">Sale price</th>
@@ -495,10 +493,6 @@ export default {
     },
     onSearchInput() {
       this.currentPage = 1;
-      this.fetchProperties();
-    },
-    changeOrdering(field) {
-      this.ordering = this.ordering === field ? `-${field}` : field;
       this.fetchProperties();
     },
     editProperty(p) { this.propertyToEdit = p; this.updateVisible = true; },
