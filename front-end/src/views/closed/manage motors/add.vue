@@ -13,8 +13,8 @@
           <div class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
             <div v-if="step === 1" class="contents">
               <label class="field">Motor name <span class="required">*</span><input v-model.trim="form.name" required class="control" placeholder="Motor name" /></label>
-              <label class="field">Motor type <span class="required">*</span><select v-model="form.motor_type" required class="control"><option value="">Select motor type</option><option v-for="type in motorTypes" :key="type" :value="type">{{ type }}</option></select></label>
-              <label class="field">Property type <span class="required">*</span><select v-model.number="form.property_type" required class="control"><option :value="null" disabled>Select property type</option><option v-for="type in propertyTypes" :key="type.id" :value="Number(type.id)">{{ type.name || type.property_type || type.title || ('Type #' + type.id) }}</option></select></label>
+              <label class="field">Motor subtype <span class="required">*</span><select v-model="form.motor_type" required class="control"><option value="">Select motor subtype</option><option v-for="type in motorTypes" :key="type" :value="type">{{ type }}</option></select></label>
+              <label class="field">Motor type <span class="required">*</span><select v-model="form.property_type" required class="control"><option value="" disabled>Select motor type</option><option v-for="type in propertyTypes" :key="type" :value="type">{{ type }}</option></select></label>
               <label class="field">Usage <span class="required">*</span><select v-model="form.usage" required class="control"><option value="" disabled>Select usage</option><option value="new">New</option><option value="used">Used</option></select></label>
               <label class="field sm:col-span-2">Location <span class="required">*</span><input v-model.trim="form.location" required class="control" placeholder="Enter motor location" /></label>
             </div>
@@ -50,11 +50,11 @@
   </Teleport>
 </template>
 <script>
-const blankForm = () => ({ name: "", motor_type: "", property_type: null, usage: "", location: "", brand: "", model: "", registration_number: "", year: null, color: "", price: null, description: "", property_zone: 0, manager: 0 });
+const blankForm = () => ({ name: "", motor_type: "", property_type: "", usage: "", location: "", brand: "", model: "", registration_number: "", year: null, color: "", price: null, description: "", property_zone: 0, manager: 0 });
 export default {
   name: "ManageMotorsAdd",
   
-  data: () => ({ step: 1, saving: false, loadingOptions: false, form: blankForm(), zones: [], managers: [], propertyTypes: [], zoneSearch: "", managerSearch: "", motorTypes: ["Motorcycle", "Car", "Truck", "Bus", "Van", "Tractor", "Other"], colors: ["Black", "White", "Silver", "Gray", "Red", "Blue", "Green", "Yellow", "Brown", "Orange", "Gold", "Other"] }),
+  data: () => ({ step: 1, saving: false, loadingOptions: false, form: blankForm(), zones: [], managers: [], propertyTypes: ["car", "motorcycle", "heavy_vehicle", "boat", "auto_accessories_parts", "export_cars"], zoneSearch: "", managerSearch: "", motorTypes: ["Motorcycle", "Car", "Truck", "Bus", "Van", "Tractor", "Other"], colors: ["Black", "White", "Silver", "Gray", "Red", "Blue", "Green", "Yellow", "Brown", "Orange", "Gold", "Other"] }),
   computed: {
     filteredZones() { const q = this.zoneSearch.trim().toLowerCase(); return this.zones.filter(z => !q || String(z.name || z.zone_name || "").toLowerCase().includes(q)); },
     filteredManagers() { const q = this.managerSearch.trim().toLowerCase(); return this.managers.filter(m => this.managerLabel(m).toLowerCase().includes(q) || String(m.manager?.email || m.email || "").toLowerCase().includes(q)); }
@@ -65,12 +65,12 @@ export default {
     managerLabel(manager) { const person = manager?.manager || manager?.user || manager; const name = [person?.first_name, person?.middle_name, person?.last_name].filter(Boolean).join(" "); return name || person?.email || manager?.email || ('Manager #' + manager?.id); },
     async loadOptions() {
       this.loadingOptions = true;
-      try { const [zoneResult, managerResult, typeResult] = await Promise.all([this.$getZones(), this.$getManagers(""), this.$apiGet("/get_property_types", {})]); this.zones = zoneResult?.zones || []; this.managers = managerResult?.managers || []; const typePayload = typeResult?.data ?? typeResult?.results ?? typeResult; this.propertyTypes = Array.isArray(typePayload) ? typePayload : (typePayload?.property_types || typePayload?.results || typePayload?.data || []); }
+      try { const [zoneResult, managerResult] = await Promise.all([this.$getZones(), this.$getManagers("")]); this.zones = zoneResult?.zones || []; this.managers = managerResult?.managers || []; }
       catch (error) { console.error("Failed to load motor zone/manager options:", error); this.$root.$refs.toast?.showToast("Could not load zones or managers", "error"); }
       finally { this.loadingOptions = false; }
     },
     nextStep() {
-      if (!this.form.name || !this.form.motor_type || !Number(this.form.property_type) || !this.form.usage || !this.form.location) return;
+      if (!this.form.name || !this.form.motor_type || !this.form.property_type || !this.form.usage || !this.form.location) return;
       this.step = 2;
     },
     previousStep() { if (this.step > 1) this.step = 1; },
@@ -79,7 +79,7 @@ export default {
       if (!Number(this.form.property_zone)) { this.$root.$refs.toast?.showToast("Please select a property zone", "error"); return; }
       this.saving = true;
       try {
-        const payload = { ...this.form, property_type: Number(this.form.property_type), property_zone: Number(this.form.property_zone) || 0, manager: Number(this.form.manager) || 0 };
+        const payload = { ...this.form, property_type: this.form.property_type, property_zone: Number(this.form.property_zone) || 0, manager: Number(this.form.manager) || 0 };
         const result = await this.$apiPost("/post_motor_property", payload);
         if (result?.error) throw new Error(typeof result.error === "string" ? result.error : "Could not save motor.");
         this.$root.$refs.toast?.showToast("Motor added successfully", "success"); this.$emit("refresh"); this.$emit("close");
