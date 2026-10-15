@@ -204,6 +204,13 @@ export default {
           ],
         },
         {
+          id: "manage_motors",
+          name: "Manage Motors",
+          icon: "fas fa-motorcycle",
+          route: "ManageMotors-view",
+          explicitRoles: ["superuser", "owner"],
+        },
+        {
           id: "maintenance",
           name: "Maintenance Requests",
           icon: "fas fa-screwdriver-wrench",
