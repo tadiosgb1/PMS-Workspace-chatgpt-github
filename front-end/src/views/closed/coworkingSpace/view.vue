@@ -14,21 +14,12 @@
     </div>
 
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-gray-100">
-      <div class="flex flex-wrap gap-3 items-center flex-1">
-        <div class="relative flex-1 max-w-sm">
-          <input 
-            v-model="searchTerm" 
-            @input="onSearchInput"
-            type="search" 
-            placeholder="Search spaces..." 
-            class="border border-gray-200 rounded-lg px-4 py-2 text-sm w-full bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition" 
-          />
-        </div>
-
-        <select v-model="zoneId" @change="fetchSpaces()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
-          <option value="">All Zones</option>
-          <option v-for="zone in zones" :key="zone.id" :value="zone.id">{{ zone.name }}</option>
-        </select>
+      <div class="grid w-full flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <input v-model="searchTerm" @input="onSearchInput" type="search" placeholder="Search spaces…" class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+        <div><input v-model="zoneSearch" list="coworking-zone-options" @change="selectZone" placeholder="Search zones…" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><datalist id="coworking-zone-options"><option v-for="zone in zones" :key="zone.id" :value="zone.name"></option></datalist></div>
+        <select v-model="ordering" @change="fetchSpaces()" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300"><option value="">Default order</option><option value="name">Name A to Z</option><option value="-name">Name Z to A</option><option value="zone">Zone A to Z</option><option value="-zone">Zone Z to A</option><option value="location">Location A to Z</option><option value="-location">Location Z to A</option><option value="capacity">Capacity: low to high</option><option value="-capacity">Capacity: high to low</option><option value="service_type">Service type A to Z</option><option value="-service_type">Service type Z to A</option><option value="price_daily">Daily price: low to high</option><option value="-price_daily">Daily price: high to low</option><option value="price_monthly">Monthly price: low to high</option><option value="-price_monthly">Monthly price: high to low</option><option value="created_at">Oldest created first</option><option value="-created_at">Newest created first</option><option value="updated_at">Least recently updated</option><option value="-updated_at">Recently updated</option></select>
+        <template v-if="canSearchOwners"><input v-model.trim="ownerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Exact owner email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><input v-model.trim="ownerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Owner account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /></template>
+        <template v-if="canSearchManagers"><input v-model.trim="managerEmail" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Exact manager email" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /><input v-model.trim="managerRef" @keyup.enter="applyAdvancedFilters" type="search" placeholder="Manager account reference" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" /></template>
       </div>
 
       <div class="flex flex-wrap items-center gap-4 text-xs">
@@ -159,8 +150,15 @@ export default {
       confirmVisible: false,
       spaceToDelete: null,
       loading: false,
-      zoneId: "", // For zone filtering
-      zones: [], // For zone dropdown
+      zoneId: "",
+      zoneSearch: "",
+      zones: [],
+      ordering: "",
+      ownerEmail: "",
+      ownerRef: "",
+      managerEmail: "",
+      managerRef: "",
+      role: ""
     };
   },
   computed: {
@@ -191,10 +189,17 @@ export default {
       return filtered;
     },
   },
+  computed: {
+    canSearchOwners() { return ["superuser", "super_user", "super_staff"].includes(this.role); },
+    canSearchManagers() { return ["owner", "staff"].includes(this.role); },
+  },
   mounted() {
+    this.role = String(this.$getRole ? this.$getRole() : localStorage.getItem("role") || "").trim().toLowerCase().replace(/[ -]/g, "_");
     // Check for zone_id in URL query parameters
     if (this.$route.query.zone_id) {
       this.zoneId = this.$route.query.zone_id;
+      const zone = this.zones.find(item => String(item.id) === String(this.zoneId));
+      if (zone) this.zoneSearch = zone.name;
     }
     this.fetchZones();
     this.fetchSpaces();
@@ -210,31 +215,39 @@ export default {
     async fetchZones() {
       try {
         const result = await this.$getZones();
-        this.zones = result.zones || [];
+        this.zones = result.zones || result.data?.zones || [];
       } catch (err) {
         console.error("Failed to fetch zones:", err);
         this.zones = [];
       }
     },
 
+    selectZone() {
+      const selected = this.zones.find(zone => String(zone.name).toLowerCase() === this.zoneSearch.trim().toLowerCase());
+      this.zoneId = selected ? String(selected.id) : "";
+      this.currentPage = 1;
+      this.fetchSpaces();
+    },
+    applyAdvancedFilters() {
+      this.currentPage = 1;
+      this.fetchSpaces();
+    },
     async fetchSpaces(url = null) {
       this.loading = true;
       try {
         let requestUrl = url;
         if (!requestUrl) {
-          requestUrl = `/get_coworking_spaces?page=${this.currentPage}&page_size=${this.pageSize}`;
-          
-          // Add zone filtering if zone is selected
-          if (this.zoneId) {
-            requestUrl += `&zone__id=${this.zoneId}`;
-          }
-          
-          // Add search term if provided
-          if (this.searchTerm) {
-            requestUrl += `&search=${encodeURIComponent(this.searchTerm)}`;
-          }
+          const params = new URLSearchParams({ page: String(this.currentPage), page_size: String(this.pageSize) });
+          if (this.zoneId) params.set("zone__id", this.zoneId);
+          if (this.searchTerm.trim()) params.set("search", this.searchTerm.trim());
+          if (this.ordering) params.set("ordering", this.ordering);
+          if (this.canSearchOwners && this.ownerEmail.trim()) params.set("zone__owner_id__email", this.ownerEmail.trim());
+          if (this.canSearchOwners && this.ownerRef.trim()) params.set("zone__owner_id__id", this.ownerRef.trim());
+          if (this.canSearchManagers && this.managerEmail.trim()) params.set("zone__manager_id__email", this.managerEmail.trim());
+          if (this.canSearchManagers && this.managerRef.trim()) params.set("zone__manager_id__id", this.managerRef.trim());
+          requestUrl = `/get_coworking_spaces?${params.toString()}`;
         }
-        
+
         const response = await this.$getCoworkingSpaces(requestUrl);
         this.spaces = response.spaces || [];
         this.currentPage = response.currentPage || 1;
