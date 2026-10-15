@@ -38,6 +38,10 @@
             </select>
           </div>
           <div>
+            <label for="application-payment-product" class="mb-1 block text-[11px] font-semibold text-slate-600">Payment product ID</label>
+            <input id="application-payment-product" v-model.trim="filters.payment_product" @keyup.enter="applyFilters" class="w-full border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Exact payment product" />
+          </div>
+          <div>
             <label for="application-phone" class="mb-1 block text-[11px] font-semibold text-slate-600">Customer phone number</label>
             <input id="application-phone" v-model.trim="filters.customer__phone_number" @keyup.enter="applyFilters" class="w-full border border-slate-200 px-3 py-2 text-xs outline-none focus:border-primary" placeholder="Exact phone number" />
           </div>
