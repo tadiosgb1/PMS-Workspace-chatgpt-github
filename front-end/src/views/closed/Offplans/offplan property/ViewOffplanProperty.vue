@@ -247,9 +247,9 @@ export default {
   },
   computed: {
     filterOptions() {
-      const fields = { project_status: ["planned", "under_construction", "completed"], completion_status: ["ready", "offplan", "under_construction"], sale_type: ["initial_sale", "resale", "rent", "lease"], project_completion: ["under_25", "25_50", "50_75", "over_75"] };
+      const fields = { project_status: ["planned", "under_construction", "completed"], completion_status: ["ready", "offplan", "under_construction"], sale_type: ["initial_sale", "resale", "rent", "lease"], project_completion: ["under_25", "50_75", "over_75"] };
       return Object.keys(fields).reduce((options, key) => {
-        options[key] = [...new Set([...fields[key], ...this.properties.map(item => item?.[key])].filter(value => value !== null && value !== undefined && value !== ""))].sort((a, b) => String(a).localeCompare(String(b)));
+        options[key] = [...new Set([...fields[key], ...this.properties.map(item => item?.[key])].filter(value => value !== null && value !== undefined && value !== "" && !(key === "project_completion" && value === "25_50")))].sort((a, b) => String(a).localeCompare(String(b)));
         return options;
       }, {});
     },
