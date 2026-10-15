@@ -35,7 +35,6 @@ export default {
   name: "ManageMotorsView", components: { AddMotor, EditMotor, Toast, Loading },
   data: () => ({ motors: [], loading: false, addVisible: false, editVisible: false, selectedMotor: null, search: "", searchTimeout: null }),
   computed: { canEdit() { const role = this.$getRole?.() || "tenant"; return ["superuser", "owner", "admin", "super_staff"].includes(String(role).toLowerCase()); }, filteredMotors() { const q = this.search.trim().toLowerCase(); return this.motors.filter(m => !q || Object.values(m || {}).some(v => String(v ?? "").toLowerCase().includes(q))); } },
-  /*computed: { */
   mounted() { this.fetchMotors(); },
   beforeUnmount() { clearTimeout(this.searchTimeout); },
   methods: {
