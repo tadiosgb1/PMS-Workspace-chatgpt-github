@@ -15,7 +15,7 @@
               <label class="field">Motor name <span class="required">*</span><input v-model.trim="form.name" required class="control" placeholder="Motor name" /></label>
               <label class="field">Motor type <span class="required">*</span><select v-model="form.motor_type" required class="control"><option value="">Select motor type</option><option v-for="type in motorTypes" :key="type" :value="type">{{ type }}</option></select></label>
               <label class="field">Property type <span class="required">*</span><select v-model.number="form.property_type" required class="control"><option :value="null" disabled>Select property type</option><option v-for="type in propertyTypes" :key="type.id" :value="Number(type.id)">{{ type.name || type.property_type || type.title || ('Type #' + type.id) }}</option></select></label>
-              <label class="field">Usage <span class="required">*</span><input v-model.trim="form.usage" required class="control" placeholder="e.g. Personal, business, rental" /></label>
+              <label class="field">Usage <span class="required">*</span><select v-model="form.usage" required class="control"><option value="" disabled>Select usage</option><option value="new">New</option><option value="used">Used</option></select></label>
               <label class="field sm:col-span-2">Location <span class="required">*</span><input v-model.trim="form.location" required class="control" placeholder="Enter motor location" /></label>
             </div>
             <div v-else class="contents">
