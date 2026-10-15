@@ -188,8 +188,6 @@ export default {
 
       return filtered;
     },
-  },
-  computed: {
     canSearchOwners() { return ["superuser", "super_user", "super_staff"].includes(this.role); },
     canSearchManagers() { return ["owner", "staff"].includes(this.role); },
   },
