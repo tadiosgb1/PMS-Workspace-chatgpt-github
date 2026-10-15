@@ -23,7 +23,7 @@
             class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-300 bg-white transition" />
         </div>
 
-        <select v-if="!zone_id_query_set" v-model="zone_id" @change="fetchProperties()"
+        <select v-if="!zone_id_query_set" v-model="zone_id" @change="applyFilters()"
           class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
           <option value="">All Zones</option>
           <option v-for="z in zones" :key="z.id" :value="z.id">{{ z.name }}</option>
