@@ -18,13 +18,25 @@ const known = ["name", "motor_type", "property_type", "brand", "model", "registr
 export default {
   name: "ManageMotorsDetail", components: { Loading }, data: () => ({ motor: {}, loading: false }),
   computed: {
-    entries() { return [{key:"name",label:"Name"},{key:"motor_type",label:"Motor type"},{key:"brand",label:"Brand"},{key:"model",label:"Model"},{key:"registration_number",label:"Registration number"},{key:"year",label:"Year"},{key:"color",label:"Color"},{key:"price",label:"Price"},{key:"description",label:"Description"},{key:"created_at",label:"Created"},{key:"updated_at",label:"Last updated"}]; },
+    entries() { return [{key:"name",label:"Name"},{key:"motor_type",label:"Motor subtype"},{key:"property_type",label:"Motor type"},{key:"brand",label:"Brand"},{key:"model",label:"Model"},{key:"registration_number",label:"Registration number"},{key:"year",label:"Year"},{key:"color",label:"Color"},{key:"price",label:"Price"},{key:"description",label:"Description"},{key:"created_at",label:"Created"},{key:"updated_at",label:"Last updated"}]; },
     extraEntries() { return Object.entries(this.motor || {}).filter(([key]) => !known.includes(key) && key !== "id").map(([key,value]) => ({key,value})); },
     pictures() { const value = this.motor?.pictures || this.motor?.motor_property_pictures || this.motor?.images || this.motor?.motor_property_picture; if (!value) return []; return Array.isArray(value) ? value : [value]; }
   },
   async mounted() {
     this.loading = true;
-    try { const response = await this.$apiGetById("/get_motor_property", this.$route.params.id); this.motor = response?.data ?? response?.result ?? response ?? {}; }
+    try {
+      const response = await this.$apiGetById("/get_motor_property", this.$route.params.id);
+      this.motor = response?.data ?? response?.result ?? response ?? {};
+      if (this.motor && !Array.isArray(this.motor)) {
+        try {
+          const pictureResponse = await this.$apiGet("/get_motor_property_pictures", {});
+          const picturePayload = pictureResponse?.data ?? pictureResponse?.results ?? pictureResponse;
+          const pictures = Array.isArray(picturePayload) ? picturePayload : picturePayload?.results || picturePayload?.motor_property_pictures || picturePayload?.data || [];
+          const related = pictures.filter(pic => Number(pic.motor_property?.id ?? pic.motor_property ?? pic.motor_property_id) === Number(this.motor.id ?? this.$route.params.id));
+          if (related.length && !this.motor.pictures && !this.motor.motor_property_pictures && !this.motor.images) this.motor = { ...this.motor, pictures: related };
+        } catch (pictureError) { console.warn("Motor pictures could not be loaded:", pictureError); }
+      }
+    }
     catch (error) { console.error("Failed to load motor:", error); this.motor = {}; }
     finally { this.loading = false; }
   },
