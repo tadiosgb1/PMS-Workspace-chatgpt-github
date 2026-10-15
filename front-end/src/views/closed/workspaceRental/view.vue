@@ -18,23 +18,54 @@
       </button>
     </div>
 
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3 bg-white p-4 rounded-lg border border-gray-100">
-      <div class="relative flex-1 max-w-sm">
-        <input 
-          v-model="searchTerm" 
-          type="search" 
-          placeholder="Search by guest or space..." 
-          class="border border-gray-200 rounded-lg px-4 py-2 text-sm w-full bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition" 
-        />
-      </div>
-
-      <div class="flex flex-wrap items-center gap-4 text-xs">
-        <div class="flex items-center gap-2 text-gray-500 ml-auto lg:ml-0">
-          <label class="font-semibold">Show</label>
-          <select v-model="pageSize" @change="fetchRentals()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 transition cursor-pointer">
+    <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+      <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-gray-800">Filter workspace rentals</h2>
+          <p class="mt-1 text-xs text-gray-500">Filter by start date and next due date, then apply your selections.</p>
+        </div>
+        <div class="mt-2 flex items-center gap-2 sm:mt-0">
+          <label for="rental-page-size" class="whitespace-nowrap text-xs font-medium text-gray-500">Rows per page</label>
+          <select id="rental-page-size" v-model="pageSize" @change="currentPage = 1; fetchRentals()" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
             <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
           </select>
-          <span class="text-gray-400">Total: <span class="font-semibold text-gray-600">{{ rentals.length }}</span></span>
+          <span class="whitespace-nowrap text-xs text-gray-500">Total: <strong class="text-gray-700">{{ rentals.length }}</strong></span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="rental-search" class="mb-1.5 block text-xs font-semibold text-gray-600">Search</label>
+        <input id="rental-search" v-model="searchTerm" type="search" placeholder="Search by guest or space…" class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <div class="rounded-lg border border-gray-100 bg-gray-50/70 p-3 sm:p-4">
+          <h3 class="mb-3 text-xs font-bold uppercase tracking-wide text-gray-700">Start date</h3>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div><label for="start-date-exact" class="mb-1 block text-xs font-medium text-gray-600">Exact date</label><input id="start-date-exact" v-model="filters.start_date" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="start-date-gt" class="mb-1 block text-xs font-medium text-gray-600">After (greater than)</label><input id="start-date-gt" v-model="filters.start_date__gt" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="start-date-gte" class="mb-1 block text-xs font-medium text-gray-600">On or after</label><input id="start-date-gte" v-model="filters.start_date__gte" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="start-date-lt" class="mb-1 block text-xs font-medium text-gray-600">Before (less than)</label><input id="start-date-lt" v-model="filters.start_date__lt" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="start-date-lte" class="mb-1 block text-xs font-medium text-gray-600">On or before</label><input id="start-date-lte" v-model="filters.start_date__lte" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+          </div>
+        </div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50/70 p-3 sm:p-4">
+          <h3 class="mb-3 text-xs font-bold uppercase tracking-wide text-gray-700">Next due date</h3>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div><label for="due-date-exact" class="mb-1 block text-xs font-medium text-gray-600">Exact date</label><input id="due-date-exact" v-model="filters.next_due_date" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="due-date-gt" class="mb-1 block text-xs font-medium text-gray-600">After (greater than)</label><input id="due-date-gt" v-model="filters.next_due_date__gt" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="due-date-gte" class="mb-1 block text-xs font-medium text-gray-600">On or after</label><input id="due-date-gte" v-model="filters.next_due_date__gte" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="due-date-lt" class="mb-1 block text-xs font-medium text-gray-600">Before (less than)</label><input id="due-date-lt" v-model="filters.next_due_date__lt" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+            <div><label for="due-date-lte" class="mb-1 block text-xs font-medium text-gray-600">On or before</label><input id="due-date-lte" v-model="filters.next_due_date__lte" type="date" class="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-xs text-gray-400">Date filters are sent to the rental list endpoint.</p>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <button type="button" @click="clearFilters" class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 sm:w-auto">Clear Filters</button>
+          <button type="button" @click="applyFilters" class="inline-flex w-full items-center justify-center rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 sm:w-auto"><i class="fas fa-filter mr-2 text-xs"></i>Apply Filters</button>
         </div>
       </div>
     </div>
@@ -182,6 +213,18 @@ export default {
       sortAsc: true,
       loading: false,
       workspace_id: null,       // set from ?workspace_id= query param
+      filters: {
+        start_date: "",
+        start_date__gt: "",
+        start_date__gte: "",
+        start_date__lt: "",
+        start_date__lte: "",
+        next_due_date: "",
+        next_due_date__gt: "",
+        next_due_date__gte: "",
+        next_due_date__lt: "",
+        next_due_date__lte: "",
+      },
     };
   },
   computed: {
@@ -224,23 +267,43 @@ export default {
       this.selectedRentalId = rentalId;
       this.paymentVisible = true;
     },
+    applyFilters() {
+      this.currentPage = 1;
+      this.fetchRentals();
+    },
+    clearFilters() {
+      this.searchTerm = "";
+      Object.keys(this.filters).forEach((key) => { this.filters[key] = ""; });
+      this.currentPage = 1;
+      this.fetchRentals();
+    },
     async fetchRentals(url = null) {
       this.loading = true;
       try {
-        // Build params — always include page_size; add space__id when filtering by workspace
-        const params = {};
-        if (this.workspace_id) params.space__id = this.workspace_id;
+        const queryParams = new URLSearchParams();
+        queryParams.set("page", String(this.currentPage));
+        queryParams.set("page_size", String(this.pageSize));
+        if (this.workspace_id) queryParams.set("space__id", String(this.workspace_id));
+        Object.entries(this.filters).forEach(([key, value]) => {
+          if (value) queryParams.set(key, value);
+        });
 
-        // When paginating with a raw next/prev URL, append space__id to it too
+        // Keep active filters when moving through next/previous result pages.
         let apiUrl = url;
         if (!apiUrl) {
-          apiUrl = `/get_workspace_rentals?page=1&page_size=${this.pageSize}`;
-          if (this.workspace_id) apiUrl += `&space__id=${this.workspace_id}`;
-        } else if (this.workspace_id && !apiUrl.includes('space__id')) {
-          apiUrl += `${apiUrl.includes('?') ? '&' : '?'}space__id=${this.workspace_id}`;
+          apiUrl = `/get_workspace_rentals?${queryParams.toString()}`;
+        } else {
+          const separator = apiUrl.includes("?") ? "&" : "?";
+          const extraParams = new URLSearchParams();
+          if (this.workspace_id && !apiUrl.includes("space__id=")) extraParams.set("space__id", String(this.workspace_id));
+          Object.entries(this.filters).forEach(([key, value]) => {
+            if (value && !apiUrl.includes(`${encodeURIComponent(key)}=`)) extraParams.set(key, value);
+          });
+          const extraQuery = extraParams.toString();
+          if (extraQuery) apiUrl += separator + extraQuery;
         }
 
-        const response = await this.$apiGet(apiUrl, params);
+        const response = await this.$apiGet(apiUrl, {});
         this.rentals = response.data?.results || response.data || response.rentals || [];
         this.currentPage = response.current_page || response.currentPage || 1;
         this.totalPages = response.total_pages || response.totalPages || 1;
