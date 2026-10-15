@@ -33,6 +33,7 @@
             <label class="field">Property zone <span class="required">*</span><select v-model.number="form.property_zone" required class="control"><option :value="0" disabled>Select a zone</option><option v-for="zone in zones" :key="zone.id" :value="Number(zone.id)">{{ zone.name || zone.zone_name || ('Zone #' + zone.id) }}</option></select></label>
             <label class="field">Manager <span class="optional">Optional</span><select v-model.number="form.manager" class="control"><option :value="0">No manager assigned</option><option v-for="manager in managers" :key="manager.id" :value="Number(manager.id)">{{ managerLabel(manager) }}</option></select></label>
             <label class="field sm:col-span-2">Description <span class="optional">Optional</span><textarea v-model.trim="form.description" rows="2" class="control resize-y" placeholder="Additional details (optional)"></textarea></label>
+            <label class="field sm:col-span-2">Motor image <span class="optional">Optional</span><input type="file" accept="image/*" class="control" @change="onImageChange" /><span class="mt-1 block text-xs font-normal text-gray-500">Choose an image to upload with this motor.</span><img v-if="imagePreview" :src="imagePreview" alt="Motor image preview" class="mt-2 h-36 max-w-full rounded object-cover" /></label>
             </div>
           </div>
         </form>
@@ -54,7 +55,7 @@ const blankForm = () => ({ name: "", motor_type: "", property_type: "", usage: "
 export default {
   name: "ManageMotorsAdd",
   
-  data: () => ({ step: 1, saving: false, loadingOptions: false, form: blankForm(), zones: [], managers: [], propertyTypes: ["car", "motorcycle", "heavy_vehicle", "boat", "auto_accessories_parts", "export_cars"], zoneSearch: "", managerSearch: "", motorTypes: ["Motorcycle", "Car", "Truck", "Bus", "Van", "Tractor", "Other"], colors: ["Black", "White", "Silver", "Gray", "Red", "Blue", "Green", "Yellow", "Brown", "Orange", "Gold", "Other"] }),
+  data: () => ({ step: 1, saving: false, loadingOptions: false, selectedImage: null, imagePreview: "", form: blankForm(), zones: [], managers: [], propertyTypes: ["car", "motorcycle", "heavy_vehicle", "boat", "auto_accessories_parts", "export_cars"], zoneSearch: "", managerSearch: "", motorTypes: ["Motorcycle", "Car", "Truck", "Bus", "Van", "Tractor", "Other"], colors: ["Black", "White", "Silver", "Gray", "Red", "Blue", "Green", "Yellow", "Brown", "Orange", "Gold", "Other"] }),
   computed: {
     filteredZones() { const q = this.zoneSearch.trim().toLowerCase(); return this.zones.filter(z => !q || String(z.name || z.zone_name || "").toLowerCase().includes(q)); },
     filteredManagers() { const q = this.managerSearch.trim().toLowerCase(); return this.managers.filter(m => this.managerLabel(m).toLowerCase().includes(q) || String(m.manager?.email || m.email || "").toLowerCase().includes(q)); }
@@ -69,6 +70,8 @@ export default {
       catch (error) { console.error("Failed to load motor zone/manager options:", error); this.$root.$refs.toast?.showToast("Could not load zones or managers", "error"); }
       finally { this.loadingOptions = false; }
     },
+    onImageChange(event) { const file = event.target.files?.[0]; if (!file) return; if (!file.type.startsWith("image/")) { this.$root.$refs.toast?.showToast("Please select an image file", "error"); event.target.value = ""; return; } this.selectedImage = file; if (this.imagePreview) URL.revokeObjectURL(this.imagePreview); this.imagePreview = URL.createObjectURL(file); },
+    async uploadImage(motorId) { if (!this.selectedImage || !motorId) return; const fd = new FormData(); fd.append("description", this.form.description || ""); fd.append("motor_property", String(motorId)); fd.append("image", this.selectedImage); await this.$apiPost("/post_motor_property_picture", fd, { "Content-Type": "multipart/form-data" }); },
     nextStep() {
       if (!this.form.name || !this.form.motor_type || !this.form.property_type || !this.form.usage || !this.form.location) return;
       this.step = 2;
@@ -82,7 +85,10 @@ export default {
         const payload = { ...this.form, property_type: this.form.property_type, property_zone: Number(this.form.property_zone) || 0, manager: Number(this.form.manager) || 0 };
         const result = await this.$apiPost("/post_motor_property", payload);
         if (result?.error) throw new Error(typeof result.error === "string" ? result.error : "Could not save motor.");
-        this.$root.$refs.toast?.showToast("Motor added successfully", "success"); this.$emit("refresh"); this.$emit("close");
+        const created = result?.data ?? result?.result ?? result;
+        const motorId = created?.id ?? created?.motor_property?.id ?? created?.motor?.id;
+        if (this.selectedImage && motorId) { try { await this.uploadImage(motorId); } catch (imageError) { console.error("Motor saved but image upload failed:", imageError); this.$root.$refs.toast?.showToast("Motor saved, but the image could not be uploaded", "warning"); this.$emit("refresh"); this.$emit("close"); return; } }
+        this.$root.$refs.toast?.showToast(this.selectedImage && !motorId ? "Motor saved, but no ID was returned for image upload" : "Motor added successfully", this.selectedImage && !motorId ? "warning" : "success"); this.$emit("refresh"); this.$emit("close");
       } catch (error) { this.$root.$refs.toast?.showToast(error?.message || "Failed to save motor", "error"); }
       finally { this.saving = false; }
     }
