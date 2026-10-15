@@ -2,18 +2,19 @@
   <Teleport to="body">
     <div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-3 sm:p-6">
       <section class="motor-modal w-full max-w-3xl overflow-hidden bg-white shadow-2xl">
-        <header class="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 px-5 py-5 text-white sm:px-7">
-          <div class="pointer-events-none absolute -right-10 -top-16 h-40 w-40 border border-white/10"></div>
-          <div class="relative flex items-start justify-between gap-4">
-            <div><div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/70"><span class="h-1.5 w-1.5 bg-white"></span> Motor management</div><h2 class="text-xl font-bold">Edit Motor</h2><p class="mt-1 text-sm text-white/75">{{ step === 1 ? 'Start with the motor details' : 'Assign the zone and manager' }}</p></div>
-            <button type="button" @click="$emit('close')" aria-label="Close modal" class="grid h-9 w-9 place-items-center border border-white/25 text-xl transition hover:bg-white/15">&times;</button>
+        <header class="border-b border-gray-100 bg-white px-5 py-5 sm:px-7">
+          <div class="flex items-start justify-between gap-4">
+            <div><p class="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Motor management</p><h2 class="mt-1 text-xl font-semibold tracking-tight text-gray-900">Edit Motor</h2><p class="mt-1 text-sm text-gray-500">{{ step === 1 ? 'Enter the basic motor information' : step === 2 ? 'Choose the zone and manager' : 'Add a description and review' }}</p></div>
+            <button type="button" @click="$emit('close')" aria-label="Close modal" class="grid h-9 w-9 shrink-0 place-items-center border border-gray-200 text-xl text-gray-500 transition hover:bg-gray-50 hover:text-gray-900">&times;</button>
           </div>
-          <div class="relative mt-6 grid grid-cols-2 gap-3">
-            <div><div class="mb-2 flex items-center gap-2"><span class="step-dot" :class="step === 1 ? 'step-active' : 'step-done'">{{ step === 1 ? '1' : '✓' }}</span><span class="text-xs font-semibold">Motor details</span></div><div class="h-1 bg-white/20"><div class="h-full bg-white transition-all duration-300" :style="{ width: step === 1 ? '42%' : '100%' }"></div></div></div>
-            <div><div class="mb-2 flex items-center gap-2"><span class="step-dot" :class="step === 2 ? 'step-active' : 'step-idle'">2</span><span class="text-xs font-semibold" :class="step === 2 ? 'text-white' : 'text-white/65'">Zone & manager</span></div><div class="h-1 bg-white/20"><div class="h-full bg-white transition-all duration-300" :style="{ width: step === 2 ? '100%' : '0%' }"></div></div></div>
+          <div class="mt-6 grid grid-cols-3 gap-3">
+            <div v-for="item in [{ n: 1, label: 'Motor details' }, { n: 2, label: 'Assignment' }, { n: 3, label: 'Description' }]" :key="item.n">
+              <div class="mb-2 flex items-center gap-2"><span class="step-dot" :class="step === item.n ? 'step-active' : step > item.n ? 'step-done' : 'step-idle'">{{ step > item.n ? '✓' : item.n }}</span><span class="text-[11px] font-medium" :class="step === item.n ? 'text-gray-900' : 'text-gray-400'">{{ item.label }}</span></div>
+              <div class="h-1 bg-gray-100"><div class="h-full bg-gray-700 transition-all duration-300" :style="{ width: step >= item.n ? '100%' : '0%' }"></div></div>
+            </div>
           </div>
         </header>
-        <form id="motorEditForm" @submit.prevent="step === 1 ? nextStep() : submit()" class="p-5 sm:p-7">
+        <form id="motorEditForm" @submit.prevent="step < 3 ? nextStep() : submit()" class="p-5 sm:p-7">
           <Transition name="step-slide" mode="out-in">
             <div v-if="step === 1" key="motor-details">
               <div class="mb-5"><h3 class="text-sm font-bold text-gray-800">Motor details</h3><p class="mt-1 text-xs text-gray-500">Fill in the identifying and basic information.</p></div>
@@ -26,10 +27,9 @@
                 <label class="field">Year<input v-model.number="form.year" type="number" min="1900" max="2100" class="control" placeholder="e.g. 2024" /></label>
                 <label class="field">Color<select v-model="form.color" class="control"><option value="">Choose a color</option><option v-for="color in colors" :key="color" :value="color">{{ color }}</option></select></label>
                 <label class="field">Price<input v-model.number="form.price" type="number" min="0" step="0.01" class="control" placeholder="0.00" /></label>
-                <label class="field sm:col-span-2">Description <span class="optional">Optional</span><textarea v-model.trim="form.description" rows="3" class="control resize-y" placeholder="Add any helpful notes about this motor..."></textarea></label>
               </div>
             </div>
-            <div v-else key="zone-manager">
+            <div v-else-if="step === 2" key="zone-manager">
               <div class="mb-5"><h3 class="text-sm font-bold text-gray-800">Zone & manager assignment</h3><p class="mt-1 text-xs text-gray-500">Choose the property zone and responsible manager for this motor.</p></div>
               <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div class="choice-card">
@@ -49,12 +49,25 @@
               </div>
               <div class="mt-5 border border-primary/10 bg-primary/5 p-4"><p class="text-xs font-bold text-gray-800">Quick review</p><div class="mt-2 grid grid-cols-2 gap-3 text-xs"><div><span class="text-gray-500">Motor</span><p class="mt-1 font-semibold text-gray-800">{{ form.name || 'Not entered' }}</p></div><div><span class="text-gray-500">Type</span><p class="mt-1 font-semibold text-gray-800">{{ form.motor_type || 'Not selected' }}</p></div></div></div>
             </div>
+            <div v-else key="description">
+              <div class="mb-5"><h3 class="text-sm font-semibold text-gray-900">Description & review</h3><p class="mt-1 text-xs text-gray-500">Add any extra details that will help identify or manage this motor.</p></div>
+              <label class="field">Description <span class="optional">Optional</span><textarea v-model.trim="form.description" rows="6" class="control resize-y" placeholder="Add helpful notes about condition, purpose, or other details..."></textarea></label>
+              <div class="mt-5 border border-gray-100 bg-gray-50 p-4">
+                <p class="text-xs font-semibold text-gray-800">Review before saving</p>
+                <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+                  <div><dt class="text-gray-400">Motor</dt><dd class="mt-1 font-medium text-gray-800">{{ form.name || 'Not entered' }}</dd></div>
+                  <div><dt class="text-gray-400">Type</dt><dd class="mt-1 font-medium text-gray-800">{{ form.motor_type || 'Not selected' }}</dd></div>
+                  <div><dt class="text-gray-400">Zone</dt><dd class="mt-1 font-medium text-gray-800">{{ zones.find(z => Number(z.id) === Number(form.property_zone))?.name || zones.find(z => Number(z.id) === Number(form.property_zone))?.zone_name || 'Selected zone' }}</dd></div>
+                  <div><dt class="text-gray-400">Manager</dt><dd class="mt-1 font-medium text-gray-800">{{ Number(form.manager) ? (managers.find(m => Number(m.id) === Number(form.manager)) ? managerLabel(managers.find(m => Number(m.id) === Number(form.manager))) : 'Selected manager') : 'Not assigned' }}</dd></div>
+                </dl>
+              </div>
+            </div>
           </Transition>
         </form>
-        <footer class="flex items-center justify-between gap-3 border-t border-gray-100 bg-gray-50/80 px-5 py-4 sm:px-7">
-          <button v-if="step === 2" type="button" @click="previousStep" class="btn-secondary"><i class="fas fa-arrow-left mr-2"></i>Previous</button>
+        <footer class="flex items-center justify-between gap-3 border-t border-gray-100 bg-white px-5 py-4 sm:px-7">
+          <button v-if="step > 1" type="button" @click="previousStep" class="btn-secondary"><i class="fas fa-arrow-left mr-2"></i>Previous</button>
           <button v-else type="button" @click="$emit('close')" class="btn-secondary">Cancel</button>
-          <div class="flex items-center gap-2"><span class="mr-2 hidden text-xs text-gray-400 sm:inline">Step {{ step }} of 2</span><button form="motorEditForm" type="submit" :disabled="saving || loadingOptions" class="btn-primary">{{ step === 1 ? 'Next step' : (saving ? 'Saving…' : 'Save Changes') }}<i v-if="step === 1" class="fas fa-arrow-right ml-2"></i></button></div>
+          <div class="flex items-center gap-2"><span class="mr-2 hidden text-xs text-gray-400 sm:inline">Step {{ step }} of 3</span><button form="motorEditForm" type="submit" :disabled="saving || loadingOptions" class="btn-primary">{{ step < 3 ? 'Next step' : (saving ? 'Saving…' : 'Save Changes') }}<i v-if="step < 3" class="fas fa-arrow-right ml-2"></i></button></div>
         </footer>
       </section>
     </div>
@@ -80,8 +93,18 @@ export default {
       catch (error) { console.error("Failed to load motor zone/manager options:", error); this.$root.$refs.toast?.showToast("Could not load zones or managers", "error"); }
       finally { this.loadingOptions = false; }
     },
-    nextStep() { if (!this.form.name || !this.form.motor_type) return; this.step = 2; },
-    previousStep() { this.step = 1; },
+    nextStep() {
+      if (this.step === 1) {
+        if (!this.form.name || !this.form.motor_type) return;
+        this.step = 2;
+        return;
+      }
+      if (this.step === 2) {
+        if (!Number(this.form.property_zone)) { this.$root.$refs.toast?.showToast("Please select a property zone", "error"); return; }
+        this.step = 3;
+      }
+    },
+    previousStep() { if (this.step > 1) this.step -= 1; },
     async submit() {
       if (!this.data?.id) return;
       if (!Number(this.form.property_zone)) { this.$root.$refs.toast?.showToast("Please select a property zone", "error"); return; }
@@ -98,19 +121,19 @@ export default {
 };
 </script>
 <style scoped>
-.modal-backdrop { background: rgba(15, 23, 42, .58); backdrop-filter: blur(5px); animation: backdrop-in .18s ease-out; }
-.motor-modal { animation: modal-in .24s cubic-bezier(.2,.75,.25,1); border: 1px solid rgba(255,255,255,.65); }
+.modal-backdrop { background: rgba(15, 23, 42, .48); backdrop-filter: blur(4px); animation: backdrop-in .18s ease-out; }
+.motor-modal { animation: modal-in .24s cubic-bezier(.2,.75,.25,1); border: 1px solid #e5e7eb; }
 .field { display:block; color:#374151; font-size:12px; font-weight:650; }
 .control { display:block; width:100%; margin-top:7px; border:1px solid #e2e8f0; background:#fff; padding:10px 12px; color:#1f2937; font-size:13px; font-weight:400; outline:none; transition:border-color .18s, box-shadow .18s, background .18s; }
 .control:focus { border-color:var(--color-primary, #64748b); box-shadow:0 0 0 3px rgba(100,116,139,.12); background:#fff; }
 .required { color:#dc2626; }
 .optional { margin-left:4px; color:#9ca3af; font-size:10px; font-weight:500; }
-.choice-card { border:1px solid #e8edf3; background:linear-gradient(145deg,#fff,#fafbfd); padding:18px; transition:border-color .2s, box-shadow .2s; }
+.choice-card { border:1px solid #e8edf3; background:#fff; padding:18px; transition:border-color .2s, box-shadow .2s; }
 .choice-card:focus-within { border-color:#cbd5e1; box-shadow:0 8px 24px rgba(15,23,42,.045); }
-.step-dot { display:inline-flex; height:25px; width:25px; flex-shrink:0; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.45); font-size:11px; font-weight:700; }
-.step-active,.step-done { background:#fff; color:#334155; }
-.step-idle { color:#fff; opacity:.72; }
-.btn-primary { background:var(--color-primary,#334155); padding:10px 17px; color:#fff; font-size:12px; font-weight:700; transition:transform .18s,filter .18s; }
+.step-dot { display:inline-flex; height:25px; width:25px; flex-shrink:0; align-items:center; justify-content:center; border:1px solid #e5e7eb; font-size:11px; font-weight:700; color:#9ca3af; background:#fff; }
+.step-active,.step-done { border-color:#374151; background:#374151; color:#fff; }
+.step-idle { color:#9ca3af; background:#fff; }
+.btn-primary { background:#374151; padding:10px 17px; color:#fff; font-size:12px; font-weight:700; transition:transform .18s,filter .18s; }
 .btn-primary:hover:not(:disabled) { filter:brightness(1.08); transform:translateY(-1px); }
 .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
 .btn-secondary { border:1px solid #e2e8f0; background:#fff; padding:10px 16px; color:#475569; font-size:12px; font-weight:650; transition:background .18s; }
