@@ -53,12 +53,12 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[620px]">
+          <table class="w-full min-w-[540px]">
             <thead class="bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
               <tr>
                 <th class="px-5 py-3">Subtype name</th>
                 <th class="px-5 py-3">Parent property type</th>
-                <th class="px-5 py-3">Subtype ID</th>
+                
                 <th class="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -78,7 +78,7 @@
                     <i class="fas fa-house text-slate-400"></i>{{ parentTypeName(subtype) }}
                   </span>
                 </td>
-                <td class="px-5 py-4 font-mono text-xs text-slate-500">#{{ subtype.id }}</td>
+                
                 <td class="px-5 py-4">
                   <div class="flex justify-end gap-1.5">
                     <button @click="viewDetail(subtype.id)" :aria-label="'View ' + subtype.name" title="View details" class="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-primary hover:bg-primary hover:text-white"><i class="fas fa-eye"></i></button>
@@ -88,7 +88,7 @@
                 </td>
               </tr>
               <tr v-if="!loading && !errorMessage && filteredSubtypes.length === 0">
-                <td colspan="4" class="px-5 py-14 text-center">
+                <td colspan="3" class="px-5 py-14 text-center">
                   <div class="mx-auto flex max-w-sm flex-col items-center">
                     <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400"><i class="fas fa-layer-group text-xl"></i></span>
                     <p class="mt-3 font-bold text-slate-800">{{ searchTerm ? 'No matching subtypes' : 'No property subtypes yet' }}</p>
