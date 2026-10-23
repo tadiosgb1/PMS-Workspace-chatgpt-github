@@ -23,8 +23,21 @@
         <i class="fas fa-spinner fa-spin mr-2"></i>Loading property…
       </div>
 
-      <form v-else @submit.prevent="submitForm" class="max-h-[calc(92vh-132px)] overflow-y-auto">
-        <div class="grid gap-5 border-b border-slate-200 p-6 md:grid-cols-2 lg:grid-cols-3">
+      <form v-else @submit.prevent="handleFormSubmit" class="max-h-[calc(92vh-132px)] overflow-y-auto">
+        <div class="border-b border-slate-200 px-6 py-4">
+          <div class="mb-2 flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-800">Step {{ currentStep }} of 2</span>
+            <span class="text-slate-500">{{ currentStep === 1 ? "Property information" : "Amenities and features" }}</span>
+          </div>
+          <div class="h-1.5 w-full bg-slate-100" role="progressbar" :aria-valuenow="currentStep" aria-valuemin="1" aria-valuemax="2" aria-label="Form progress">
+            <div class="h-1.5 bg-primary transition-all" :style="{ width: currentStep === 1 ? '50%' : '100%' }"></div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <div :class="currentStep === 1 ? 'border-primary bg-slate-50 text-slate-900' : 'border-slate-200 text-slate-500'" class="border px-3 py-2 text-xs font-medium">1. Property information</div>
+            <div :class="currentStep === 2 ? 'border-primary bg-slate-50 text-slate-900' : 'border-slate-200 text-slate-500'" class="border px-3 py-2 text-xs font-medium">2. Amenities and features</div>
+          </div>
+        </div>
+        <div v-if="currentStep === 1" class="grid gap-5 border-b border-slate-200 p-6 md:grid-cols-2 lg:grid-cols-3">
           <Field label="Property type" required>
             <select v-model.number="form.property_type" class="input" required @change="onPropertyTypeChange">
               <option :value="null" disabled>Select a property type</option>
@@ -80,7 +93,7 @@
           </Field>
         </div>
 
-        <div class="border-b border-slate-200 p-6">
+        <div v-if="currentStep === 2" class="border-b border-slate-200 p-6">
           <div class="mb-4">
             <h3 class="text-sm font-semibold text-slate-900">Amenities and features</h3>
             <p class="mt-1 text-xs text-slate-500">Select the features included with the property.</p>
@@ -95,11 +108,15 @@
 
         <div v-if="error" class="mx-6 my-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
 
-        <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <button type="button" @click="close" class="border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
-          <button type="submit" :disabled="saving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">
-            <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>{{ saving ? "Saving…" : "Save changes" }}
-          </button>
+        <div class="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
+          <button type="button" @click="previousStep" :disabled="currentStep === 1 || saving" class="border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+          <div class="flex items-center gap-3">
+            <button type="button" @click="close" class="border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button v-if="currentStep === 1" type="button" @click="nextStep" :disabled="saving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">Next <i class="fas fa-arrow-right ml-2"></i></button>
+            <button v-else type="submit" :disabled="saving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">
+              <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>{{ saving ? "Saving…" : "Save changes" }}
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -134,6 +151,7 @@ export default {
   data() {
     return {
       form: { ...defaults },
+      currentStep: 1,
       loadingData: false,
       saving: false,
       error: "",
@@ -169,7 +187,10 @@ export default {
   },
   watch: {
     open(value) {
-      if (value) this.load();
+      if (value) {
+        this.currentStep = 1;
+        this.load();
+      }
     }
   },
   computed: {
@@ -282,6 +303,31 @@ export default {
         this.error = "The selected subtype does not belong to the selected property type.";
       }
       return valid;
+    },
+    nextStep() {
+      if (this.currentStep >= 2) return;
+      const formElement = this.$el.querySelector("form");
+      if (formElement && !formElement.reportValidity()) return;
+      if (!this.form.property_type) {
+        this.error = "Please select a property type.";
+        return;
+      }
+      if (!this.validateSubtypeSelection()) return;
+      this.error = "";
+      this.currentStep = 2;
+    },
+    previousStep() {
+      if (this.currentStep > 1) {
+        this.currentStep -= 1;
+        this.error = "";
+      }
+    },
+    handleFormSubmit() {
+      if (this.currentStep === 1) {
+        this.nextStep();
+        return;
+      }
+      this.submitForm();
     },
     close() {
       if (!this.saving) this.$emit("close");
