@@ -353,13 +353,34 @@ export default {
     },
     nextStep() {
       if (this.currentStep >= 3) return;
-      const formElement = this.$el.querySelector("form");
-      if (formElement && !formElement.reportValidity()) return;
-      if (!this.form.property_type) {
-        this.error = "Please select a property type.";
-        return;
+
+      // Validate only the current step. Validating the whole form can be
+      // blocked by required controls in other wizard steps.
+      if (this.currentStep === 1) {
+        if (!this.form.property_type) {
+          this.error = "Please select a property type.";
+          return;
+        }
+        if (!String(this.form.price ?? "").trim()) {
+          this.error = "Please enter the property price.";
+          return;
+        }
+        if (!this.form.completion_status || !this.form.sale_type) {
+          this.error = "Please complete all required fields in Basic details.";
+          return;
+        }
+        if (!this.validateSubtypeSelection()) return;
+      } else if (this.currentStep === 2) {
+        if (!this.form.project_completion || !this.form.pre_handover_payment || !this.form.project_status || !String(this.form.developer ?? "").trim()) {
+          this.error = "Please complete the required project details.";
+          return;
+        }
+        if (!this.form.property_zone || !this.form.owner || !this.form.manager) {
+          this.error = "Please select the property zone, owner and manager before continuing.";
+          return;
+        }
       }
-      if (!this.validateSubtypeSelection()) return;
+
       this.error = "";
       this.currentStep += 1;
     },
