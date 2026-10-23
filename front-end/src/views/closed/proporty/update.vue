@@ -497,7 +497,7 @@ export default {
         this.form.property_type = this.form.property_type.id;
       }
       this.form.property_type = this.selectedTypeId || this.form.property_type || "";
-      this.form.property_subtype = this.form.property_subtype ? Number(this.form.property_subtype) : "";
+      this.form.property_subtype = this.form.property_subtype ? Number(this.form.property_subtype) : null;
 
       try {
         await this.$apiPatch("/update_property", this.form.id, { ...this.form });
