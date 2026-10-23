@@ -370,7 +370,7 @@ export default {
       }
     },
     handleFormSubmit() {
-      if (this.currentStep === 1) {
+      if (this.currentStep < 3) {
         this.nextStep();
         return;
       }
