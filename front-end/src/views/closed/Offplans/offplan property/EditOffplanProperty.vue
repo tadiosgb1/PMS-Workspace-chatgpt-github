@@ -320,7 +320,7 @@ export default {
       this.saving = true;
       this.error = "";
       try {
-        await this.$apiPatch("/update_offplan_property", this.id, { ...this.form });
+        await this.$apiPatch("/update_offplan_property", this.id, { ...this.form, property_type: Number(this.form.property_type), property_subtype: this.form.property_subtype == null || this.form.property_subtype === "" ? null : Number(this.form.property_subtype) });
         this.$emit("saved");
         this.$emit("close");
       } catch (e) {
