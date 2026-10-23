@@ -325,13 +325,21 @@ export default {
     },
     nextStep() {
       if (this.currentStep >= 3) return;
-      const formElement = this.$el.querySelector("form");
-      if (formElement && !formElement.reportValidity()) return;
-      if (!this.form.property_type) {
-        this.error = "Please select a property type.";
-        return;
+
+      // Validate only the current step, not required fields in other steps.
+      if (this.currentStep === 1) {
+        if (!this.form.property_type) {
+          this.error = "Please select a property type.";
+          return;
+        }
+        if (!this.validateSubtypeSelection()) return;
+      } else if (this.currentStep === 2) {
+        if (!this.form.property_zone || !this.form.owner || !this.form.manager) {
+          this.error = "Please select the property zone, owner and manager before continuing.";
+          return;
+        }
       }
-      if (!this.validateSubtypeSelection()) return;
+
       this.error = "";
       this.currentStep += 1;
     },
