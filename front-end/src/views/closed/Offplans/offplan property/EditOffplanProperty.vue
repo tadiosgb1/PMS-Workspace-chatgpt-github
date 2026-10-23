@@ -25,7 +25,19 @@
 
       <form v-else @submit.prevent="submitForm" class="max-h-[calc(92vh-132px)] overflow-y-auto">
         <div class="grid gap-5 border-b border-slate-200 p-6 md:grid-cols-2 lg:grid-cols-3">
-          <Field label="Property type"><select v-model="form.property_type" class="input"><option value="residential">Residential</option><option value="commercial">Commercial</option></select></Field>
+          <Field label="Property type" required>
+            <select v-model.number="form.property_type" class="input" required @change="onPropertyTypeChange">
+              <option :value="null" disabled>Select a property type</option>
+              <option v-for="type in propertyTypes" :key="type.id" :value="Number(type.id)">{{ type.name }}</option>
+            </select>
+          </Field>
+          <Field label="Property subtype">
+            <select v-model="form.property_subtype" class="input" :disabled="!form.property_type" @change="validateSubtypeSelection">
+              <option :value="null">No subtype</option>
+              <option v-for="subtype in availableSubtypes" :key="subtype.id" :value="Number(subtype.id)">{{ subtype.name }}</option>
+            </select>
+            <p v-if="form.property_type && availableSubtypes.length === 0" class="mt-1 text-xs text-slate-500">No subtypes are configured for this type.</p>
+          </Field>
           <Field label="Completion status"><select v-model="form.completion_status" class="input"><option value="ready">Ready</option><option value="offplan">Offplan</option><option value="under_construction">Under construction</option></select></Field>
           <Field label="Price"><input v-model="form.price" class="input" /></Field>
           <Field label="Bedrooms"><input v-model="form.bedrooms" class="input" /></Field>
@@ -98,7 +110,7 @@
 import OffplanField from "./OffplanField.vue";
 
 const defaults = {
-  property_type: "residential", completion_status: "ready", price: "", bedrooms: "", bathrooms: "", area_or_size: "",
+  property_type: null, property_subtype: null, completion_status: "ready", price: "", bedrooms: "", bathrooms: "", area_or_size: "",
   sale_type: "initial_sale", project_completion: "under_25", pre_handover_payment: "under_25",
   project_status: "under_construction", developer: "", is_furnished: true, has_maids_room: true, has_study: true,
   has_central_or_ac_and_heating: true, has_balcony: true, has_private_garden: true, has_private_pool: true,
@@ -126,6 +138,8 @@ export default {
       saving: false,
       error: "",
       zones: [],
+      propertyTypes: [],
+      propertySubtypes: [],
       owners: [],
       managers: [],
       zoneSearch: "",
@@ -180,6 +194,13 @@ export default {
       const q = this.managerSearch.trim().toLowerCase();
       return q ? this.managers.filter(item => item.name.toLowerCase().includes(q)) : this.managers;
     },
+    availableSubtypes() {
+      return this.propertySubtypes.filter(subtype => {
+        const relation = subtype?.property_type;
+        const parentId = relation && typeof relation === "object" ? relation.id : (subtype?.property_type_id ?? relation);
+        return String(parentId ?? "") === String(this.form.property_type ?? "");
+      });
+    },
     ownerDisplayName() {
       const owner = this.owners.find(item => Number(item.id) === Number(this.form.owner));
       return owner?.name || (this.form.owner ? "Assigned owner" : "Assigned owner");
@@ -211,7 +232,17 @@ export default {
       this.loadingData = true;
       this.error = "";
       try {
-        const zoneResponse = await this.$getZones({ page: 1, pageSize: 1000 });
+        const [typeResponse, subtypeResponse, zoneResponse] = await Promise.all([
+          this.$apiGet("/get_property_types"),
+          this.$apiGet("/get_property_subtypes", {}),
+          this.$getZones({ page: 1, pageSize: 1000 })
+        ]);
+        this.propertyTypes = this.normalizeList(typeResponse, ["types", "property_types", "results"]).map(item => ({
+          ...item, id: Number(item?.id ?? item?.property_type_id), name: String(item?.name ?? item?.title ?? item?.property_type ?? "")
+        })).filter(item => item.id && item.name);
+        this.propertySubtypes = this.normalizeList(subtypeResponse, ["property_subtypes", "subtypes", "results"]).map(item => ({
+          ...item, id: Number(item?.id ?? item?.property_subtype_id), name: String(item?.name ?? item?.title ?? item?.property_subtype ?? "")
+        })).filter(item => item.id && item.name);
         this.zones = (zoneResponse.zones || []).map(this.normalizeZone).filter(item => item.id);
         if (this.isElevatedUser) {
           const ownerResponse = await this.$apiGet("/get_owners", { page: 1, page_size: 1000 });
@@ -232,6 +263,26 @@ export default {
         this.loadingData = false;
       }
     },
+    onPropertyTypeChange() {
+      if (!this.availableSubtypes.some(subtype => Number(subtype.id) === Number(this.form.property_subtype))) {
+        this.form.property_subtype = null;
+      }
+    },
+    validateSubtypeSelection() {
+      if (this.form.property_subtype && !this.form.property_type) {
+        this.form.property_subtype = null;
+        this.error = "Select a property type before choosing a subtype.";
+        return false;
+      }
+      const valid = !this.form.property_subtype || this.availableSubtypes.some(
+        subtype => Number(subtype.id) === Number(this.form.property_subtype)
+      );
+      if (!valid) {
+        this.form.property_subtype = null;
+        this.error = "The selected subtype does not belong to the selected property type.";
+      }
+      return valid;
+    },
     close() {
       if (!this.saving) this.$emit("close");
     },
@@ -240,6 +291,10 @@ export default {
       const res = await this.$apiGetById("/get_offplan_property", this.id);
       const item = res?.data?.data || res?.data || res?.property || res;
       this.form = { ...defaults, ...item };
+      const rawType = item?.property_type;
+      this.form.property_type = Number(rawType && typeof rawType === "object" ? rawType.id : (item?.property_type_id ?? rawType)) || null;
+      const rawSubtype = item?.property_subtype;
+      this.form.property_subtype = Number(rawSubtype && typeof rawSubtype === "object" ? rawSubtype.id : (item?.property_subtype_id ?? rawSubtype)) || null;
       if (!this.isElevatedUser) this.form.owner = this.getLoggedInUserId();
     },
     async load() {
@@ -248,6 +303,11 @@ export default {
     },
     async submitForm() {
       if (!this.canAccess) return;
+      if (!this.form.property_type) {
+        this.error = "Please select a property type.";
+        return;
+      }
+      if (!this.validateSubtypeSelection()) return;
       if (!this.form.property_zone || !this.form.manager) {
         this.error = "Property zone and manager are required.";
         return;
