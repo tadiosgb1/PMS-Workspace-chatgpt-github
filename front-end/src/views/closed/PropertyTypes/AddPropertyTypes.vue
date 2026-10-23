@@ -48,7 +48,8 @@ export default {
       this.loadingTypes = true;
       try {
         const response = await this.$apiGet("/get_property_types", { page: 1, page_size: 1000 });
-        this.propertyTypes = Array.isArray(response) ? response : (response?.data || response?.results || response?.property_types || []);\n        if (this.parentTypeId != null) this.form.property_type = String(this.parentTypeId);
+        this.propertyTypes = Array.isArray(response) ? response : (response?.data || response?.results || response?.property_types || []);
+        if (this.parentTypeId != null) this.form.property_type = String(this.parentTypeId);
       } catch (error) {
         this.errorMessage = error?.message || "Unable to load property types.";
       } finally { this.loadingTypes = false; }
