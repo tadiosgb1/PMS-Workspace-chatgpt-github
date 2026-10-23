@@ -335,7 +335,7 @@ export default {
       this.loading = true;
       this.error = "";
       try {
-        await this.$apiPost("/post_offplan_property", { ...this.form });
+        await this.$apiPost("/post_offplan_property", { ...this.form, property_type: Number(this.form.property_type), property_subtype: this.form.property_subtype == null || this.form.property_subtype === "" ? null : Number(this.form.property_subtype) });
         this.$emit("saved");
         this.$emit("close");
       } catch (e) {
