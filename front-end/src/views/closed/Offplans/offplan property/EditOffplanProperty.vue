@@ -333,7 +333,7 @@ export default {
       }
       if (!this.validateSubtypeSelection()) return;
       this.error = "";
-      this.currentStep = 2;
+      this.currentStep += 1;
     },
     previousStep() {
       if (this.currentStep > 1) {
