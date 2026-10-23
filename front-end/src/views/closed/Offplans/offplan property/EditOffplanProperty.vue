@@ -24,17 +24,29 @@
       </div>
 
       <form v-else @submit.prevent="handleFormSubmit" class="max-h-[calc(92vh-132px)] overflow-y-auto">
-        <div class="border-b border-slate-200 px-6 py-4">
-          <div class="mb-2 flex items-center justify-between text-xs">
-            <span class="font-semibold text-slate-800">Step {{ currentStep }} of 2</span>
-            <span class="text-slate-500">{{ currentStep === 1 ? "Property information" : "Amenities and features" }}</span>
+        <div class="border-b border-slate-200 bg-white px-6 py-5">
+          <div class="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Property setup</p>
+              <p class="mt-1 text-sm font-semibold text-slate-900">Step {{ currentStep }} of 3</p>
+            </div>
+            <p class="text-xs text-slate-500">{{ currentStep === 1 ? "Basic details" : currentStep === 2 ? "Project & ownership" : "Amenities & features" }}</p>
           </div>
-          <div class="h-1.5 w-full bg-slate-100" role="progressbar" :aria-valuenow="currentStep" aria-valuemin="1" aria-valuemax="2" aria-label="Form progress">
-            <div class="h-1.5 bg-primary transition-all" :style="{ width: currentStep === 1 ? '50%' : '100%' }"></div>
+          <div class="relative">
+            <div class="absolute left-[16.66%] right-[16.66%] top-4 h-0.5 bg-slate-200"></div>
+            <div class="absolute left-[16.66%] top-4 h-0.5 bg-primary transition-all" :style="{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '33.33%' : '66.66%' }"></div>
+            <div class="relative grid grid-cols-3 gap-2">
+              <div v-for="step in [{ number: 1, label: 'Basic details' }, { number: 2, label: 'Project & ownership' }, { number: 3, label: 'Amenities & features' }]" :key="step.number" class="flex flex-col items-center text-center">
+                <div :class="currentStep === step.number ? 'border-primary bg-primary text-white' : currentStep > step.number ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white text-slate-500'" class="z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold">
+                  <i v-if="currentStep > step.number" class="fas fa-check"></i>
+                  <span v-else>{{ step.number }}</span>
+                </div>
+                <span :class="currentStep === step.number ? 'font-semibold text-slate-900' : 'text-slate-500'" class="mt-2 text-[11px] sm:text-xs">{{ step.label }}</span>
+              </div>
+            </div>
           </div>
-          <div class="mt-3 grid grid-cols-2 gap-2">
-            <div :class="currentStep === 1 ? 'border-primary bg-slate-50 text-slate-900' : 'border-slate-200 text-slate-500'" class="border px-3 py-2 text-xs font-medium">1. Property information</div>
-            <div :class="currentStep === 2 ? 'border-primary bg-slate-50 text-slate-900' : 'border-slate-200 text-slate-500'" class="border px-3 py-2 text-xs font-medium">2. Amenities and features</div>
+          <div class="mt-4 h-1 w-full overflow-hidden bg-slate-100">
+            <div class="h-full bg-primary transition-all" :style="{ width: (currentStep / 3 * 100) + '%' }"></div>
           </div>
         </div>
         <div v-if="currentStep === 1" class="grid gap-5 border-b border-slate-200 p-6 md:grid-cols-2 lg:grid-cols-3">
@@ -57,6 +69,13 @@
           <Field label="Bathrooms"><input v-model="form.bathrooms" class="input" /></Field>
           <Field label="Area / size"><input v-model="form.area_or_size" class="input" /></Field>
           <Field label="Sale type"><select v-model="form.sale_type" class="input"><option value="initial_sale">Initial sale</option><option value="resale">Resale</option></select></Field>
+        </div>
+
+        <div v-if="currentStep === 2" class="grid gap-5 border-b border-slate-200 p-6 md:grid-cols-2 lg:grid-cols-3">
+          <div class="md:col-span-2 lg:col-span-3 border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-semibold text-slate-900">Project and ownership</h3>
+            <p class="mt-1 text-xs text-slate-500">Track delivery progress, developer, zone and responsible people.</p>
+          </div>
           <Field label="Project completion"><select v-model="form.project_completion" class="input"><option value="under_25">Under 25%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
           <Field label="Pre-handover payment"><select v-model="form.pre_handover_payment" class="input"><option value="under_25">Under 25%</option><option value="50_75">50% – 75%</option><option value="over_75">Over 75%</option></select></Field>
           <Field label="Project status"><select v-model="form.project_status" class="input"><option value="under_construction">Under construction</option><option value="planned">Planned</option><option value="completed">Completed</option></select></Field>
@@ -93,7 +112,7 @@
           </Field>
         </div>
 
-        <div v-if="currentStep === 2" class="border-b border-slate-200 p-6">
+        <div v-if="currentStep === 3" class="border-b border-slate-200 p-6">
           <div class="mb-4">
             <h3 class="text-sm font-semibold text-slate-900">Amenities and features</h3>
             <p class="mt-1 text-xs text-slate-500">Select the features included with the property.</p>
@@ -112,7 +131,7 @@
           <button type="button" @click="previousStep" :disabled="currentStep === 1 || saving" class="border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
           <div class="flex items-center gap-3">
             <button type="button" @click="close" class="border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
-            <button v-if="currentStep === 1" type="button" @click="nextStep" :disabled="saving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">Next <i class="fas fa-arrow-right ml-2"></i></button>
+            <button v-if="currentStep < 3" type="button" @click="nextStep" :disabled="saving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">Next <i class="fas fa-arrow-right ml-2"></i></button>
             <button v-else type="submit" :disabled="saving" class="border border-primary bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">
               <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>{{ saving ? "Saving…" : "Save changes" }}
             </button>
@@ -305,7 +324,7 @@ export default {
       return valid;
     },
     nextStep() {
-      if (this.currentStep >= 2) return;
+      if (this.currentStep >= 3) return;
       const formElement = this.$el.querySelector("form");
       if (formElement && !formElement.reportValidity()) return;
       if (!this.form.property_type) {
