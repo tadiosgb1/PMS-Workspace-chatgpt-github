@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 p-4 md:p-6">
+  <div class="pms-brand-page min-h-screen bg-slate-50 p-4 md:p-6">
     <Loading :visible="loading" message="Loading property subtype..." />
     <main class="mx-auto max-w-3xl space-y-5">
       <button @click="$router.back()" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-primary"><i class="fas fa-arrow-left"></i> Back to property subtypes</button>
