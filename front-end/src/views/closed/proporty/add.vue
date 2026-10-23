@@ -416,7 +416,7 @@ export default {
       }
       if (!this.validateSubtypeSelection()) return;
       this.form.property_type = this.selectedTypeId || "";
-      this.form.property_subtype = this.form.property_subtype ? Number(this.form.property_subtype) : "";
+      this.form.property_subtype = this.form.property_subtype ? Number(this.form.property_subtype) : null;
 
       // Zero-out the pricing field that doesn't apply to the selected status
       if (this.form.status === 'available') {
