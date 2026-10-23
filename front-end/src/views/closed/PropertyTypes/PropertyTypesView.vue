@@ -71,7 +71,6 @@ export default {
   methods: {
     async loadDirectory() {
       await this.fetchPropertyTypes();
-      if (this.propertyTypes.length) await this.fetchPropertySubtypes();
     },
     async fetchPropertyTypes() {
       this.loading = true; this.errorMessage = "";
