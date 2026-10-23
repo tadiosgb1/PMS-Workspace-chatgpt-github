@@ -108,3 +108,14 @@
 .pms-brand-page .hover\\:bg-slate-900:hover {
   background-color: rgb(var(--color-dprimary) / 1) !important;
 }
+
+
+/* Keep the property type and subtype workflow restrained and consistent. */
+.pms-brand-page .shadow-sm,
+.pms-brand-page .shadow,
+.pms-brand-page .shadow-md,
+.pms-brand-page .shadow-lg,
+.pms-brand-page .shadow-xl,
+.pms-brand-page .shadow-2xl {
+  box-shadow: none !important;
+}
