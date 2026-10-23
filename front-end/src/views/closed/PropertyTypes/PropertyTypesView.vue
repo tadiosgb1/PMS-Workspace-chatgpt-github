@@ -1,18 +1,13 @@
 <template>
-  <div class="min-h-screen bg-slate-50 p-4 md:p-6 text-sm">
+  <div class="pms-brand-page min-h-screen bg-slate-50 p-4 md:p-6 text-sm">
     <Toast ref="toast" />
     <Loading :visible="loading" message="Loading property types..." />
     <main class="mx-auto max-w-7xl space-y-5">
-      <header class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-start gap-3">
-          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><i class="fas fa-house text-xl"></i></div>
-          <div>
-            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Property configuration</p>
-            <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-900">Property Types</h1>
-            <p class="mt-1 text-sm text-slate-500">Choose a property type to view or add its subtypes.</p>
-          </div>
+      <header class="flex flex-col gap-1 border-b border-slate-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-lg font-semibold text-slate-900">Property Types</h1>
+          <p class="mt-1 text-xs text-slate-500">Manage property types and their subtypes.</p>
         </div>
-        <button @click="fetchPropertyTypes" :disabled="loading" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 transition hover:border-primary hover:text-primary disabled:opacity-50"><i class="fas fa-rotate" :class="{ 'fa-spin': loading }"></i> Refresh</button>
       </header>
 
       <section class="grid grid-cols-1 gap-3 sm:grid-cols-3">
