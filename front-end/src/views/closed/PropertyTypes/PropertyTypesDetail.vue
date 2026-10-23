@@ -1,225 +1,75 @@
 <template>
-  <div class="p-4 md:p-6 bg-background min-h-screen text-sm">
-    <Loading :visible="loading" message="Loading property type..." />
-
-    <div v-if="item.id" class="max-w-4xl mx-auto space-y-4">
-
-      <!-- Back + Header -->
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <button @click="$router.back()"
-            class="flex items-center gap-1.5 text-xs text-gray-700 hover:text-primary transition">
-            <i class="fas fa-arrow-left text-xs"></i> Back
-          </button>
-          <div class="w-px h-4 bg-gray-300"></div>
-          <div>
-            <h1 class="text-lg font-black text-primary tracking-tight">{{ item.name }}</h1>
-            <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mt-0.5">Property Type · ID #{{ item.id }}</p>
+  <div class="min-h-screen bg-slate-50 p-4 md:p-6">
+    <Loading :visible="loading" message="Loading property subtype..." />
+    <main class="mx-auto max-w-3xl space-y-5">
+      <button @click="$router.back()" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-primary"><i class="fas fa-arrow-left"></i> Back to property subtypes</button>
+      <section v-if="item.id" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <header class="flex flex-col gap-4 border-b border-slate-100 bg-gradient-to-r from-primary/10 to-white p-6 sm:flex-row sm:items-center">
+          <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-xl font-black uppercase text-white">{{ initials(item.name) }}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Property subtype · #{{ item.id }}</p>
+            <h1 class="mt-1 break-words text-2xl font-black text-slate-900">{{ item.name }}</h1>
+            <p class="mt-1 text-sm text-slate-500">A subtype linked to a parent property type.</p>
+          </div>
+          <button @click="editSubtype" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-primary hover:text-primary"><i class="fas fa-pen"></i> Edit</button>
+        </header>
+        <div class="grid gap-4 p-6 sm:grid-cols-2">
+          <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Subtype name</p>
+            <p class="mt-2 font-bold text-slate-900">{{ item.name || '—' }}</p>
+          </div>
+          <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Parent property type</p>
+            <p class="mt-2 font-bold text-slate-900">{{ parentTypeName }}</p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span :class="item.is_sellable ? 'bg-green-100 text-green-700' : 'bg-background text-gray-500'"
-            class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase">
-            {{ item.is_sellable ? 'Sellable' : 'Not Sellable' }}
-          </span>
-          <span :class="item.is_rentable ? 'bg-blue-100 text-blue-700' : 'bg-background text-gray-500'"
-            class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase">
-            {{ item.is_rentable ? 'Rentable' : 'Not Rentable' }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Main Info Card -->
-      <div class="bg-white rounded-xl border border-primary/10 shadow-sm overflow-hidden">
-        <div class="px-5 py-3 bg-primary/5 border-b border-primary/10">
-          <h2 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Basic Information</h2>
-        </div>
-        <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-          <div class="detail-row">
-            <span class="detail-label">Name</span>
-            <span class="detail-value font-semibold text-primary">{{ item.name }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Description</span>
-            <span class="detail-value text-gray-700">{{ item.description || '—' }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Created</span>
-            <span class="detail-value">{{ formatDate(item.created_at) }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Last Updated</span>
-            <span class="detail-value">{{ formatDate(item.updated_at) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Physical Features -->
-      <div class="bg-white rounded-xl border border-primary/10 shadow-sm overflow-hidden">
-        <div class="px-5 py-3 bg-primary/5 border-b border-primary/10">
-          <h2 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Physical Features</h2>
-        </div>
-        <div class="p-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div v-for="feat in physicalFeatures" :key="feat.key" class="feat-card" :class="item[feat.key] ? 'feat-on' : 'feat-off'">
-            <i :class="[feat.icon, 'text-sm']"></i>
-            <span class="text-xs font-semibold">{{ feat.label }}</span>
-            <span class="ml-auto text-[10px] font-bold uppercase">{{ item[feat.key] ? 'Yes' : 'No' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Listing Capabilities -->
-      <div class="bg-white rounded-xl border border-primary/10 shadow-sm overflow-hidden">
-        <div class="px-5 py-3 bg-primary/5 border-b border-primary/10">
-          <h2 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Listing Capabilities</h2>
-        </div>
-        <div class="p-5 grid grid-cols-2 gap-3">
-          <div class="feat-card" :class="item.is_sellable ? 'feat-on' : 'feat-off'">
-            <i class="fas fa-tag text-sm"></i>
-            <span class="text-xs font-semibold">Is Sellable</span>
-            <span class="ml-auto text-[10px] font-bold uppercase">{{ item.is_sellable ? 'Yes' : 'No' }}</span>
-          </div>
-          <div class="feat-card" :class="item.is_rentable ? 'feat-on' : 'feat-off'">
-            <i class="fas fa-home text-sm"></i>
-            <span class="text-xs font-semibold">Is Rentable</span>
-            <span class="ml-auto text-[10px] font-bold uppercase">{{ item.is_rentable ? 'Yes' : 'No' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Project Info -->
-      <div class="bg-white rounded-xl border border-primary/10 shadow-sm overflow-hidden">
-        <div class="px-5 py-3 bg-primary/5 border-b border-primary/10">
-          <h2 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Project Info</h2>
-        </div>
-        <div class="p-5 space-y-3">
-
-          <!-- Project Completion -->
-          <div class="flex items-center justify-between py-2 border-b border-gray-50">
-            <div class="flex items-center gap-2 text-xs text-gray-700">
-              <i class="fas fa-calendar-check text-gray-500 w-4 text-center"></i>
-              <span class="font-medium">Has Project Completion</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span :class="item.has_project_completion ? 'bg-green-100 text-green-700' : 'bg-background text-gray-500'"
-                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
-                {{ item.has_project_completion ? 'Yes' : 'No' }}
-              </span>
-              <span v-if="item.has_project_completion && item.project_completion_year"
-                class="text-xs font-bold text-gray-800 bg-yellow-50 border border-yellow-200 px-2 py-0.5 rounded">
-                {{ item.project_completion_year }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Project Status -->
-          <div class="flex items-center justify-between py-2 border-b border-gray-50">
-            <div class="flex items-center gap-2 text-xs text-gray-700">
-              <i class="fas fa-hard-hat text-gray-500 w-4 text-center"></i>
-              <span class="font-medium">Has Project Status</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span :class="item.has_project_status ? 'bg-green-100 text-green-700' : 'bg-background text-gray-500'"
-                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
-                {{ item.has_project_status ? 'Yes' : 'No' }}
-              </span>
-              <span v-if="item.has_project_status && item.project_status"
-                :class="item.project_status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'"
-                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
-                {{ item.project_status === 'under_construction' ? 'Under Construction' : 'Completed' }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Pre-handover Payment -->
-          <div class="flex items-center justify-between py-2">
-            <div class="flex items-center gap-2 text-xs text-gray-700">
-              <i class="fas fa-hand-holding-dollar text-gray-500 w-4 text-center"></i>
-              <span class="font-medium">Has Pre-handover Payment</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span :class="item.has_pre_handover_payment ? 'bg-green-100 text-green-700' : 'bg-background text-gray-500'"
-                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
-                {{ item.has_pre_handover_payment ? 'Yes' : 'No' }}
-              </span>
-              <span v-if="item.pre_handover_payment"
-                class="text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full uppercase">
-                {{ preHandoverLabel(item.pre_handover_payment) }}
-              </span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <div v-else-if="!loading" class="text-center py-20 text-sm text-gray-500 italic">
-      Property type not found.
-    </div>
+      </section>
+      <section v-else-if="!loading" class="rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center">
+        <i class="fas fa-circle-exclamation text-3xl text-slate-300"></i>
+        <h1 class="mt-3 font-bold text-slate-900">Property subtype not found</h1>
+        <p class="mt-1 text-sm text-slate-500">{{ errorMessage || 'The subtype may have been deleted or is no longer available.' }}</p>
+      </section>
+    </main>
+    <EditPropertyTypes v-if="updateVisible" :data="item" :visible="updateVisible" @close="updateVisible = false" @refresh="afterSave" />
   </div>
 </template>
 
 <script>
 import Loading from "@/components/Loading.vue";
+import EditPropertyTypes from "./EditPropertyTypes.vue";
 
 export default {
   name: "PropertyTypesDetail",
-  components: { Loading },
+  components: { Loading, EditPropertyTypes },
   data() {
-    return {
-      item: {},
-      loading: false,
-      physicalFeatures: [
-        { key: 'has_floor',        label: 'Has Floor',        icon: 'fas fa-layer-group' },
-        { key: 'has_bedroom',      label: 'Has Bedroom',      icon: 'fas fa-bed' },
-        { key: 'has_bathroom',     label: 'Has Bathroom',     icon: 'fas fa-bath' },
-        { key: 'has_house_number', label: 'Has House Number', icon: 'fas fa-hashtag' },
-        { key: 'has_block_number', label: 'Has Block Number', icon: 'fas fa-th-large' },
-        { key: 'has_furnishing',   label: 'Has Furnishing',   icon: 'fas fa-couch' },
-      ],
-    };
+    return { item: {}, propertyTypes: [], loading: false, errorMessage: "", updateVisible: false };
   },
-  async mounted() {
-    this.loading = true;
-    try {
-      const response = await this.$apiGetById('/get_property_type', this.$route.params.id);
-      this.item = response || {};
-    } catch (e) {
-      console.error(e);
-    } finally {
-      this.loading = false;
-    }
+  computed: {
+    parentTypeName() {
+      const relation = this.item?.property_type;
+      if (relation && typeof relation === "object") return relation.name || relation.title || (relation.id ? "Type #" + relation.id : "Not assigned");
+      const id = this.item?.property_type_id ?? relation;
+      return this.propertyTypes.find((type) => String(type.id) === String(id))?.name || (id != null ? "Type #" + id : "Not assigned");
+    },
   },
+  mounted() { this.fetchDetail(); this.fetchPropertyTypes(); },
   methods: {
-    formatDate(dateStr) {
-      if (!dateStr) return '—';
-      return new Date(dateStr).toLocaleDateString('en-US', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-      });
+    async fetchDetail() {
+      this.loading = true;
+      this.errorMessage = "";
+      try { this.item = (await this.$apiGetById("/get_property_subtype", this.$route.params.id)) || {}; }
+      catch (error) { console.error(error); this.errorMessage = error?.message || "Unable to load this subtype."; }
+      finally { this.loading = false; }
     },
-    preHandoverLabel(val) {
-      const map = {
-        under_25:  '< 25%',
-        '25_to_50': '25–50%',
-        '51_to_75': '51–75%',
-        above_75:  '> 75%',
-      };
-      return map[val] || val;
+    async fetchPropertyTypes() {
+      try {
+        const response = await this.$apiGet("/get_property_types", { page: 1, page_size: 1000 });
+        this.propertyTypes = Array.isArray(response) ? response : (response?.data || response?.results || response?.property_types || []);
+      } catch (error) { console.error("Unable to load parent property types:", error); }
     },
+    initials(name) { return String(name || "?").trim().split(/\s+/).slice(0, 2).map((part) => part.charAt(0)).join("") || "?"; },
+    editSubtype() { this.updateVisible = true; },
+    async afterSave() { this.updateVisible = false; await this.fetchDetail(); },
   },
 };
 </script>
-
-<style scoped>
-.detail-row   { @apply flex flex-col gap-0.5; }
-.detail-label { @apply text-[10px] font-bold text-gray-500 uppercase tracking-wider; }
-.detail-value { @apply text-sm text-gray-800; }
-
-.feat-card {
-  @apply flex items-center gap-2 px-3 py-2.5 rounded-lg border text-xs font-medium transition-colors;
-}
-.feat-on  { @apply bg-primary text-white border-primary; }
-.feat-off { @apply bg-primary/5 text-gray-500 border-primary/10; }
-</style>
