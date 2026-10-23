@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm">
-      <section class="my-6 w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <section class="pms-brand-page my-6 w-full max-w-xl overflow-hidden border border-slate-200 bg-white">
         <header class="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
           <div class="flex items-center gap-3">
             <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><i class="fas fa-layer-group"></i></span>
