@@ -166,6 +166,12 @@ const routes = [
         component: () => import('../views/closed/PropertyTypes/PropertyTypesView.vue'),
       },
       {
+        path: "propertytypes/:id/subtypes",
+        name: "PropertySubtypes-view",
+        component: () => import('../views/closed/PropertyTypes/PropertySubtypesView.vue'),
+        props: true,
+      },
+      {
         path: "propertytypes/add",
         name: "PropertyTypes-add",
         component: () => import('../views/closed/PropertyTypes/AddPropertyTypes.vue'),
