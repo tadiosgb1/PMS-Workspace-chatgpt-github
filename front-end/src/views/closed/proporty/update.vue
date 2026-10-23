@@ -42,6 +42,18 @@
                   </select>
                 </div>
 
+                <!-- Property Subtype: options are limited to the selected property type -->
+                <div>
+                  <label class="form-label">Subtype</label>
+                  <select v-model="form.property_subtype" class="form-input" :disabled="!selectedTypeId" @change="validateSubtypeSelection">
+                    <option value="">No subtype</option>
+                    <option v-for="subtype in availableSubtypes" :key="subtype.id" :value="subtype.id">
+                      {{ subtype.name }}
+                    </option>
+                  </select>
+                  <p v-if="selectedTypeId && availableSubtypes.length === 0" class="mt-1 text-xs text-gray-400">No subtypes are configured for this type.</p>
+                </div>
+
                 <!-- Zone with search -->
                 <div>
                   <label class="form-label">Zone <span class="text-red-500">*</span></label>
@@ -227,6 +239,7 @@ export default {
       zones: [],
       managers: [],
       propertyTypes: [],
+      propertySubtypes: [],
       zoneSearch: "",
       zoneSearchTimeout: null,
       amenities: [{ amenity: "", value: "" }],
@@ -248,6 +261,7 @@ export default {
         manager_id: "",
         name: "",
         property_type: "",
+        property_subtype: "",
         address: "",
         city: "",
         state: "",
@@ -272,6 +286,8 @@ export default {
       handler(val) {
         if (!val) return;
         this.form = { ...val };
+        // API responses may return subtype as an object or a raw id.
+        this.form.property_subtype = val.property_subtype?.id ?? val.property_subtype ?? "";
         this.amenities = this.parseAmenities(val.description);
 
         // property_type can be an object {id, name} or a raw id/string
@@ -300,6 +316,19 @@ export default {
       console.error("Failed to load property types", e);
     }
 
+    // Property subtypes
+    try {
+      const subtypeRes = await this.$apiGet("/get_property_subtypes", {});
+      this.propertySubtypes = Array.isArray(subtypeRes)
+        ? subtypeRes
+        : (subtypeRes?.data || subtypeRes?.results || subtypeRes?.property_subtypes || []);
+      if (this.form.property_subtype && !this.availableSubtypes.some((subtype) => String(subtype.id) === String(this.form.property_subtype))) {
+        this.form.property_subtype = "";
+      }
+    } catch (e) {
+      console.error("Failed to load property subtypes", e);
+    }
+
     // Zones
     const zRes = await this.$getZones();
     this.zones = zRes.zones || [];
@@ -316,6 +345,17 @@ export default {
       ? await this.$apiGet("/get_managers")
       : await this.$apiGet("/get_owner_managers", { owner__id: localStorage.getItem("userId") });
     this.managers = mRes.data || [];
+  },
+  computed: {
+    availableSubtypes() {
+      return this.propertySubtypes.filter((subtype) => {
+        const relation = subtype?.property_type;
+        const parentId = relation && typeof relation === "object"
+          ? relation.id
+          : (subtype?.property_type_id ?? relation);
+        return String(parentId ?? "") === String(this.selectedTypeId ?? "");
+      });
+    },
   },
   methods: {
 
@@ -356,6 +396,25 @@ export default {
     onTypeSelected() {
       this.selectedType = this.propertyTypes.find(t => t.id == this.selectedTypeId) || null;
       this.form.property_type = this.selectedTypeId;
+      if (!this.availableSubtypes.some((subtype) => String(subtype.id) === String(this.form.property_subtype))) {
+        this.form.property_subtype = "";
+      }
+    },
+
+    validateSubtypeSelection() {
+      if (this.form.property_subtype && !this.selectedTypeId) {
+        this.form.property_subtype = "";
+        this.$root.$refs.toast.showToast("Select a property type before choosing a subtype.", "error");
+        return false;
+      }
+      const valid = !this.form.property_subtype || this.availableSubtypes.some(
+        (subtype) => String(subtype.id) === String(this.form.property_subtype)
+      );
+      if (!valid) {
+        this.form.property_subtype = "";
+        this.$root.$refs.toast.showToast("The selected subtype does not belong to the selected property type.", "error");
+      }
+      return valid;
     },
 
     async fetchZones(search = "") {
@@ -399,6 +458,12 @@ export default {
         this.$root.$refs.toast.showToast("You do not have permission to edit properties.", "error");
         return;
       }
+      // Validate subtype ownership before submitting the property.
+      if (!this.selectedTypeId && this.form.property_subtype) {
+        this.$root.$refs.toast.showToast("A subtype requires a matching property type.", "error");
+        return;
+      }
+      if (!this.validateSubtypeSelection()) return;
       this.saving = true;
 
       // Zero-out the pricing field that doesn't apply to the selected status
@@ -427,10 +492,12 @@ export default {
         .map(a => `${a.amenity.trim()}:"${a.value.trim()}"`)
         .join(",");
 
-      // Ensure property_type is the id (not an object)
+      // Ensure property type and subtype are sent as IDs, not relation objects.
       if (this.form.property_type?.id) {
         this.form.property_type = this.form.property_type.id;
       }
+      this.form.property_type = this.selectedTypeId || this.form.property_type || "";
+      this.form.property_subtype = this.form.property_subtype ? Number(this.form.property_subtype) : "";
 
       try {
         await this.$apiPatch("/update_property", this.form.id, { ...this.form });
