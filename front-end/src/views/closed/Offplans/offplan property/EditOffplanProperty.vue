@@ -103,6 +103,15 @@ const defaults = {
   project_status: "under_construction", developer: "", is_furnished: true, has_maids_room: true, has_study: true,
   has_central_or_ac_and_heating: true, has_balcony: true, has_private_garden: true, has_private_pool: true,
   has_private_gym: true, has_private_jacuzzi: true, has_shared_pool: true, has_shared_spa: true,
+  has_conference_room: false,
+  has_covered_parking: false,
+  is_available_furnished: false,
+  is_available_networked: false,
+  has_shared_gym: false,
+  has_dining_in_building: false,
+  has_retail_in_building: false,
+  has_view_of_water: false,
+  has_view_of_landmark: false,
   property_zone: 0, owner: 0, manager: 0
 };
 
@@ -128,7 +137,16 @@ export default {
         { key: "has_balcony", label: "Balcony" }, { key: "has_private_garden", label: "Private garden" },
         { key: "has_private_pool", label: "Private pool" }, { key: "has_private_gym", label: "Private gym" },
         { key: "has_private_jacuzzi", label: "Private jacuzzi" }, { key: "has_shared_pool", label: "Shared pool" },
-        { key: "has_shared_spa", label: "Shared spa" }
+        { key: "has_shared_spa", label: "Shared spa" },
+        { key: "has_conference_room", label: "Conference room" },
+        { key: "has_covered_parking", label: "Covered parking" },
+        { key: "is_available_furnished", label: "Available furnished" },
+        { key: "is_available_networked", label: "Available networked" },
+        { key: "has_shared_gym", label: "Shared gym" },
+        { key: "has_dining_in_building", label: "Dining in building" },
+        { key: "has_retail_in_building", label: "Retail in building" },
+        { key: "has_view_of_water", label: "View of water" },
+        { key: "has_view_of_landmark", label: "View of landmark" }
       ]
     };
   },
