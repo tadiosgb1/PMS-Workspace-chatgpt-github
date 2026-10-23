@@ -37,10 +37,10 @@
 <script>
 export default {
   name: "AddPropertySubtype",
-  props: { visible: Boolean },
+  props: { visible: Boolean, parentTypeId: { type: [String, Number], default: null } },
   emits: ["close", "refresh"],
   data() {
-    return { saving: false, loadingTypes: false, errorMessage: "", propertyTypes: [], form: { property_type: "", name: "" } };
+    return { saving: false, loadingTypes: false, errorMessage: "", propertyTypes: [], form: { property_type: this.parentTypeId == null ? "" : String(this.parentTypeId), name: "" } };
   },
   mounted() { this.fetchPropertyTypes(); },
   methods: {
@@ -48,7 +48,7 @@ export default {
       this.loadingTypes = true;
       try {
         const response = await this.$apiGet("/get_property_types", { page: 1, page_size: 1000 });
-        this.propertyTypes = Array.isArray(response) ? response : (response?.data || response?.results || response?.property_types || []);
+        this.propertyTypes = Array.isArray(response) ? response : (response?.data || response?.results || response?.property_types || []);\n        if (this.parentTypeId != null) this.form.property_type = String(this.parentTypeId);
       } catch (error) {
         this.errorMessage = error?.message || "Unable to load property types.";
       } finally { this.loadingTypes = false; }
