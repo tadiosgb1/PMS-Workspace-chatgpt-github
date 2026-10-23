@@ -81,33 +81,33 @@
           <Field label="Project status"><select v-model="form.project_status" class="input"><option value="under_construction">Under construction</option><option value="planned">Planned</option><option value="completed">Completed</option></select></Field>
           <Field label="Developer"><input v-model="form.developer" class="input" /></Field>
           <Field label="Property zone" required>
-            <div class="space-y-2">
-              <input v-model="zoneSearch" class="input" placeholder="Search property zones…" autocomplete="off" />
-              <select v-model.number="form.property_zone" class="input" required>
-                <option :value="0" disabled>Select a property zone</option>
-                <option v-for="zone in filteredZones" :key="zone.id" :value="zone.id">{{ zone.name }}</option>
-              </select>
+            <div class="relative">
+              <input v-model="zoneSearch" class="input" placeholder="Search or select a property zone…" autocomplete="off" role="combobox" :aria-expanded="zoneDropdownOpen" @focus="zoneDropdownOpen = true" @input="form.property_zone = 0; zoneDropdownOpen = true" @keydown.esc="zoneDropdownOpen = false" />
+              <div v-if="zoneDropdownOpen" class="absolute z-30 mt-1 max-h-52 w-full overflow-y-auto border border-slate-200 bg-white shadow-lg">
+                <button v-for="zone in filteredZones" :key="zone.id" type="button" class="block w-full px-3 py-2 text-left text-sm hover:bg-slate-100" @mousedown.prevent="selectZone(zone)">{{ zone.name }}</button>
+                <p v-if="filteredZones.length === 0" class="px-3 py-2 text-sm text-slate-500">No matching zones found.</p>
+              </div>
             </div>
           </Field>
           <Field label="Owner" required>
             <template v-if="isElevatedUser">
-              <div class="space-y-2">
-                <input v-model="ownerSearch" class="input" placeholder="Search owners…" autocomplete="off" />
-                <select v-model.number="form.owner" class="input" required>
-                  <option :value="0" disabled>Select an owner</option>
-                  <option v-for="owner in filteredOwners" :key="owner.id" :value="owner.id">{{ owner.name }}</option>
-                </select>
+              <div class="relative">
+                <input v-model="ownerSearch" class="input" placeholder="Search or select an owner…" autocomplete="off" role="combobox" :aria-expanded="ownerDropdownOpen" @focus="ownerDropdownOpen = true" @input="form.owner = 0; ownerDropdownOpen = true" @keydown.esc="ownerDropdownOpen = false" />
+                <div v-if="ownerDropdownOpen" class="absolute z-30 mt-1 max-h-52 w-full overflow-y-auto border border-slate-200 bg-white shadow-lg">
+                  <button v-for="owner in filteredOwners" :key="owner.id" type="button" class="block w-full px-3 py-2 text-left text-sm hover:bg-slate-100" @mousedown.prevent="selectOwner(owner)">{{ owner.name }}</button>
+                  <p v-if="filteredOwners.length === 0" class="px-3 py-2 text-sm text-slate-500">No matching owners found.</p>
+                </div>
               </div>
             </template>
             <input v-else :value="ownerDisplayName" class="input bg-slate-50" readonly />
           </Field>
           <Field label="Manager" required>
-            <div class="space-y-2">
-              <input v-model="managerSearch" class="input" placeholder="Search managers…" autocomplete="off" />
-              <select v-model.number="form.manager" class="input" required>
-                <option :value="0" disabled>Select a manager</option>
-                <option v-for="manager in filteredManagers" :key="manager.id" :value="manager.id">{{ manager.name }}</option>
-              </select>
+            <div class="relative">
+              <input v-model="managerSearch" class="input" placeholder="Search or select a manager…" autocomplete="off" role="combobox" :aria-expanded="managerDropdownOpen" @focus="managerDropdownOpen = true" @input="form.manager = 0; managerDropdownOpen = true" @keydown.esc="managerDropdownOpen = false" />
+              <div v-if="managerDropdownOpen" class="absolute z-30 mt-1 max-h-52 w-full overflow-y-auto border border-slate-200 bg-white shadow-lg">
+                <button v-for="manager in filteredManagers" :key="manager.id" type="button" class="block w-full px-3 py-2 text-left text-sm hover:bg-slate-100" @mousedown.prevent="selectManager(manager)">{{ manager.name }}</button>
+                <p v-if="filteredManagers.length === 0" class="px-3 py-2 text-sm text-slate-500">No matching managers found.</p>
+              </div>
             </div>
           </Field>
         </div>
@@ -182,6 +182,9 @@ export default {
       zoneSearch: "",
       ownerSearch: "",
       managerSearch: "",
+      zoneDropdownOpen: false,
+      ownerDropdownOpen: false,
+      managerDropdownOpen: false,
       amenityOptions: [
         { key: "is_furnished", label: "Furnished" }, { key: "has_maids_room", label: "Maid’s room" },
         { key: "has_study", label: "Study" }, { key: "has_central_or_ac_and_heating", label: "Central A/C & heating" },
@@ -208,6 +211,9 @@ export default {
     open(value) {
       if (value) {
         this.currentStep = 1;
+        this.zoneDropdownOpen = false;
+        this.ownerDropdownOpen = false;
+        this.managerDropdownOpen = false;
         this.load();
       }
     }
@@ -303,6 +309,21 @@ export default {
         this.loadingData = false;
       }
     },
+    selectZone(zone) {
+      this.form.property_zone = Number(zone.id);
+      this.zoneSearch = zone.name;
+      this.zoneDropdownOpen = false;
+    },
+    selectOwner(owner) {
+      this.form.owner = Number(owner.id);
+      this.ownerSearch = owner.name;
+      this.ownerDropdownOpen = false;
+    },
+    selectManager(manager) {
+      this.form.manager = Number(manager.id);
+      this.managerSearch = manager.name;
+      this.managerDropdownOpen = false;
+    },
     onPropertyTypeChange() {
       if (!this.availableSubtypes.some(subtype => Number(subtype.id) === Number(this.form.property_subtype))) {
         this.form.property_subtype = null;
@@ -368,6 +389,12 @@ export default {
       this.form.property_type = Number(rawType && typeof rawType === "object" ? rawType.id : (item?.property_type_id ?? rawType)) || null;
       const rawSubtype = item?.property_subtype;
       this.form.property_subtype = Number(rawSubtype && typeof rawSubtype === "object" ? rawSubtype.id : (item?.property_subtype_id ?? rawSubtype)) || null;
+      const zone = this.zones.find(entry => Number(entry.id) === Number(this.form.property_zone));
+      const owner = this.owners.find(entry => Number(entry.id) === Number(this.form.owner));
+      const manager = this.managers.find(entry => Number(entry.id) === Number(this.form.manager));
+      this.zoneSearch = zone?.name || item?.property_zone_name || "";
+      this.ownerSearch = owner?.name || item?.owner_name || "";
+      this.managerSearch = manager?.name || item?.manager_name || "";
       if (!this.isElevatedUser) this.form.owner = this.getLoggedInUserId();
     },
     async load() {
