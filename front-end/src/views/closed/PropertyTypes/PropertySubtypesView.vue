@@ -4,6 +4,7 @@
     <Loading :visible="loading" message="Loading property subtypes..." />
 
     <div class="mx-auto max-w-7xl space-y-5">
+      <button @click="$router.push({ name: 'PropertyTypes-view' })" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-primary"><i class="fas fa-arrow-left"></i> Back to property types</button>
       <header class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-start gap-3">
           <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
