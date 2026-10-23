@@ -23,16 +23,16 @@
         </div>
         <div v-if="errorMessage" class="m-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700" role="alert"><i class="fas fa-circle-exclamation mt-0.5"></i><div class="flex-1"><p class="font-semibold">Could not load property types</p><p class="mt-1 text-xs">{{ errorMessage }}</p></div><button @click="fetchPropertyTypes" class="text-xs font-bold underline">Retry</button></div>
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[650px]">
-            <thead class="bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-3">Property type</th><th class="px-5 py-3">Type ID</th><th class="px-5 py-3">Subtypes</th><th class="px-5 py-3 text-right">Actions</th></tr></thead>
+          <table class="w-full min-w-[560px]">
+            <thead class="bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-3">Property type</th><th class="px-5 py-3">Subtypes</th><th class="px-5 py-3 text-right">Actions</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="type in filteredPropertyTypes" :key="type.id" class="transition hover:bg-slate-50/80">
                 <td class="px-5 py-4"><div class="flex items-center gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-black uppercase text-primary">{{ initials(type.name) }}</span><div><p class="font-bold text-slate-900">{{ type.name || 'Unnamed property type' }}</p><p class="mt-0.5 text-xs text-slate-400">Parent property type</p></div></div></td>
-                <td class="px-5 py-4 font-mono text-xs text-slate-500">#{{ type.id }}</td>
+                
                 <td class="px-5 py-4"><span class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{{ subtypeCount(type.id) }} {{ subtypeCount(type.id) === 1 ? 'subtype' : 'subtypes' }}</span></td>
                 <td class="px-5 py-4"><div class="flex justify-end gap-2"><button @click="openAddSubtype(type)" :aria-label="'Add subtype to ' + type.name" title="Add subtype" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-white transition hover:opacity-90"><i class="fas fa-plus"></i><span>Add subtype</span></button><button @click="viewSubtypes(type)" :aria-label="'View subtypes for ' + type.name" title="View subtypes" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-primary hover:text-primary"><i class="fas fa-eye"></i><span>View subtypes</span></button></div></td>
               </tr>
-              <tr v-if="!loading && !errorMessage && filteredPropertyTypes.length === 0"><td colspan="4" class="px-5 py-14 text-center"><i class="fas fa-house text-3xl text-slate-300"></i><p class="mt-3 font-bold text-slate-800">{{ searchTerm ? 'No matching property types' : 'No property types found' }}</p><p class="mt-1 text-xs text-slate-500">Property types are loaded from the get_property_types API.</p></td></tr>
+              <tr v-if="!loading && !errorMessage && filteredPropertyTypes.length === 0"><td colspan="3" class="px-5 py-14 text-center"><i class="fas fa-house text-3xl text-slate-300"></i><p class="mt-3 font-bold text-slate-800">{{ searchTerm ? 'No matching property types' : 'No property types found' }}</p><p class="mt-1 text-xs text-slate-500">Property types are loaded from the get_property_types API.</p></td></tr>
             </tbody>
           </table>
         </div>
