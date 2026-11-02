@@ -97,8 +97,8 @@ Install the following before running the project:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/tadiosgb1/PMS-Workspace-chatgpt-github.git
-cd PMS-Workspace-chatgpt-github/front-end
+git clone https://github.com/Alpha-Engineering2/Alpha-PMS-Admin.git
+cd Alpha-PMS-Admin/front-end
 ```
 
 ### 2. Install dependencies
