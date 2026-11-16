@@ -46,17 +46,20 @@
             <template v-if="currentStep === 1">
               <div class="space-y-1.5">
                 <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Company Name</label>
-                <input v-model="form.company_name" required placeholder="Company name" class="field" />
+                <input v-model.trim="form.company_name" required maxlength="150" placeholder="Company name" class="field" :class="{ 'field-error': errors.company_name }" />
+                <p v-if="errors.company_name" class="validation-error">{{ errors.company_name }}</p>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">TIN Number</label>
-                  <input v-model="form.tin_number" required placeholder="TIN number" class="field" />
+                  <input v-model="form.tin_number" required inputmode="numeric" maxlength="10" placeholder="10-digit TIN number" class="field" :class="{ 'field-error': errors.tin_number }" />
+                  <p v-if="errors.tin_number" class="validation-error">{{ errors.tin_number }}</p>
                 </div>
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Business License</label>
-                  <input v-model="form.business_license" required placeholder="Business license number" class="field" />
+                  <input v-model.trim="form.business_license" required maxlength="50" placeholder="Business license number" class="field" :class="{ 'field-error': errors.business_license }" />
+                  <p v-if="errors.business_license" class="validation-error">{{ errors.business_license }}</p>
                 </div>
               </div>
 
@@ -86,11 +89,13 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">First Name</label>
-                  <input v-model="form.first_name" required placeholder="First name" class="field" />
+                  <input v-model.trim="form.first_name" required maxlength="80" autocomplete="given-name" placeholder="First name" class="field" :class="{ 'field-error': errors.first_name }" />
+                  <p v-if="errors.first_name" class="validation-error">{{ errors.first_name }}</p>
                 </div>
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Middle Name</label>
-                  <input v-model="form.middle_name" placeholder="Middle name" class="field" />
+                  <input v-model.trim="form.middle_name" maxlength="80" autocomplete="additional-name" placeholder="Middle name (optional)" class="field" :class="{ 'field-error': errors.middle_name }" />
+                  <p v-if="errors.middle_name" class="validation-error">{{ errors.middle_name }}</p>
                 </div>
               </div>
 
@@ -103,9 +108,12 @@
                     required
                     placeholder="you@example.com"
                     class="field"
-                    :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-300': emailExistsError }"
+                    autocomplete="email"
+                    maxlength="254"
+                    :class="{ 'field-error': errors.email || emailExistsError }"
                   />
-                  <p v-if="emailExistsError" class="text-xs font-medium text-red-600">{{ emailExistsError }}</p>
+                  <p v-if="errors.email" class="validation-error">{{ errors.email }}</p>
+                  <p v-if="emailExistsError" class="validation-error">{{ emailExistsError }}</p>
                 </div>
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Phone Number</label>
@@ -113,9 +121,14 @@
                     v-model="form.phone_number"
                     type="tel"
                     required
-                    placeholder="+251..."
+                    placeholder="+251912345678"
+                    autocomplete="tel"
+                    maxlength="25"
                     class="field"
+                    :class="{ 'field-error': errors.phone_number }"
                   />
+                  <p v-if="errors.phone_number" class="validation-error">{{ errors.phone_number }}</p>
+                  <p class="text-[11px] text-slate-400">Include the country code, e.g. +251912345678.</p>
                 </div>
               </div>
 
@@ -127,8 +140,19 @@
                     type="password"
                     required
                     placeholder="Create a password"
+                    autocomplete="new-password"
+                    maxlength="128"
                     class="field"
+                    :class="{ 'field-error': errors.password }"
                   />
+                  <ul class="mt-2 space-y-1 text-[11px]" :class="errors.password ? 'text-red-600' : 'text-slate-500'">
+                    <li :class="{ 'text-green-600': passwordChecks.length }">• At least 8 characters</li>
+                    <li :class="{ 'text-green-600': passwordChecks.upper }">• One uppercase letter (A–Z)</li>
+                    <li :class="{ 'text-green-600': passwordChecks.lower }">• One lowercase letter (a–z)</li>
+                    <li :class="{ 'text-green-600': passwordChecks.number }">• One number (0–9)</li>
+                    <li :class="{ 'text-green-600': passwordChecks.special }">• One special character (e.g. !@#$%)</li>
+                  </ul>
+                  <p v-if="errors.password" class="validation-error">{{ errors.password }}</p>
                 </div>
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Confirm Password</label>
@@ -138,9 +162,12 @@
                     required
                     placeholder="Repeat password"
                     class="field"
-                    :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-300': passwordMismatch }"
+                    autocomplete="new-password"
+                    maxlength="128"
+                    class="field"
+                    :class="{ 'field-error': errors.confirmPassword || passwordMismatch }"
                   />
-                  <p v-if="passwordMismatch" class="text-xs font-medium text-red-600">Passwords do not match</p>
+                  <p v-if="errors.confirmPassword || passwordMismatch" class="validation-error">{{ errors.confirmPassword || 'Passwords do not match' }}</p>
                 </div>
               </div>
             </template>
@@ -213,6 +240,7 @@ export default {
       selectedPlanName: "",
       passwordMismatch: false,
       emailExistsError: "",
+      errors: {},
       loading: false,
     };
   },
@@ -227,14 +255,91 @@ export default {
     goBack() {
       if (this.currentStep > 1) {
         this.currentStep -= 1;
+        this.errors = {};
         this.passwordMismatch = false;
         this.emailExistsError = "";
       }
     },
 
+    getPasswordChecks(password = "") {
+      return {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9\\s]/.test(password),
+      };
+    },
+
+    validateCompanyStep() {
+      const errors = {};
+      const companyName = this.form.company_name.trim();
+      const tin = this.form.tin_number.trim();
+      const license = this.form.business_license.trim();
+
+      if (!companyName) errors.company_name = "Company name is required.";
+      else if (companyName.length < 2) errors.company_name = "Company name must contain at least 2 characters.";
+      else if (!/^[\\p{L}\\p{N}][\\p{L}\\p{N} .,'’&()\\-/]*$/u.test(companyName)) {
+        errors.company_name = "Use letters, numbers, spaces and common business-name punctuation only.";
+      }
+
+      if (!/^\\d{10}$/.test(tin)) errors.tin_number = "TIN must contain exactly 10 digits (numbers only).";
+
+      if (!license) errors.business_license = "Business license number is required.";
+      else if (license.length < 2 || license.length > 50) errors.business_license = "Business license must be between 2 and 50 characters.";
+      else if (!/^[\\p{L}\\p{N}][\\p{L}\\p{N} ._\\-/]*$/u.test(license)) {
+        errors.business_license = "Use letters, numbers, spaces, dots, hyphens or slashes only.";
+      }
+
+      this.errors = errors;
+      return Object.keys(errors).length === 0;
+    },
+
+    validateContactStep() {
+      const errors = {};
+      const firstName = this.form.first_name.trim();
+      const middleName = this.form.middle_name.trim();
+      const email = this.form.email.trim();
+      const phone = this.form.phone_number.trim();
+      const password = this.form.password;
+      const checks = this.getPasswordChecks(password);
+
+      const namePattern = /^[\\p{L}\\p{M}]+(?:[ '\\u2019-][\\p{L}\\p{M}]+)*$/u;
+      if (!firstName) errors.first_name = "First name is required.";
+      else if (firstName.length > 80 || !namePattern.test(firstName)) errors.first_name = "Enter a valid name using letters, spaces, apostrophes or hyphens.";
+
+      if (middleName && (middleName.length > 80 || !namePattern.test(middleName))) {
+        errors.middle_name = "Enter a valid middle name, or leave this field blank.";
+      }
+
+      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/;
+      if (!email) errors.email = "Email address is required.";
+      else if (email.length > 254 || !emailPattern.test(email)) errors.email = "Enter a valid email address.";
+
+      const phoneDigits = phone.replace(/\\D/g, "");
+      if (!phone) errors.phone_number = "Phone number is required.";
+      else if (!/^\\+[0-9().\\s-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+        errors.phone_number = "Enter an international phone number with +country code and 7–15 digits.";
+      }
+
+      if (!password) errors.password = "Password is required.";
+      else if (!checks.length || !checks.upper || !checks.lower || !checks.number || !checks.special || /\\s/.test(password)) {
+        errors.password = "Password must be at least 8 characters and include uppercase, lowercase, a number and a special character, with no spaces.";
+      }
+
+      if (!this.form.confirmPassword) errors.confirmPassword = "Please confirm your password.";
+      else if (password !== this.form.confirmPassword) errors.confirmPassword = "Passwords do not match.";
+
+      this.errors = errors;
+      this.passwordMismatch = Boolean(errors.confirmPassword && this.form.confirmPassword);
+      return Object.keys(errors).length === 0;
+    },
+
     handleFormAction() {
       if (this.currentStep === 1) {
+        if (!this.validateCompanyStep()) return;
         this.currentStep = 2;
+        this.errors = {};
         return;
       }
       this.submitForm();
@@ -244,23 +349,25 @@ export default {
       this.passwordMismatch = false;
       this.emailExistsError = "";
 
-      if (this.form.password !== this.form.confirmPassword) {
-        this.passwordMismatch = true;
+      // Revalidate both steps immediately before the API request.
+      if (!this.validateCompanyStep()) {
+        this.currentStep = 1;
         return;
       }
+      if (!this.validateContactStep()) return;
 
       this.loading = true;
       try {
         const payload = {
           plan: this.form.plan,
-          company_name: this.form.company_name,
-          tin_number: this.form.tin_number,
-          business_license: this.form.business_license,
+          company_name: this.form.company_name.trim(),
+          tin_number: this.form.tin_number.trim(),
+          business_license: this.form.business_license.trim(),
           is_developer: this.form.is_developer,
-          first_name: this.form.first_name,
-          middle_name: this.form.middle_name,
-          email: this.form.email,
-          phone_number: this.form.phone_number,
+          first_name: this.form.first_name.trim(),
+          middle_name: this.form.middle_name.trim(),
+          email: this.form.email.trim().toLowerCase(),
+          phone_number: this.form.phone_number.trim(),
           password: this.form.password,
         };
 
@@ -288,5 +395,11 @@ export default {
 .field {
   @apply w-full bg-white border border-slate-300 rounded py-2.5 px-3 text-sm text-slate-800
          placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all;
+}
+.field-error {
+  @apply border-red-400 focus:border-red-400 focus:ring-red-300;
+}
+.validation-error {
+  @apply text-xs font-medium text-red-600 mt-1;
 }
 </style>
