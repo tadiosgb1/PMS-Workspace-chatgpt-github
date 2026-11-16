@@ -159,8 +159,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   name: "PropertiesSection",
   data() {
@@ -219,7 +217,7 @@ export default {
         const baseUrl =
           this.currentTab === "cowork"
             ? "/get_coworking_spaces"
-            : "/api/get_properties";
+            : "/get_properties";
 
         const params = {};
         if (this.currentTab === "rent") params.status__in = "for_rent" ;
