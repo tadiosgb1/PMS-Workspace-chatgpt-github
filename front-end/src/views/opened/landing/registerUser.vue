@@ -68,7 +68,7 @@
                   />
                   <p id="tin-rule" class="text-[11px] text-slate-500">
                     TIN rule: enter exactly 10 digits (0–9). Letters, spaces and symbols are not allowed.
-                    <span class="font-medium">{{ form.tin_number.length }}/10 digits</span>
+                    <span class="font-medium">{{ (form.tin_number || '').length }}/10 digits</span>
                   </p>
                   <p v-if="errors.tin_number" class="validation-error">{{ errors.tin_number }}</p>
                 </div>
