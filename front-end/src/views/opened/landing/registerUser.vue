@@ -59,6 +59,26 @@
                   <input v-model="form.business_license" required placeholder="Business license number" class="field" />
                 </div>
               </div>
+
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-4 space-y-2">
+                <div class="space-y-1">
+                  <p class="text-sm font-semibold text-slate-800">Does your company manage off-plan properties?</p>
+                  <p class="text-xs text-slate-600">
+                    Select this if your company develops or manages properties that are sold before construction is complete.
+                    This helps us tailor your workspace to your business.
+                  </p>
+                </div>
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input
+                    v-model="form.is_developer"
+                    type="checkbox"
+                    class="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                  />
+                  <span class="text-sm font-medium text-slate-700">
+                    Yes, our company develops or manages off-plan properties.
+                  </span>
+                </label>
+              </div>
             </template>
 
             <!-- ═══════════ STEP 2: Contact Person ═══════════ -->
@@ -182,6 +202,7 @@ export default {
         company_name: "",
         tin_number: "",
         business_license: "",
+        is_developer: false,
         first_name: "",
         middle_name: "",
         email: "",
@@ -235,6 +256,7 @@ export default {
           company_name: this.form.company_name,
           tin_number: this.form.tin_number,
           business_license: this.form.business_license,
+          is_developer: this.form.is_developer,
           first_name: this.form.first_name,
           middle_name: this.form.middle_name,
           email: this.form.email,
