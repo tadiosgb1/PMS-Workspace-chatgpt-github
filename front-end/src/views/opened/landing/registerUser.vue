@@ -242,20 +242,20 @@
             </div>
             <div>
               <h3 id="registration-success-title" class="text-base font-semibold text-slate-900">Account created successfully</h3>
-              <p class="mt-0.5 text-xs text-slate-500">Registration complete</p>
+              <p class="mt-0.5 text-xs text-slate-500">Email verification required</p>
             </div>
           </div>
         </div>
         <div class="px-6 py-5">
-          <p class="text-sm leading-6 text-slate-600">Your account has been created. You can now sign in using your email address and password.</p>
+          <p class="text-sm leading-6 text-slate-600">We have sent an account activation link to <strong class="font-semibold text-slate-800">{{ form.email.trim() }}</strong>. Please check your email and follow the link to activate your account before signing in. If you do not see the email, please check your spam or junk folder.</p>
         </div>
         <div class="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-4">
           <button
             type="button"
-            @click="goToLogin"
+            @click="showSuccessModal = false"
             class="border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
           >
-            Continue to sign in
+            Okay
           </button>
         </div>
       </div>
