@@ -226,20 +226,35 @@ export default {
         if (this.currentTab === "sale") params.status__in = "for_sale";
         
         params.page_size=3
-        const res = await this.$apiGet(url || baseUrl, { params });
+        // $apiGet returns the response body (not the full Axios response).
+        // The listing endpoints use the same paginated envelope as get_plans:
+        // { count, next, previous, data: [...] }.
+        const response = await this.$apiGet(url || baseUrl, { params });
+        const records = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+            ? response
+            : [];
 
-        const data = res.data;
-        this.items = (data.data || []).map((item) => ({
+        this.items = records.map((item) => ({
           ...item,
+          property_pictures: Array.isArray(item.property_pictures)
+            ? item.property_pictures
+            : [],
           imageIndex: 0,
           showDownload: false,
         }));
 
         this.filteredItems = [...this.items];
-        this.currentPage = data.current_page || 1;
-        this.totalPages = data.total_pages || 1;
-        this.nextPageUrl = data.next;
-        this.prevPageUrl = data.previous;
+        this.currentPage = Number(response?.current_page || response?.page || 1);
+        this.totalPages = Number(
+          response?.total_pages ||
+          (response?.count != null
+            ? Math.max(1, Math.ceil(Number(response.count) / Number(params.page_size || 3)))
+            : 1)
+        );
+        this.nextPageUrl = response?.next || null;
+        this.prevPageUrl = response?.previous || null;
       } catch (error) {
         console.error("Error fetching data:", error);
         this.items = [];
