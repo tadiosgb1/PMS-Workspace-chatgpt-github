@@ -267,7 +267,7 @@ export default {
         upper: /[A-Z]/.test(password),
         lower: /[a-z]/.test(password),
         number: /[0-9]/.test(password),
-        special: /[^A-Za-z0-9\\s]/.test(password),
+        special: /[^A-Za-z0-9\s]/.test(password),
       };
     },
 
@@ -279,15 +279,15 @@ export default {
 
       if (!companyName) errors.company_name = "Company name is required.";
       else if (companyName.length < 2) errors.company_name = "Company name must contain at least 2 characters.";
-      else if (!/^[\\p{L}\\p{N}][\\p{L}\\p{N} .,'’&()\\-/]*$/u.test(companyName)) {
+      else if (!/^[\p{L}\p{N}][\p{L}\p{N} .,'’&()\-/]*$/u.test(companyName)) {
         errors.company_name = "Use letters, numbers, spaces and common business-name punctuation only.";
       }
 
-      if (!/^\\d{10}$/.test(tin)) errors.tin_number = "TIN must contain exactly 10 digits (numbers only).";
+      if (!/^\d{10}$/.test(tin)) errors.tin_number = "TIN must contain exactly 10 digits (numbers only).";
 
       if (!license) errors.business_license = "Business license number is required.";
       else if (license.length < 2 || license.length > 50) errors.business_license = "Business license must be between 2 and 50 characters.";
-      else if (!/^[\\p{L}\\p{N}][\\p{L}\\p{N} ._\\-/]*$/u.test(license)) {
+      else if (!/^[\p{L}\p{N}][\p{L}\p{N} ._\-/]*$/u.test(license)) {
         errors.business_license = "Use letters, numbers, spaces, dots, hyphens or slashes only.";
       }
 
@@ -304,7 +304,7 @@ export default {
       const password = this.form.password;
       const checks = this.getPasswordChecks(password);
 
-      const namePattern = /^[\\p{L}\\p{M}]+(?:[ '\\u2019-][\\p{L}\\p{M}]+)*$/u;
+      const namePattern = /^[\p{L}\p{M}]+(?:[ '\u2019-][\p{L}\p{M}]+)*$/u;
       if (!firstName) errors.first_name = "First name is required.";
       else if (firstName.length > 80 || !namePattern.test(firstName)) errors.first_name = "Enter a valid name using letters, spaces, apostrophes or hyphens.";
 
@@ -312,18 +312,18 @@ export default {
         errors.middle_name = "Enter a valid middle name, or leave this field blank.";
       }
 
-      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
       if (!email) errors.email = "Email address is required.";
       else if (email.length > 254 || !emailPattern.test(email)) errors.email = "Enter a valid email address.";
 
-      const phoneDigits = phone.replace(/\\D/g, "");
+      const phoneDigits = phone.replace(/\D/g, "");
       if (!phone) errors.phone_number = "Phone number is required.";
-      else if (!/^\\+[0-9().\\s-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+      else if (!/^\+[0-9().\s-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
         errors.phone_number = "Enter an international phone number with +country code and 7–15 digits.";
       }
 
       if (!password) errors.password = "Password is required.";
-      else if (!checks.length || !checks.upper || !checks.lower || !checks.number || !checks.special || /\\s/.test(password)) {
+      else if (!checks.length || !checks.upper || !checks.lower || !checks.number || !checks.special || /\s/.test(password)) {
         errors.password = "Password must be at least 8 characters and include uppercase, lowercase, a number and a special character, with no spaces.";
       }
 
