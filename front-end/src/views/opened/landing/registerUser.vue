@@ -136,14 +136,14 @@
                     v-model="form.phone_number"
                     type="tel"
                     required
-                    placeholder="+251912345678"
+                    placeholder="Phone number"
                     autocomplete="tel"
                     maxlength="25"
                     class="field"
                     :class="{ 'field-error': errors.phone_number }"
                   />
                   <p v-if="errors.phone_number" class="validation-error">{{ errors.phone_number }}</p>
-                  <p class="text-[11px] text-slate-400">Include the country code, e.g. +251912345678.</p>
+                  <p class="text-[11px] text-slate-400">Enter 7–15 digits. Country code is optional.</p>
                 </div>
               </div>
 
@@ -224,6 +224,43 @@
       </div>
     </div>
 
+    <!-- Registration success modal -->
+    <div
+      v-if="showSuccessModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="registration-success-title"
+    >
+      <div class="w-full max-w-md border border-slate-200 bg-white shadow-2xl">
+        <div class="border-b border-slate-200 px-6 py-5">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center border border-green-200 bg-green-50 text-green-700">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="m5 12 4 4L19 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <h3 id="registration-success-title" class="text-base font-semibold text-slate-900">Account created successfully</h3>
+              <p class="mt-0.5 text-xs text-slate-500">Registration complete</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-5">
+          <p class="text-sm leading-6 text-slate-600">Your account has been created. You can now sign in using your email address and password.</p>
+        </div>
+        <div class="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-4">
+          <button
+            type="button"
+            @click="goToLogin"
+            class="border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+          >
+            Continue to sign in
+          </button>
+        </div>
+      </div>
+    </div>
+
     <LandingFooter />
   </div>
 </template>
@@ -256,6 +293,7 @@ export default {
       emailExistsError: "",
       errors: {},
       loading: false,
+      showSuccessModal: false,
     };
   },
   created() {
@@ -279,6 +317,11 @@ export default {
       if (this.errors.tin_number && /^\\d{10}$/.test(digitsOnly)) {
         this.errors.tin_number = "";
       }
+    },
+
+    goToLogin() {
+      this.showSuccessModal = false;
+      this.$router.push("/login");
     },
 
     goBack() {
@@ -347,8 +390,8 @@ export default {
 
       const phoneDigits = phone.replace(/\D/g, "");
       if (!phone) errors.phone_number = "Phone number is required.";
-      else if (!/^\+[0-9().\s-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
-        errors.phone_number = "Enter an international phone number with +country code and 7–15 digits.";
+      else if (!/^\+?[0-9().\s-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+        errors.phone_number = "Enter a valid phone number with 7–15 digits.";
       }
 
       if (!password) errors.password = "Password is required.";
@@ -402,9 +445,8 @@ export default {
 
         await this.$apiPost("sign_up", payload);
 
-        // Registration succeeded
-        alert("Account created successfully! You can now log in.");
-        this.$router.push("/login");
+        // Registration succeeded; show an in-app confirmation modal.
+        this.showSuccessModal = true;
       } catch (error) {
         const errorMsg = error.response?.data?.error;
         if (errorMsg === "This email already exists in the system") {
