@@ -221,7 +221,7 @@ export default {
     async fetchPlans() {
       this.loading = true;
       try {
-        const response = await axios.get("https://alphapms.sunriseworld.org/api/get_plans");
+        const response = await this.apiGet("/get_plans");
         if (Array.isArray(response.data.data)) {
           this.plans = response.data.data;
         } else {

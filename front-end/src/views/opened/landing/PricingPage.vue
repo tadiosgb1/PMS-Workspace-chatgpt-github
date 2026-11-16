@@ -154,7 +154,7 @@ export default {
     async fetchPlans() {
       this.loading = true;
       try {
-        const res = await axios.get("https://alphapms.sunriseworld.org/api/get_plans");
+        const res = await this.$apiGet("/get_plans");
         this.plans = Array.isArray(res.data.data) ? res.data.data : [];
       } catch (e) {
         console.error("Failed to fetch plans", e);
