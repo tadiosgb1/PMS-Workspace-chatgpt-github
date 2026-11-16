@@ -265,6 +265,11 @@ export default {
       this.selectedPlanName = name || "";
     }
   },
+  computed: {
+    passwordChecks() {
+      return this.getPasswordChecks(this.form?.password || "");
+    },
+  },
   methods: {
     onTinInput(event) {
       // Keep only ASCII digits and enforce the 10-digit limit while typing or pasting.
