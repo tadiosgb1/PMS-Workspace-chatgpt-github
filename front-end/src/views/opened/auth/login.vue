@@ -114,6 +114,7 @@ export default {
           phone_number,
           groups,
           role,
+          is_developer
         } = response;
 
         // Admin access is restricted to the admin application.
@@ -189,6 +190,8 @@ export default {
         localStorage.setItem("userId", id);
         localStorage.setItem("is_superuser", is_superuser);
         localStorage.setItem("phone_number", phone_number);
+
+        localStorage.setItem("is_developer",is_developer);
 
         const user = await this.$apiGetById(`/get_user`, id);
         localStorage.setItem("name", user.first_name);
