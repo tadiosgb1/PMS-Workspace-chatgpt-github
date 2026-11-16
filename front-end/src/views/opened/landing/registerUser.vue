@@ -53,7 +53,23 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">TIN Number</label>
-                  <input v-model="form.tin_number" required inputmode="numeric" maxlength="10" placeholder="10-digit TIN number" class="field" :class="{ 'field-error': errors.tin_number }" />
+                  <input
+                    :value="form.tin_number"
+                    @input="onTinInput"
+                    type="text"
+                    required
+                    inputmode="numeric"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    placeholder="Enter 10 digits"
+                    aria-describedby="tin-rule"
+                    class="field"
+                    :class="{ 'field-error': errors.tin_number }"
+                  />
+                  <p id="tin-rule" class="text-[11px] text-slate-500">
+                    TIN rule: enter exactly 10 digits (0–9). Letters, spaces and symbols are not allowed.
+                    <span class="font-medium">{{ form.tin_number.length }}/10 digits</span>
+                  </p>
                   <p v-if="errors.tin_number" class="validation-error">{{ errors.tin_number }}</p>
                 </div>
                 <div class="space-y-1.5">
@@ -251,6 +267,16 @@ export default {
     }
   },
   methods: {
+    onTinInput(event) {
+      // Keep only ASCII digits and enforce the 10-digit limit while typing or pasting.
+      const digitsOnly = event.target.value.replace(/[^0-9]/g, "").slice(0, 10);
+      this.form.tin_number = digitsOnly;
+      event.target.value = digitsOnly;
+      if (this.errors.tin_number && /^\\d{10}$/.test(digitsOnly)) {
+        this.errors.tin_number = "";
+      }
+    },
+
     goBack() {
       if (this.currentStep > 1) {
         this.currentStep -= 1;
