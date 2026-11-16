@@ -164,7 +164,6 @@
                     class="field"
                     autocomplete="new-password"
                     maxlength="128"
-                    class="field"
                     :class="{ 'field-error': errors.confirmPassword || passwordMismatch }"
                   />
                   <p v-if="errors.confirmPassword || passwordMismatch" class="validation-error">{{ errors.confirmPassword || 'Passwords do not match' }}</p>
