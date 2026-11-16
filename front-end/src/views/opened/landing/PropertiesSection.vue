@@ -226,7 +226,7 @@ export default {
         if (this.currentTab === "sale") params.status__in = "for_sale";
         
         params.page_size=3
-        const res = await axios.get(url || baseUrl, { params });
+        const res = await this.$apiGet(url || baseUrl, { params });
 
         const data = res.data;
         this.items = (data.data || []).map((item) => ({
