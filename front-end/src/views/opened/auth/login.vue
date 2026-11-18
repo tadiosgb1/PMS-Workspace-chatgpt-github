@@ -191,7 +191,7 @@ export default {
         localStorage.setItem("is_superuser", is_superuser);
         localStorage.setItem("phone_number", phone_number);
 
-        localStorage.setItem("is_developer",is_developer);
+        localStorage.setItem("is_developer", String(is_developer === true || String(is_developer).toLowerCase() === "true"));
 
         const user = await this.$apiGetById(`/get_user`, id);
         localStorage.setItem("name", user.first_name);
