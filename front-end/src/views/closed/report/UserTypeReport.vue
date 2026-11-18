@@ -27,7 +27,7 @@ export default {
         return { group, count, share: this.totalUsers ? count / this.totalUsers * 100 : 0 };
       });
     },
-    totalUsers() { return this.rows.reduce((sum, row) => sum + row.count, 0); },
+    totalUsers() { return (this.report?.counts || []).reduce((sum, value) => sum + (Number(value) || 0), 0); },
     largestGroup() { return [...this.rows].sort((a, b) => b.count - a.count)[0]?.group || "—"; }
   },
   async created() {
