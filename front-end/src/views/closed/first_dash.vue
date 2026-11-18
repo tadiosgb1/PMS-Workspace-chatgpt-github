@@ -38,7 +38,7 @@ export default {
     this.isDeveloper = localStorage.getItem("is_developer") === "true"
     const role = String(localStorage.getItem("role") || "").toLowerCase()
     let groups = []
-    try { groups = JSON.parse(localStorage.getItem("groups") || "[]").map(g => typeof g === "string" ? g.toLowerCase() : String(g?.name || g?.group || "").toLowerCase()) } catch { groups = [] }
+    try { groups = JSON.parse(localStorage.getItem("groups") || "[]").map(g => typeof g === "string" ? g.toLowerCase() : String(g?.name || g?.group || g?.role || "").toLowerCase()) } catch { groups = [] }
     this.isSuperuser = localStorage.getItem("is_superuser") === "true" || ["superuser", "admin", "super_staff"].includes(role) || groups.some(g => ["superuser", "admin", "super_staff"].includes(g))
     // Check superuser status from localStorage
     const storedUser = localStorage.getItem('user')
