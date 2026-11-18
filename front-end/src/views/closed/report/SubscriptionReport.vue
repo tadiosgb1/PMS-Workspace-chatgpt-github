@@ -24,8 +24,8 @@ export default {
       return (this.report?.plans || []).map((plan, index) => ({ plan: String(plan), users: Number(this.report?.users?.[index]) || 0, revenue: Number(this.report?.revenue?.[index]) || 0 }))
         .map(row => ({ ...row, share: this.totalUsers ? Math.round(row.users / this.totalUsers * 100) : 0 }));
     },
-    totalUsers() { return this.rows.reduce((sum, row) => sum + row.users, 0); },
-    totalRevenue() { return this.rows.reduce((sum, row) => sum + row.revenue, 0); },
+    totalUsers() { return (this.report?.users || []).reduce((sum, value) => sum + (Number(value) || 0), 0); },
+    totalRevenue() { return (this.report?.revenue || []).reduce((sum, value) => sum + (Number(value) || 0), 0); },
     highlights() { return [
       { label: "Total subscribers", value: this.format(this.totalUsers), icon: "fas fa-users", iconBg: "bg-sky-50", iconColor: "text-sky-600", accent: "border-l-sky-500" },
       { label: "Plans available", value: this.format(this.rows.length), icon: "fas fa-layer-group", iconBg: "bg-violet-50", iconColor: "text-violet-600", accent: "border-l-violet-500" },
