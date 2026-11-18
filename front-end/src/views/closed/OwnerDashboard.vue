@@ -20,8 +20,8 @@
   <div v-else class="space-y-6 max-w-[1600px] mx-auto p-5 bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 min-h-screen">
 
     <!-- ── Portfolio Summary Cards ── -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group h-16 flex items-center gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
+      <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group min-h-[112px] h-full flex flex-col items-stretch justify-between gap-2">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -30,11 +30,11 @@
           </div>
           <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wide">Portfolio</span>
         </div>
-        <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.portfolio_summary?.total_properties || 0 }}</p>
+        <p class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight break-words leading-tight">{{ report?.portfolio_summary?.total_properties || 0 }}</p>
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Total Properties</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group h-16 flex items-center gap-3">
+      <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-emerald-300 transition-all group min-h-[112px] h-full flex flex-col items-stretch justify-between gap-2">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -43,11 +43,11 @@
           </div>
           <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wide">{{ report?.portfolio_summary?.occupied_units || 0 }} occupied</span>
         </div>
-        <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.portfolio_summary?.occupancy_rate_pct || 0 }}<span class="text-lg text-slate-500">%</span></p>
+        <p class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight break-words leading-tight">{{ report?.portfolio_summary?.occupancy_rate_pct || 0 }}<span class="text-lg text-slate-500">%</span></p>
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Occupancy Rate</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-amber-300 transition-all group h-16 flex items-center gap-3">
+      <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-amber-300 transition-all group min-h-[112px] h-full flex flex-col items-stretch justify-between gap-2">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -69,7 +69,7 @@
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-2">Allocations</p>
       </div>
 
-      <div class="bg-white border border-slate-200 p-2 rounded-none shadow-sm hover:shadow-md hover:border-sky-300 transition-all group h-16 flex items-center gap-3">
+      <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-sky-300 transition-all group min-h-[112px] h-full flex flex-col items-stretch justify-between gap-2">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -78,7 +78,7 @@
           </div>
           <span class="text-[10px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full uppercase tracking-wide">ETB</span>
         </div>
-        <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ report?.portfolio_summary?.avg_rent_per_unit || 0 }}</p>
+        <p class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight break-words leading-tight">{{ report?.portfolio_summary?.avg_rent_per_unit || 0 }}</p>
         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Avg Rent / Unit</p>
       </div>
     </div>
