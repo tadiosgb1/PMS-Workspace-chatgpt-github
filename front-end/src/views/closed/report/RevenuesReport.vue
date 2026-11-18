@@ -1,13 +1,13 @@
 <template>
-  <section class="min-h-screen bg-slate-50 p-4 sm:p-6 text-sm text-slate-800">
-    <div class="mx-auto max-w-[1600px] space-y-5">
+  <section class="min-h-screen bg-slate-50/70 p-3 sm:p-5 text-xs text-slate-700">
+    <div class="mx-auto max-w-[1500px] space-y-4">
       <header class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-primary">Alpha PMS · Executive Report</p>
-          <h1 class="mt-1 text-2xl font-black text-slate-900">Revenue Report</h1>
-          <p class="mt-1 text-xs text-slate-500">Monthly revenue across rent, sales, subscriptions and workspace.</p>
+          <p class="text-[9px] font-bold uppercase tracking-[0.16em] text-primary">Alpha PMS · Executive Report</p>
+          <h1 class="mt-1 text-xl font-bold tracking-tight text-slate-900">Revenue Report</h1>
+          <p class="mt-1 text-[10px] text-slate-400">Monthly revenue across rent, sales, subscriptions and workspace.</p>
         </div>
-        <button @click="exportCsv" :disabled="!monthlyRows.length" class="rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
+        <button @click="exportCsv" :disabled="!monthlyRows.length" class="rounded-md bg-slate-900 px-3 py-2 text-[11px] font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-50">
           <i class="fas fa-download mr-2"></i>Export Revenue CSV
         </button>
       </header>
@@ -17,22 +17,22 @@
       </div>
       <div v-else-if="error" class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{{ error }}</div>
       <template v-else>
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <article v-for="card in cards" :key="card.label" class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-[10px] font-black uppercase tracking-wider text-slate-400">{{ card.label }}</p>
-            <p class="mt-2 text-2xl font-black text-slate-900 tabular-nums">{{ formatAmount(card.value) }} <span class="text-xs font-semibold text-slate-500">ETB</span></p>
+        <div class="grid grid-cols-2 gap-2.5 xl:grid-cols-4">
+          <article v-for="card in cards" :key="card.label" class="rounded-lg border border-slate-200/80 bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">{{ card.label }}</p>
+            <p class="mt-1.5 text-lg font-bold tracking-tight text-slate-900 tabular-nums sm:text-xl">{{ formatAmount(card.value) }} <span class="text-[10px] font-medium text-slate-400">ETB</span></p>
             <p class="mt-1 text-[11px] text-slate-500">{{ card.note }}</p>
           </article>
         </div>
 
-        <section class="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
-          <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="font-black text-slate-900">Monthly Revenue Trend</h2>
-            <p class="mt-1 text-xs text-slate-400">Total revenue by month across all reported categories</p>
-            <div v-if="monthlyRows.length" class="mt-7 flex h-60 items-end gap-2 border-b border-slate-100 pb-1 sm:gap-3">
+        <section class="grid gap-3 lg:grid-cols-[1.2fr_.8fr]">
+          <div class="rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <h2 class="text-xs font-bold text-slate-800">Monthly Revenue Trend</h2>
+            <p class="mt-0.5 text-[10px] text-slate-400">Total revenue by month across all reported categories</p>
+            <div v-if="monthlyRows.length" class="mt-5 flex h-44 items-end gap-2 border-b border-slate-100 pb-1 sm:gap-3">
               <div v-for="month in monthlyRows" :key="month.month" class="flex h-full min-w-0 flex-1 flex-col justify-end gap-2">
-                <div class="w-full rounded-t-md bg-primary/80" :style="{ height: barHeight(month.total) }" :title="formatAmount(month.total) + ' ETB'"></div>
-                <span class="truncate text-center text-[10px] font-bold text-slate-500">{{ month.label }}</span>
+                <div class="w-full rounded-t-sm bg-primary/80 transition-all" :style="{ height: barHeight(month.total) }" :title="formatAmount(month.total) + ' ETB'"></div>
+                <span class="truncate text-center text-[9px] font-semibold text-slate-400">{{ month.label }}</span>
               </div>
             </div>
             <p v-else class="py-12 text-center text-xs text-slate-400">No monthly revenue data returned.</p>
@@ -41,31 +41,31 @@
           <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 class="font-black text-slate-900">Revenue Mix</h2>
             <p class="mt-1 text-xs text-slate-400">Total reported revenue by category</p>
-            <div class="mt-6 space-y-5">
+            <div class="mt-4 space-y-3.5">
               <div v-for="stream in streams" :key="stream.key">
-                <div class="mb-1 flex items-center justify-between gap-2 text-xs font-bold">
+                <div class="mb-1 flex items-center justify-between gap-2 text-[10px] font-semibold">
                   <span>{{ stream.label }}</span><span class="tabular-nums">{{ formatAmount(stream.value) }} ETB</span>
                 </div>
                 <div class="h-2 overflow-hidden rounded-full bg-slate-100">
                   <div class="h-full rounded-full bg-primary" :style="{ width: stream.share + '%' }"></div>
                 </div>
-                <p class="mt-1 text-right text-[10px] text-slate-400">{{ stream.share }}%</p>
+                <p class="mt-0.5 text-right text-[9px] text-slate-400">{{ stream.share }}%</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div class="border-b border-slate-100 p-4">
+        <section class="overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+          <div class="border-b border-slate-100 px-4 py-3">
             <h2 class="font-black text-slate-900">Monthly Revenue Breakdown</h2>
             <p class="mt-1 text-xs text-slate-400">Values are loaded directly from the get_revenue_report endpoint.</p>
           </div>
           <div v-if="!monthlyRows.length" class="p-8 text-center text-xs text-slate-400">No revenue records are available.</div>
           <div v-else class="overflow-x-auto">
-            <table class="w-full min-w-[650px] text-left">
-              <thead class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400">
+            <table class="w-full min-w-[650px] text-left text-[11px]">
+              <thead class="bg-slate-50/80 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 <tr>
-                  <th class="px-4 py-3">Month</th>
+                  <th class="px-3 py-2">Month</th>
                   <th class="px-4 py-3 text-right">Rent</th>
                   <th class="px-4 py-3 text-right">Sale</th>
                   <th class="px-4 py-3 text-right">Subscription</th>
@@ -75,22 +75,22 @@
               </thead>
               <tbody class="divide-y divide-slate-100">
                 <tr v-for="month in monthlyRows" :key="month.month" class="hover:bg-slate-50">
-                  <td class="px-4 py-3 font-bold text-slate-700">{{ month.label }}</td>
-                  <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.rent) }}</td>
+                  <td class="px-3 py-2 font-semibold text-slate-700">{{ month.label }}</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-500">{{ formatAmount(month.rent) }}</td>
                   <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.sale) }}</td>
                   <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.subscription) }}</td>
                   <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.workspace) }}</td>
-                  <td class="px-4 py-3 text-right font-black tabular-nums">{{ formatAmount(month.total) }} ETB</td>
+                  <td class="px-3 py-2 text-right font-bold tabular-nums text-slate-800">{{ formatAmount(month.total) }} ETB</td>
                 </tr>
               </tbody>
               <tfoot class="border-t-2 border-slate-200 bg-slate-50">
                 <tr>
-                  <td class="px-4 py-3 font-black">Total</td>
-                  <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.rent) }}</td>
+                  <td class="px-3 py-2 font-bold">Total</td>
+                  <td class="px-3 py-2 text-right font-semibold">{{ formatAmount(totals.rent) }}</td>
                   <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.sale) }}</td>
                   <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.subscription) }}</td>
                   <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.workspace) }}</td>
-                  <td class="px-4 py-3 text-right font-black">{{ formatAmount(totals.all) }} ETB</td>
+                  <td class="px-3 py-2 text-right font-bold">{{ formatAmount(totals.all) }} ETB</td>
                 </tr>
               </tfoot>
             </table>
