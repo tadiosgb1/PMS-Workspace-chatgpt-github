@@ -18,10 +18,17 @@
       <div v-else-if="error" class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{{ error }}</div>
       <template v-else>
         <div class="grid grid-cols-2 gap-2.5 xl:grid-cols-4">
-          <article v-for="card in cards" :key="card.label" class="rounded-lg border border-slate-200/80 bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">{{ card.label }}</p>
-            <p class="mt-1.5 text-lg font-bold tracking-tight text-slate-900 tabular-nums sm:text-xl">{{ formatAmount(card.value) }} <span class="text-[10px] font-medium text-slate-400">ETB</span></p>
-            <p class="mt-1 text-[11px] text-slate-500">{{ card.note }}</p>
+          <article v-for="card in cards" :key="card.label" class="relative overflow-hidden rounded-lg border border-slate-200/80 bg-white p-3 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">{{ card.label }}</span>
+              <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-500"><i :class="['fas', card.icon, 'text-[11px]']"></i></span>
+            </div>
+            <p class="mt-1 text-lg font-bold tracking-tight text-slate-900 tabular-nums sm:text-xl">{{ formatAmount(card.value) }} <span class="text-[10px] font-medium text-slate-400">ETB</span></p>
+            <div class="mt-1 flex items-center justify-between gap-2">
+              <span class="text-[10px] text-slate-400">{{ card.note }}</span>
+              <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-500">Total</span>
+            </div>
+            <span class="absolute bottom-0 left-0 h-[2px] w-full bg-primary/60"></span>
           </article>
         </div>
 
@@ -38,13 +45,17 @@
             <p v-else class="py-12 text-center text-xs text-slate-400">No monthly revenue data returned.</p>
           </div>
 
-          <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="font-black text-slate-900">Revenue Mix</h2>
-            <p class="mt-1 text-xs text-slate-400">Total reported revenue by category</p>
+          <div class="rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-xs font-bold text-slate-800">Revenue Mix</h2>
+              <span class="rounded-full bg-primary/10 px-2 py-1 text-[9px] font-bold text-primary">BY CATEGORY</span>
+            </div>
+            <p class="mt-0.5 text-[10px] text-slate-400">Share of total reported revenue</p>
             <div class="mt-4 space-y-3.5">
               <div v-for="stream in streams" :key="stream.key">
-                <div class="mb-1 flex items-center justify-between gap-2 text-[10px] font-semibold">
-                  <span>{{ stream.label }}</span><span class="tabular-nums">{{ formatAmount(stream.value) }} ETB</span>
+                <div class="mb-1 flex items-center justify-between gap-2">
+                  <span class="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600">{{ stream.label }}</span>
+                  <span class="text-[10px] font-semibold tabular-nums text-slate-700">{{ formatAmount(stream.value) }} <span class="font-normal text-slate-400">ETB</span></span>
                 </div>
                 <div class="h-2 overflow-hidden rounded-full bg-slate-100">
                   <div class="h-full rounded-full bg-primary" :style="{ width: stream.share + '%' }"></div>
@@ -56,9 +67,12 @@
         </section>
 
         <section class="overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-          <div class="border-b border-slate-100 px-4 py-3">
-            <h2 class="font-black text-slate-900">Monthly Revenue Breakdown</h2>
-            <p class="mt-1 text-xs text-slate-400">Values are loaded directly from the get_revenue_report endpoint.</p>
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
+            <div>
+              <h2 class="text-xs font-bold text-slate-800">Monthly Revenue Breakdown</h2>
+              <p class="mt-0.5 text-[10px] text-slate-400">Monthly totals by revenue stream</p>
+            </div>
+            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-semibold text-slate-500">{{ monthlyRows.length }} {{ monthlyRows.length === 1 ? 'MONTH' : 'MONTHS' }}</span>
           </div>
           <div v-if="!monthlyRows.length" class="p-8 text-center text-xs text-slate-400">No revenue records are available.</div>
           <div v-else class="overflow-x-auto">
@@ -66,18 +80,18 @@
               <thead class="bg-slate-50/80 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 <tr>
                   <th class="px-3 py-2">Month</th>
-                  <th class="px-4 py-3 text-right">Rent</th>
-                  <th class="px-4 py-3 text-right">Sale</th>
-                  <th class="px-4 py-3 text-right">Subscription</th>
-                  <th class="px-4 py-3 text-right">Workspace</th>
-                  <th class="px-4 py-3 text-right">Total</th>
+                  <th class="px-3 py-2 text-right">Rent</th>
+                  <th class="px-3 py-2 text-right">Sale</th>
+                  <th class="px-3 py-2 text-right">Subscription</th>
+                  <th class="px-3 py-2 text-right">Workspace</th>
+                  <th class="px-3 py-2 text-right">Total</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 <tr v-for="month in monthlyRows" :key="month.month" class="hover:bg-slate-50">
                   <td class="px-3 py-2 font-semibold text-slate-700">{{ month.label }}</td>
                   <td class="px-3 py-2 text-right tabular-nums text-slate-500">{{ formatAmount(month.rent) }}</td>
-                  <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.sale) }}</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-500">{{ formatAmount(month.sale) }}</td>
                   <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.subscription) }}</td>
                   <td class="px-4 py-3 text-right tabular-nums">{{ formatAmount(month.workspace) }}</td>
                   <td class="px-3 py-2 text-right font-bold tabular-nums text-slate-800">{{ formatAmount(month.total) }} ETB</td>
@@ -87,7 +101,7 @@
                 <tr>
                   <td class="px-3 py-2 font-bold">Total</td>
                   <td class="px-3 py-2 text-right font-semibold">{{ formatAmount(totals.rent) }}</td>
-                  <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.sale) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold">{{ formatAmount(totals.sale) }}</td>
                   <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.subscription) }}</td>
                   <td class="px-4 py-3 text-right font-bold">{{ formatAmount(totals.workspace) }}</td>
                   <td class="px-3 py-2 text-right font-bold">{{ formatAmount(totals.all) }} ETB</td>
@@ -148,10 +162,10 @@ export default {
     },
     cards() {
       return [
-        { label: "Total Revenue", value: this.totals.all, note: "All reported revenue streams" },
-        { label: "Sales Revenue", value: this.totals.sale, note: "Property sales" },
-        { label: "Subscription Revenue", value: this.totals.subscription, note: "Subscription payments" },
-        { label: "Rent & Workspace", value: this.totals.rent + this.totals.workspace, note: "Rental and workspace revenue" }
+        { label: "Total Revenue", value: this.totals.all, note: "All revenue streams", icon: "fa-wallet" },
+        { label: "Sales Revenue", value: this.totals.sale, note: "Property sales", icon: "fa-house" },
+        { label: "Subscription Revenue", value: this.totals.subscription, note: "Subscription payments", icon: "fa-repeat" },
+        { label: "Rent & Workspace", value: this.totals.rent + this.totals.workspace, note: "Rental and workspace", icon: "fa-building" }
       ];
     },
     streams() {
