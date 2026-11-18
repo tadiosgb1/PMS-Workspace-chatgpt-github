@@ -10,6 +10,7 @@
 
       <!-- Render appropriate dashboard -->
       <SuperAdminDashboard v-if="isSuperuser" />
+      <DeveloperDashboard v-else-if="isDeveloper" />
       <OwnerDashboard v-else />
     </div>
   </div>
@@ -18,19 +19,23 @@
 <script>
 import SuperAdminDashboard from './SuperAdminDashboard.vue'
 import OwnerDashboard from './OwnerDashboard.vue'
+import DeveloperDashboard from './DeveloperDashboard.vue'
 
 export default {
   name: 'Dashboard',
   components: {
     SuperAdminDashboard,
-    OwnerDashboard
+    OwnerDashboard,
+    DeveloperDashboard
   },
   data() {
     return {
-      isSuperuser: false
+      isSuperuser: false,
+      isDeveloper: false
     }
   },
   created() {
+    this.isDeveloper = localStorage.getItem("is_developer") === "true"
     // Check superuser status from localStorage
     const storedUser = localStorage.getItem('user')
     const isSuper = localStorage.getItem('is_superuser')
