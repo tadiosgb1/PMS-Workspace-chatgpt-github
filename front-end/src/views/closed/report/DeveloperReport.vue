@@ -2,7 +2,7 @@
   <section class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50/50 p-4 sm:p-6 space-y-6">
     <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
       <div>
-        <div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center bg-violet-100 text-violet-700"><i class="fas fa-file-lines text-lg"></i></span><div><p class="text-[10px] font-black uppercase tracking-[.2em] text-violet-600">Off-plan portfolio</p><h1 class="text-2xl font-black text-slate-900">Developer Report</h1></div></div>
+        <div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center bg-violet-100 text-violet-700"><i class="fas fa-file-lines text-lg"></i></span><div><p class="text-[10px] font-black uppercase tracking-[.2em] text-violet-600">Off-plan portfolio</p><h1 class="text-2xl font-bold text-slate-900">Developer Report</h1></div></div>
         <p class="text-sm text-slate-500 mt-1">Off-plan developer performance and project summary.</p>
       </div>
       <p v-if="report?.generated_at" class="text-xs text-slate-500">Generated {{ formatDate(report.generated_at) }}</p>
@@ -12,8 +12,8 @@
     <template v-else>
       <div class="flex items-center gap-3 border-y border-violet-200 bg-violet-50/70 px-4 py-3"><span class="grid h-10 w-10 place-items-center bg-violet-100 text-violet-700"><i class="fas fa-user-tie text-lg"></i></span><div><p class="text-[10px] font-black uppercase tracking-wider text-violet-600">Prepared for</p><p class="text-base font-extrabold text-slate-900">{{ report?.developer_name || "Developer" }}</p></div><span class="ml-auto border border-violet-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-violet-700">Performance summary</span></div>
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        <article v-for="metric in metrics" :key="metric.key" class="min-w-0 min-h-[132px] border-t-4 border-x border-b border-slate-200 bg-white p-4 shadow-sm flex flex-col justify-between gap-3" :class="metric.accent">
-          <div class="flex items-start justify-between gap-2"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 break-words">{{ metric.label }}</p><span class="grid h-9 w-9 shrink-0 place-items-center" :class="metric.iconClass"><i :class="metric.icon"></i></span></div>
+        <article v-for="metric in metrics" :key="metric.key" class="min-w-0 min-h-[104px] border-t-2 border-x border-b border-slate-200 bg-white p-3 shadow-sm flex flex-col justify-between gap-2" :class="metric.accent">
+          <div class="flex items-start justify-between gap-2"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 break-words">{{ metric.label }}</p><span class="grid h-8 w-8 shrink-0 place-items-center" :class="metric.iconClass"><i :class="metric.icon"></i></span></div>
           <p class="text-2xl font-black text-slate-900 leading-tight break-words">{{ formatValue(report?.summary?.[metric.key]) }}</p>
         </article>
       </div>
