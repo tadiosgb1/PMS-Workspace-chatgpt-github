@@ -310,8 +310,8 @@ export default {
 
           const filteredChildren = item.children
             .filter(child => {
-              if (child.developerOnly && !this.isDeveloper) return false;
-              if (child.ownerOnly && this.isDeveloper) return false;
+              if (child.developerOnly) return this.isDeveloper;
+              if (child.ownerOnly) return !this.isDeveloper;
               if (!this.isRoleAllowed(child.minRole || item.minRole, child.explicitRoles)) return false;
               if (child.permission && !this.checkPermission(child.permission)) return false;
               return true;
@@ -327,6 +327,7 @@ export default {
         })
         .filter(item => {
           if (!item) return false;
+          if (item.id === "reports" && this.isDeveloper) return true;
           if (!this.isRoleAllowed(item.minRole, item.explicitRoles)) return false;
           if (item.permission && !this.checkPermission(item.permission)) return false;
           return true;
