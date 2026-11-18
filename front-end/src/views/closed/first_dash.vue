@@ -36,13 +36,17 @@ export default {
   },
   created() {
     this.isDeveloper = localStorage.getItem("is_developer") === "true"
+    const role = String(localStorage.getItem("role") || "").toLowerCase()
+    let groups = []
+    try { groups = JSON.parse(localStorage.getItem("groups") || "[]").map(g => typeof g === "string" ? g.toLowerCase() : String(g?.name || g?.group || "").toLowerCase()) } catch { groups = [] }
+    this.isSuperuser = localStorage.getItem("is_superuser") === "true" || ["superuser", "admin", "super_staff"].includes(role) || groups.some(g => ["superuser", "admin", "super_staff"].includes(g))
     // Check superuser status from localStorage
     const storedUser = localStorage.getItem('user')
     const isSuper = localStorage.getItem('is_superuser')
 
     if (storedUser) {
       const user = JSON.parse(storedUser)
-      this.isSuperuser = user.is_superuser === true
+      this.isSuperuser = this.isSuperuser || user.is_superuser === true
     } else if (isSuper) {
       this.isSuperuser = isSuper === 'true'
     }
