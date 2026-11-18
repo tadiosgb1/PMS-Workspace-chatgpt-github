@@ -128,6 +128,7 @@ export default {
       userRole: "tenant",
       isDeveloper: false,
       isSuperContext: false,
+      isOwnerContext: false,
       userPermissions: [],
       openMenuIndex: null,
 
@@ -309,7 +310,7 @@ export default {
           const filteredChildren = item.children
             .filter(child => {
               if (child.developerOnly) return this.isDeveloper && !this.isSuperContext;
-              if (child.ownerOnly) return !this.isDeveloper && !this.isSuperContext;
+              if (child.ownerOnly) return this.isOwnerContext && !this.isDeveloper && !this.isSuperContext;
               if (child.superOnly) return this.isSuperContext;
               if (!this.isRoleAllowed(child.minRole || item.minRole, child.explicitRoles)) return false;
               if (child.permission && !this.checkPermission(child.permission)) return false;
@@ -367,6 +368,7 @@ export default {
 
     this.isDeveloper = localStorage.getItem("is_developer") === "true";
     this.isSuperContext = ["superuser", "super_staff", "admin"].includes(this.userRole) || localStorage.getItem("is_superuser") === "true";
+    this.isOwnerContext = this.userRole === "owner";
 
     try {
       this.userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
