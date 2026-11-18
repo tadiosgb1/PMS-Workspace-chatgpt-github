@@ -127,6 +127,7 @@ export default {
       showTitle: false,
       userRole: "tenant",
       isDeveloper: false,
+      isSuperContext: false,
       userPermissions: [],
       openMenuIndex: null,
 
@@ -233,12 +234,9 @@ export default {
           children: [
             { id: "report_owner", name: "Owner Report", route: "OwnerReport-view", ownerOnly: true },
             { id: "report_developer", name: "Developer Report", route: "OffplanDeveloperReport-view", developerOnly: true },
-            { id: "report_properties", name: "Properties Report", route: "PropertiesReport-view", minRole: "manager" },
-            { id: "report_offplan", name: "Off-plan Properties Report", route: "OffplanPropertiesReport-view", minRole: "manager" },
-            { id: "report_workspace", name: "Workspace Report", route: "WorkspaceReport-view", minRole: "manager" },
-            { id: "report_clients", name: "Client Report", route: "ClientReport-view", explicitRoles: ["superuser"] },
-            { id: "report_subscriptions", name: "Subscription Report", route: "SubscriptionReport-view", explicitRoles: ["superuser"] },
-            { id: "report_revenues", name: "Revenues Report", route: "RevenuesReport-view", explicitRoles: ["superuser"] },
+            { id: "report_user_types", name: "User Type Report", route: "UserTypeReport-view", superOnly: true },
+            { id: "report_subscriptions", name: "Subscription Report", route: "SubscriptionReport-view", superOnly: true },
+            { id: "report_revenues", name: "Revenue Report", route: "RevenuesReport-view", superOnly: true },
           ],
         },
         {
@@ -310,8 +308,9 @@ export default {
 
           const filteredChildren = item.children
             .filter(child => {
-              if (child.developerOnly) return this.isDeveloper;
-              if (child.ownerOnly) return !this.isDeveloper;
+              if (child.developerOnly) return this.isDeveloper && !this.isSuperContext;
+              if (child.ownerOnly) return !this.isDeveloper && !this.isSuperContext;
+              if (child.superOnly) return this.isSuperContext;
               if (!this.isRoleAllowed(child.minRole || item.minRole, child.explicitRoles)) return false;
               if (child.permission && !this.checkPermission(child.permission)) return false;
               return true;
@@ -327,7 +326,7 @@ export default {
         })
         .filter(item => {
           if (!item) return false;
-          if (item.id === "reports" && this.isDeveloper) return true;
+          if (item.id === "reports") return true;
           if (!this.isRoleAllowed(item.minRole, item.explicitRoles)) return false;
           if (item.permission && !this.checkPermission(item.permission)) return false;
           return true;
@@ -367,6 +366,7 @@ export default {
     }
 
     this.isDeveloper = localStorage.getItem("is_developer") === "true";
+    this.isSuperContext = ["superuser", "super_staff", "admin"].includes(this.userRole) || localStorage.getItem("is_superuser") === "true";
 
     try {
       this.userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
