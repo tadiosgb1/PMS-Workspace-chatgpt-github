@@ -126,6 +126,7 @@ export default {
     return {
       showTitle: false,
       userRole: "tenant",
+      isDeveloper: false,
       userPermissions: [],
       openMenuIndex: null,
 
@@ -230,6 +231,8 @@ export default {
           icon: "fas fa-chart-column",
           minRole: "manager",
           children: [
+            { id: "report_owner", name: "Owner Report", route: "OwnerReport-view", ownerOnly: true },
+            { id: "report_developer", name: "Developer Report", route: "OffplanDeveloperReport-view", developerOnly: true },
             { id: "report_properties", name: "Properties Report", route: "PropertiesReport-view", minRole: "manager" },
             { id: "report_offplan", name: "Off-plan Properties Report", route: "OffplanPropertiesReport-view", minRole: "manager" },
             { id: "report_workspace", name: "Workspace Report", route: "WorkspaceReport-view", minRole: "manager" },
@@ -307,6 +310,8 @@ export default {
 
           const filteredChildren = item.children
             .filter(child => {
+              if (child.developerOnly && !this.isDeveloper) return false;
+              if (child.ownerOnly && this.isDeveloper) return false;
               if (!this.isRoleAllowed(child.minRole || item.minRole, child.explicitRoles)) return false;
               if (child.permission && !this.checkPermission(child.permission)) return false;
               return true;
@@ -359,6 +364,8 @@ export default {
     } catch {
       this.userRole = "tenant";
     }
+
+    this.isDeveloper = localStorage.getItem("is_developer") === "true";
 
     try {
       this.userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
