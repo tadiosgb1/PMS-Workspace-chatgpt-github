@@ -1,15 +1,50 @@
 <template>
-<div class="min-h-screen bg-slate-50 p-5 text-sm text-slate-800"><div class="mx-auto max-w-[1600px] space-y-5">
-<header class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div><div class="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-primary">Alpha PMS · Executive Report</div></div><button @click="exportCsv" class="rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white"><i class="fas fa-download mr-2"></i>Export</button></header>
-<div class="grid grid-cols-2 gap-3 lg:grid-cols-4"><div v-for="c in cards" :key="c.label" class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div class="text-[10px] font-black uppercase tracking-wider text-slate-400">{{c.label}}</div><div class="mt-2 text-2xl font-black text-slate-900">{{c.value}}</div><div class="mt-1 text-[11px] font-semibold text-slate-500">{{c.note}}</div></div></div>
-<section class="grid gap-5 lg:grid-cols-[.8fr_1.2fr]"><div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><h2 class="font-black">Plan Mix</h2><p class="mt-1 text-xs text-slate-400">Current sample account distribution</p><div class="mt-6 space-y-5"><div v-for="p in plans" :key="p.name"><div class="mb-1 flex justify-between text-xs font-bold"><span>{{p.name}}</span><span>{{p.subscribers}} subscribers</span></div><div class="h-2 rounded-full bg-slate-100"><div class="h-full rounded-full bg-primary" :style="{width:p.share+'%'}"></div></div></div></div></div>
-<div class="rounded-xl border border-slate-200 bg-white shadow-sm"><div class="border-b border-slate-100 p-4"><h2 class="font-black">Subscription Ledger</h2><p class="mt-1 text-xs text-slate-400">Aligned with plans and subscription payment concepts in the PMS</p></div><div class="overflow-x-auto"><table class="w-full text-left"><thead class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400"><tr><th class="px-4 py-3">Account</th><th class="px-4 py-3">Plan</th><th class="px-4 py-3">Billing</th><th class="px-4 py-3">Renewal</th><th class="px-4 py-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100"><tr v-for="s in subscriptions" :key="s.id" class="hover:bg-slate-50"><td class="px-4 py-3 font-bold">{{s.account}}</td><td class="px-4 py-3 text-xs">{{s.plan}}</td><td class="px-4 py-3 text-xs font-semibold">{{s.amount.toLocaleString()}} ETB</td><td class="px-4 py-3 text-xs text-slate-500">{{s.renewal}}</td><td class="px-4 py-3"><span :class="s.status==='Active'?'bg-emerald-50 text-emerald-700':'bg-amber-50 text-amber-700'" class="rounded-full px-2 py-1 text-[10px] font-bold">{{s.status}}</span></td></tr></tbody></table></div></div></section>
-</div></div></template>
+  <section class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 p-4 sm:p-6 space-y-6">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-5">
+      <div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center bg-emerald-100 text-emerald-700"><i class="fas fa-layer-group text-lg"></i></span><div><p class="text-[10px] font-black uppercase tracking-[.2em] text-emerald-700">Platform analytics</p><h1 class="text-2xl font-black text-slate-900">Subscription Report</h1><p class="text-sm text-slate-500 mt-1">Subscribers and revenue by plan.</p></div></div>
+      <button @click="exportCsv" class="inline-flex items-center gap-2 bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-700"><i class="fas fa-download"></i> Export CSV</button>
+    </header>
+    <div v-if="loading" class="py-16 text-center text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Loading subscription report…</div>
+    <div v-else-if="error" class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{{ error }}</div>
+    <template v-else>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><article v-for="item in highlights" :key="item.label" class="border-l-4 border-y border-r border-slate-200 bg-white p-4 shadow-sm" :class="item.accent"><div class="flex items-center justify-between"><p class="text-xs font-bold uppercase tracking-wide text-slate-500">{{ item.label }}</p><span class="grid h-9 w-9 place-items-center" :class="item.iconBg"><i :class="[item.icon,item.iconColor]"></i></span></div><p class="mt-4 text-2xl font-black text-slate-900 tabular-nums">{{ item.value }}</p></article></div>
+      <section class="border border-slate-200 bg-white"><div class="border-b border-slate-200 p-4"><h2 class="font-extrabold text-slate-900"><i class="fas fa-chart-column text-emerald-600 mr-2"></i>Plan performance</h2><p class="mt-1 text-xs text-slate-500">Plan list is generated dynamically from the API response.</p></div>
+        <div v-if="!rows.length" class="p-8 text-center text-sm text-slate-500">No subscription plan data is available.</div>
+        <div v-else class="overflow-x-auto"><table class="w-full min-w-[520px] text-left text-sm"><thead class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-500"><tr><th class="px-4 py-3">Plan</th><th class="px-4 py-3 text-right">Subscribers</th><th class="px-4 py-3 text-right">Revenue</th><th class="px-4 py-3">Share</th></tr></thead><tbody class="divide-y divide-slate-100"><tr v-for="row in rows" :key="row.plan" class="hover:bg-emerald-50/40"><td class="px-4 py-4 font-bold text-slate-800"><i class="fas fa-cube text-emerald-600 mr-2"></i>{{ row.plan }}</td><td class="px-4 py-4 text-right font-semibold tabular-nums">{{ format(row.users) }}</td><td class="px-4 py-4 text-right font-bold text-emerald-700 tabular-nums">{{ format(row.revenue) }} ETB</td><td class="px-4 py-4"><div class="flex items-center gap-3"><div class="h-2 min-w-20 flex-1 bg-slate-100"><div class="h-2 bg-emerald-500" :style="{width: row.share + '%'}"></div></div><span class="w-10 text-right text-xs font-bold text-slate-500">{{ row.share }}%</span></div></td></tr></tbody></table></div>
+      </section>
+    </template>
+  </section>
+</template>
 <script>
-export default{name:"SubscriptionReport",data(){return{subscriptions:[
-{id:1,account:"Alpha Realty Group",plan:"Enterprise",amount:18500,renewal:"2026-11-15",status:"Active"},
-{id:2,account:"Horizon Properties",plan:"Professional",amount:9200,renewal:"2026-10-28",status:"Active"},
-{id:3,account:"Blue Nile Estates",plan:"Professional",amount:9200,renewal:"2026-10-19",status:"Active"},
-{id:4,account:"Meklit Workspace",plan:"Starter",amount:4200,renewal:"2026-10-09",status:"Pending"},
-{id:5,account:"Sunrise Holdings",plan:"Enterprise",amount:18500,renewal:"2026-12-02",status:"Active"}],plans:[{name:"Enterprise",subscribers:2,share:40},{name:"Professional",subscribers:2,share:40},{name:"Starter",subscribers:1,share:20}]}},computed:{cards(){return[{label:"Active subscriptions",value:this.subscriptions.filter(s=>s.status==="Active").length,note:"Recurring accounts"},{label:"Sample MRR",value:"59,600 ETB",note:"Before adjustments"},{label:"Avg. plan value",value:"11,920 ETB",note:"Per account / cycle"},{label:"Renewals due",value:2,note:"Within 30 days"}]}},methods:{exportCsv(){const rows=[["Account","Plan","Amount","Renewal","Status"],...this.subscriptions.map(s=>[s.account,s.plan,s.amount,s.renewal,s.status])];const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(",")).join("\n")],{type:"text/csv"}));a.download="alpha-pms-subscription-report.csv";a.click();URL.revokeObjectURL(a.href)}}}
+export default {
+  name: "SubscriptionReport",
+  data() { return { report: null, loading: true, error: "" }; },
+  computed: {
+    rows() {
+      return (this.report?.plans || []).map((plan, index) => ({ plan: String(plan), users: Number(this.report?.users?.[index]) || 0, revenue: Number(this.report?.revenue?.[index]) || 0 }))
+        .map(row => ({ ...row, share: this.totalUsers ? Math.round(row.users / this.totalUsers * 100) : 0 }));
+    },
+    totalUsers() { return this.rows.reduce((sum, row) => sum + row.users, 0); },
+    totalRevenue() { return this.rows.reduce((sum, row) => sum + row.revenue, 0); },
+    highlights() { return [
+      { label: "Total subscribers", value: this.format(this.totalUsers), icon: "fas fa-users", iconBg: "bg-sky-50", iconColor: "text-sky-600", accent: "border-l-sky-500" },
+      { label: "Plans available", value: this.format(this.rows.length), icon: "fas fa-layer-group", iconBg: "bg-violet-50", iconColor: "text-violet-600", accent: "border-l-violet-500" },
+      { label: "Total plan revenue", value: this.format(this.totalRevenue) + " ETB", icon: "fas fa-coins", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", accent: "border-l-emerald-500" }
+    ]; }
+  },
+  async created() {
+    try { this.report = await this.$apiGet("/get_subscription_report"); }
+    catch (error) { console.error(error); this.error = "Unable to load subscription report."; }
+    finally { this.loading = false; }
+  },
+  methods: {
+    format(value) { return Number(value || 0).toLocaleString(); },
+    exportCsv() {
+      const rows = [["Plan", "Subscribers", "Revenue"], ...this.rows.map(row => [row.plan, row.users, row.revenue])];
+      const csv = rows.map(row => row.map(value => '"' + String(value).replaceAll('"', '""') + '"').join(",")).join("\n");
+      const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+      link.download = "subscription-report.csv"; link.click(); URL.revokeObjectURL(link.href);
+    }
+  }
+};
 </script>
