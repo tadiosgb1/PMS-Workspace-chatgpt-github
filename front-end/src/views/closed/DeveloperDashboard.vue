@@ -7,9 +7,9 @@
     <div v-if="loading" class="py-16 text-center text-slate-500">Loading developer dashboard…</div>
     <div v-else-if="error" class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{{ error }}</div>
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-      <article v-for="metric in metrics" :key="metric.key" class="min-w-0 min-h-[142px] border-l-4 border-y border-r border-slate-200 bg-white p-4 shadow-sm flex flex-col justify-between gap-4" :class="metric.accent">
-        <div class="flex items-center justify-between gap-2"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 break-words">{{ metric.label }}</p><span class="grid h-10 w-10 shrink-0 place-items-center" :class="metric.iconClass"><i :class="metric.icon"></i></span></div>
-        <p class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight break-words">{{ formatValue(report?.[metric.key]) }}</p>
+      <article v-for="metric in metrics" :key="metric.key" class="min-w-0 min-h-[108px] border-l-2 border-y border-r border-slate-200 bg-white p-3 shadow-sm flex flex-col justify-between gap-2" :class="metric.accent">
+        <div class="flex items-center justify-between gap-2"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 break-words">{{ metric.label }}</p><span class="grid h-8 w-8 shrink-0 place-items-center" :class="metric.iconClass"><i :class="metric.icon"></i></span></div>
+        <p class="text-2xl font-bold text-slate-900 leading-tight break-words">{{ formatValue(report?.[metric.key]) }}</p>
       </article>
     </div>
   </section>
