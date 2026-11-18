@@ -12,7 +12,7 @@
     <template v-else>
       <div class="flex items-center gap-3 border-y border-violet-200 bg-violet-50/70 px-4 py-3"><span class="grid h-10 w-10 place-items-center bg-violet-100 text-violet-700"><i class="fas fa-user-tie text-lg"></i></span><div><p class="text-[10px] font-black uppercase tracking-wider text-violet-600">Prepared for</p><p class="text-base font-extrabold text-slate-900">{{ report?.developer_name || "Developer" }}</p></div><span class="ml-auto border border-violet-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-violet-700">Performance summary</span></div>
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        <article v-for="metric in metrics" :key="metric.key" class="min-w-0 min-h-[104px] border-t-2 border-x border-b border-slate-200 bg-white p-3 shadow-sm flex flex-col justify-between gap-2" :class="metric.accent">
+        <article v-for="metric in metrics" :key="metric.key" class="min-w-0 min-h-[104px] border-l-2 border-y border-r border-slate-200 bg-white p-3 shadow-sm flex flex-col justify-between gap-2" :class="metric.accent">
           <div class="flex items-start justify-between gap-2"><p class="text-xs font-bold uppercase tracking-wide text-slate-500 break-words">{{ metric.label }}</p><span class="grid h-8 w-8 shrink-0 place-items-center" :class="metric.iconClass"><i :class="metric.icon"></i></span></div>
           <p class="text-2xl font-black text-slate-900 leading-tight break-words">{{ formatValue(report?.summary?.[metric.key]) }}</p>
         </article>
@@ -40,15 +40,15 @@ export default {
   },
   computed: {
     metrics() { return [
-        { key: "total_projects", label: "Total Projects", icon: "fas fa-building", iconClass: "bg-indigo-50 text-indigo-600", accent: "border-t-indigo-500" },
-        { key: "total_applications", label: "Total Applications", icon: "fas fa-file-signature", iconClass: "bg-sky-50 text-sky-600", accent: "border-t-sky-500" },
-        { key: "pending_applications", label: "Pending Applications", icon: "fas fa-hourglass-half", iconClass: "bg-amber-50 text-amber-600", accent: "border-t-amber-500" },
-        { key: "approved_applications", label: "Approved Applications", icon: "fas fa-circle-check", iconClass: "bg-emerald-50 text-emerald-600", accent: "border-t-emerald-500" },
-        { key: "rejected_applications", label: "Rejected Applications", icon: "fas fa-circle-xmark", iconClass: "bg-rose-50 text-rose-600", accent: "border-t-rose-500" },
-        { key: "agreed_revenue", label: "Agreed Revenue", icon: "fas fa-handshake", iconClass: "bg-violet-50 text-violet-600", accent: "border-t-violet-500" },
-        { key: "payments_received", label: "Payments Received", icon: "fas fa-money-bill-transfer", iconClass: "bg-teal-50 text-teal-600", accent: "border-t-teal-500" },
-        { key: "outstanding_balance", label: "Outstanding Balance", icon: "fas fa-wallet", iconClass: "bg-orange-50 text-orange-600", accent: "border-t-orange-500" },
-        { key: "overdue_installments", label: "Overdue Installments", icon: "fas fa-calendar-days", iconClass: "bg-red-50 text-red-600", accent: "border-t-red-500" }
+        { key: "total_projects", label: "Total Projects", icon: "fas fa-building", iconClass: "bg-indigo-50 text-indigo-600", accent: "border-l-indigo-500" },
+        { key: "total_applications", label: "Total Applications", icon: "fas fa-file-signature", iconClass: "bg-sky-50 text-sky-600", accent: "border-l-sky-500" },
+        { key: "pending_applications", label: "Pending Applications", icon: "fas fa-hourglass-half", iconClass: "bg-amber-50 text-amber-600", accent: "border-l-amber-500" },
+        { key: "approved_applications", label: "Approved Applications", icon: "fas fa-circle-check", iconClass: "bg-emerald-50 text-emerald-600", accent: "border-l-emerald-500" },
+        { key: "rejected_applications", label: "Rejected Applications", icon: "fas fa-circle-xmark", iconClass: "bg-rose-50 text-rose-600", accent: "border-l-rose-500" },
+        { key: "agreed_revenue", label: "Agreed Revenue", icon: "fas fa-handshake", iconClass: "bg-violet-50 text-violet-600", accent: "border-l-violet-500" },
+        { key: "payments_received", label: "Payments Received", icon: "fas fa-money-bill-transfer", iconClass: "bg-teal-50 text-teal-600", accent: "border-l-teal-500" },
+        { key: "outstanding_balance", label: "Outstanding Balance", icon: "fas fa-wallet", iconClass: "bg-orange-50 text-orange-600", accent: "border-l-orange-500" },
+        { key: "overdue_installments", label: "Overdue Installments", icon: "fas fa-calendar-days", iconClass: "bg-red-50 text-red-600", accent: "border-l-red-500" }
       ];
     }
   },
