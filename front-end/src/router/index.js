@@ -53,6 +53,8 @@ import PropertiesReport from '../views/closed/report/PropertiesReport.vue'
 import OffplanPropertiesReport from '../views/closed/report/OffplanPropertiesReport.vue'
 import RevenuesReport from '../views/closed/report/RevenuesReport.vue'
 import WorkspaceReport from '../views/closed/report/WorkspaceReport.vue'
+import DeveloperReport from '../views/closed/report/DeveloperReport.vue'
+import OwnerDashboard from '../views/closed/OwnerDashboard.vue'
 import CowrkingSpaces from '../views/closed/coworkingSpace/view.vue'
 import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
 import Contacts from '../views/closed/contacts/view.vue'
@@ -334,6 +336,8 @@ const routes = [
       { path: '/tenants', name: 'tenants', component: Tenants },
       { path: '/payments', name: 'payments', component: Payments },
       { path: '/reports', name: 'reports', component: Reports },
+  { path: '/reports/owner', name: 'OwnerReport-view', component: OwnerDashboard },
+  { path: '/reports/offplan-developer', name: 'OffplanDeveloperReport-view', component: DeveloperReport },
       { path: '/reports/clients', name: 'ClientReport-view', component: ClientReport, meta: { role: 'superuser' } },
       { path: '/reports/subscriptions', name: 'SubscriptionReport-view', component: SubscriptionReport, meta: { role: 'superuser' } },
       { path: '/reports/properties', name: 'PropertiesReport-view', component: PropertiesReport },
