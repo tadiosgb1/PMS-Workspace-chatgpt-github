@@ -190,6 +190,7 @@ export default {
         localStorage.setItem("userId", id);
         localStorage.setItem("is_superuser", is_superuser);
         localStorage.setItem("phone_number", phone_number);
+        localStorage.setItem("role", normalizedRole);
 
         localStorage.setItem("is_developer", String(is_developer === true || String(is_developer).toLowerCase() === "true"));
 
