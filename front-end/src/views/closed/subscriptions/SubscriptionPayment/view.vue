@@ -126,7 +126,7 @@
                 <th class="px-6 py-4 text-left">Paid At</th>
                 <th class="px-6 py-4 text-left">Valid Until/End Date</th>
                 <th class="px-6 py-4 text-center">Receipt</th>
-                <th v-if="$hasPermission('pms.change_subscriptionpayment')" class="px-6 py-4 text-right">Actions</th>
+                <th v-if="canApprovePayments" class="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -188,7 +188,7 @@
                   </button>
                   <span v-else class="text-gray-400 text-sm">No Slip</span>
                 </td>
-                <td v-if="$hasPermission('pms.change_subscriptionpayment')" class="px-6 py-4 text-right">
+                <td v-if="canApprovePayments" class="px-6 py-4 text-right">
                   <div class="flex justify-end gap-2">
                     <button 
                       v-if="p.status !== 'paid'"
@@ -268,6 +268,7 @@
 import Toast from "@/components/Toast.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Loading from "@/components/Loading.vue";
+import { getRole } from "@/utils/authRole";
 
 export default {
   components: { Toast, ConfirmModal, Loading },
@@ -293,6 +294,14 @@ export default {
   },
 
   computed: {
+    canApprovePayments() {
+      // Payment approval is reserved for platform-level administrators.
+      const isSuperuser = ["true", "1"].includes(
+        String(localStorage.getItem("is_superuser") ?? localStorage.getItem("is_super_user") ?? "").trim().toLowerCase()
+      );
+      return isSuperuser || ["superuser", "super_staff", "admin"].includes(getRole());
+    },
+
     filteredAndSortedPayments() {
       let list = [...this.payments];
 
@@ -351,7 +360,7 @@ export default {
 
         if (this.statusFilter) params.status = this.statusFilter;
 
-        if (localStorage.getItem("is_superuser") !== "true") {
+        if (!this.canApprovePayments) {
           params.user_id = localStorage.getItem("userId");
         }
 
@@ -413,7 +422,7 @@ export default {
         };
 
         if (this.statusFilter) params.status = this.statusFilter;
-        if (localStorage.getItem("is_superuser") !== "true") {
+        if (!this.canApprovePayments) {
           params.user_id = localStorage.getItem("userId");
         }
 
@@ -462,13 +471,17 @@ export default {
     },
 
     askConfirmation(action, payment) {
+      if (!this.canApprovePayments) return;
       this.selectedPayment = payment;
       this.selectedAction = action;
       this.showConfirm = true;
     },
 
     async confirmAction() {
-      if (!this.selectedPayment) return;
+      if (!this.canApprovePayments || !this.selectedPayment) {
+        this.showConfirm = false;
+        return;
+      }
 
       const newStatus = this.selectedAction === "approve" ? "complete" : "canceled";
 
