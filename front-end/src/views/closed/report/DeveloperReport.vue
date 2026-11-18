@@ -8,7 +8,7 @@
       <p v-if="report?.generated_at" class="text-xs text-slate-500">Generated {{ formatDate(report.generated_at) }}</p>
     </header>
     <div v-if="loading" class="py-16 text-center text-slate-500">Generating developer report…</div>
-    <div v-else-if="error" class="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{{ error }}</div>
+    <div v-else-if="error" class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{{ error }}</div>
     <template v-else>
       <div class="flex items-center gap-3 border-y border-violet-200 bg-violet-50/70 px-4 py-3"><span class="grid h-10 w-10 place-items-center bg-violet-100 text-violet-700"><i class="fas fa-user-tie text-lg"></i></span><div><p class="text-[10px] font-black uppercase tracking-wider text-violet-600">Prepared for</p><p class="text-base font-extrabold text-slate-900">{{ report?.developer_name || "Developer" }}</p></div><span class="ml-auto border border-violet-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-violet-700">Performance summary</span></div>
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -17,7 +17,7 @@
           <p class="text-2xl font-black text-slate-900 leading-tight break-words">{{ formatValue(report?.summary?.[metric.key]) }}</p>
         </article>
       </div>
-      <section class="rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <section class="border border-slate-200 bg-white overflow-hidden">
         <div class="p-4 border-b border-slate-200"><h2 class="font-bold text-slate-900">Projects</h2></div>
         <div v-if="!report?.projects?.length" class="p-6 text-sm text-slate-500">No project details are available in this report.</div>
         <div v-else class="overflow-x-auto">
