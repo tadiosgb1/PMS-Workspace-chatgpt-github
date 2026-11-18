@@ -48,6 +48,7 @@ import Notifications from '../views/closed/notifications/view.vue'
 import notificationDetail from '../views/closed/notifications/notificationDeatil.vue'
 import Reports from '../views/closed/report/view.vue'
 import ClientReport from '../views/closed/report/ClientReport.vue'
+import UserTypeReport from '../views/closed/report/UserTypeReport.vue'
 import SubscriptionReport from '../views/closed/report/SubscriptionReport.vue'
 import PropertiesReport from '../views/closed/report/PropertiesReport.vue'
 import OffplanPropertiesReport from '../views/closed/report/OffplanPropertiesReport.vue'
@@ -338,6 +339,7 @@ const routes = [
       { path: '/reports', name: 'reports', component: Reports },
   { path: '/reports/owner', name: 'OwnerReport-view', component: OwnerDashboard },
   { path: '/reports/offplan-developer', name: 'OffplanDeveloperReport-view', component: DeveloperReport },
+      { path: '/reports/user-types', name: 'UserTypeReport-view', component: UserTypeReport, meta: { role: 'superuser' } },
       { path: '/reports/clients', name: 'ClientReport-view', component: ClientReport, meta: { role: 'superuser' } },
       { path: '/reports/subscriptions', name: 'SubscriptionReport-view', component: SubscriptionReport, meta: { role: 'superuser' } },
       { path: '/reports/properties', name: 'PropertiesReport-view', component: PropertiesReport },
